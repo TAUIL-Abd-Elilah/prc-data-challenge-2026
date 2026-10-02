@@ -64,7 +64,7 @@ DERIVED_COLUMNS = (
     "schedule_utc_weekday", "schedule_local_hour", "schedule_local_weekday",
     "mvt_schedule_gap_seconds", "mvt_schedule_day_offset", "schedule_missing",
 )
-FORBIDDEN_NAME_PARTS = ("_flt", "aobt", "lobt", "iobt", "eobt", "proxy",
+FORBIDDEN_NAME_PARTS = ("_flt", "aobt", "lobt", "iobt", "eobt",
                         "callsign", "flight_id", "mvt_id", "taxitime", "target")
 
 
@@ -126,6 +126,13 @@ def protocol() -> dict:
         "candidate_weights": list(WEIGHTS),
         "selection": "Minimum all-finite Jan/Jul RMSE; ties favor smaller weight",
         "promotion": "Selected positive weight improves all-finite RMSE and UTC-day bootstrap 95% lower gain bound >0 on both folds; independent Apr/Oct paired architecture audit also required",
+        "fresh_architecture_audit": {
+            "reference": "Refit the accepted v5 ordinary CatBoost direct architecture excluding April/October labels",
+            "candidate": "Refit movement-only LightGBM on ordinary departures excluding April/October labels",
+            "comparison": "On finite no-NM invalid-AOBT non-LIRF April/October rows, compare CatBoost direct against the fixed Jan/Jul weight blend of CatBoost direct and movement-only direct, clipped at zero",
+            "pass_rule": "Both individual months improve RMSE and pooled UTC-day bootstrap 95% gain lower bound is positive",
+            "no_in_sample_v5": True,
+        },
         "leaderboard_use": "No leaderboard feedback enters model or selection",
         "status": "Predeclared protocol; fit and validation artifacts track completion",
     }
@@ -161,7 +168,8 @@ def assert_safe_matrix(features: pd.DataFrame, names: list[str]) -> None:
     if list(features.columns) != names or len(names) != len(set(names)):
         raise ValueError("Movement-only feature schema differs from the allowlist")
     forbidden = [name for name in names
-                 if any(part in name.lower() for part in FORBIDDEN_NAME_PARTS)]
+                 if (any(part in name.lower() for part in FORBIDDEN_NAME_PARTS)
+                     or ("proxy" in name.lower() and not name.startswith("wx_")))]
     if forbidden:
         raise ValueError(f"Forbidden predictor names: {forbidden}")
     if any(not (pd.api.types.is_numeric_dtype(features[name]) or

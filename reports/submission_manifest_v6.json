@@ -1,0 +1,16 @@
+{
+  "file": "merry-mushroom_v6.parquet",
+  "rows": 344841,
+  "columns": [
+    "MVT_ID_mvt",
+    "TAXITIME_SEC_mvt"
+  ],
+  "sha256": "3fa41955c243f2821626203b9c33f83b40f71271993f7204acdc6f0294dc161d",
+  "bytes": 4707625,
+  "all_template_ids_in_original_order": true,
+  "finite_predictions": true,
+  "prediction_min_sec": 7.770729448600491,
+  "prediction_max_sec": 108387.66171039159,
+  "prediction_mean_sec": 1039.7932482821734,
+  "predictions_above_24h": 2
+}

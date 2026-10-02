@@ -249,7 +249,7 @@ def final_predict(args):
     present = base.expert.notna().to_numpy()
     if len(base)!=344841 or not np.array_equal(present, valid):
         raise ValueError('Ranking reference coverage/order differs from cached features')
-    values = base.TAXITIME_SEC_mvt.to_numpy(dtype=float)
+    values = base.TAXITIME_SEC_mvt.to_numpy(dtype=float, copy=True)
     weight = report['selected_weight']
     values[present] = np.maximum(values[present]+weight*(base.expert.to_numpy()[present]-values[present]),0)
     base['TAXITIME_SEC_mvt'] = values
