@@ -116,6 +116,21 @@ The matched January/July ablation trains the same architecture, seed, fit indice
 
 The combined next experiment (`traffic_deep_expert.py`) keeps the depth-10/10,000-tree architecture fixed and adds those 24 neighbor plus eight runway features. Its protocol and v6 OOF reference are frozen before any v6 official result is observed. It has its own seasonal selection, fixed forward check and matched April/October feature audit against the saved depth-10 ARR model. The prepared protocol is `reports/traffic_protocol_v7.json`.
 
+Reproduce the added feature caches and the frozen traffic experiment after completing v6. Run fitting stages serially on the reference machine. The fresh audit rejects a candidate whose two-fold gates fail; final prediction rejects a candidate without every required local gate.
+
+```powershell
+python proxy_neighbour_expert.py --mode build-features
+python runway_arrival_features.py --mode build
+python traffic_deep_expert.py --mode prepare
+python traffic_deep_expert.py --mode fit
+python traffic_deep_expert.py --mode fresh-audit
+python traffic_deep_expert.py --mode final-predict
+```
+
+## Accepted v6 outcome
+
+The validated larger clock/arrival blend was finalized and its source published before upload. It was accepted over all 344,841 pairs at official RMSE **280.48 seconds**, with team rank **72nd** at 2026-10-02 22:28:39 UTC. Remote readback matched SHA-256 `3fa41955c243f2821626203b9c33f83b40f71271993f7204acdc6f0294dc161d`. The traffic experiment's architecture, features and selection protocol were already frozen before this outcome. No setting was changed from the official result. First place remains unachieved.
+
 The separate `movement_only_expert.py` protocol tests transfer from all ordinary 2025 departures to the sparse invalid-AOBT/no-NM/non-Rome gate. Its predictor allowlist removes all NM fields and off-block proxies, while retaining common movement, schedule, traffic, NOAA and released ARR fields. It is a direct taxi-time model rather than a residual-to-NM expert. Preparation does not promote or upload it; the same independent local validation gates are required.
 
 ARR summaries likewise use the complete released batch and can include an arrival whose in-block time follows the queried departure. This is retrospective challenge prediction, not a claim that every field would be available in a real-time departure forecast.

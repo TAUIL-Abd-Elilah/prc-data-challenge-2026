@@ -11,11 +11,13 @@ import argparse
 import gc
 import hashlib
 import json
+import time
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
+from catboost import CatBoostRegressor, Pool
 
 import deep_arrival_expert as arrival
 import deep_timestamp_expert as deep
@@ -335,6 +337,95 @@ def fresh_audit(args: argparse.Namespace) -> None:
     evaluate(args)
 
 
+def final_predict(args: argparse.Namespace) -> None:
+    """Fit all eligible 2025 labels only after every frozen local gate passes."""
+    report = evaluate(args)
+    if not report["promoted"]:
+        raise ValueError("Combined expert failed the predeclared local gates")
+    frozen = pd.read_parquet(args.ranking_reference)
+    if (list(frozen) != ["MVT_ID_mvt", "TAXITIME_SEC_mvt"]
+            or len(frozen) != EXPECTED_RANKING_ROWS
+            or frozen.MVT_ID_mvt.duplicated().any()
+            or frozen.MVT_ID_mvt.isna().any()
+            or not np.isfinite(frozen.TAXITIME_SEC_mvt.to_numpy(dtype=float)).all()):
+        raise ValueError("v6 ranking reference schema, IDs, or predictions changed")
+    model_path = args.output_dir / "full_2025.cbm"
+    params = deep.params(args)
+    params["iterations"] = int(np.median(
+        [row["trees"] for row in report["folds"].values()]))
+    model = CatBoostRegressor(**params)
+    fit_seconds = None
+    if not model_path.exists():
+        rows, features = load_features(args)
+        proxy = rows.proxy.to_numpy(dtype=float)
+        target = rows.target.to_numpy(dtype=float)
+        core = (np.isfinite(target) & (target >= 0) & (target <= 86400)
+                & np.isfinite(proxy) & (proxy >= 0) & (proxy <= 7200))
+        cats = features.select_dtypes(include="category").columns.tolist()
+        pool = Pool(features.loc[core], label=(target-proxy)[core],
+                    cat_features=cats)
+        start = time.monotonic()
+        model.fit(pool)
+        fit_seconds = time.monotonic() - start
+        model.save_model(str(model_path))
+        del pool, rows, features
+        gc.collect()
+    else:
+        model.load_model(str(model_path))
+    rank_rows, rank_features = load_features(args, ranking=True)
+    if not np.array_equal(frozen.MVT_ID_mvt.to_numpy(),
+                          rank_rows.MVT_ID_mvt.to_numpy()):
+        raise ValueError("v6 ranking reference ID order differs from feature cache")
+    rank_proxy = rank_rows.proxy.to_numpy(dtype=float)
+    valid = (np.isfinite(rank_proxy) & (rank_proxy >= 0)
+             & (rank_proxy <= 7200))
+    expert_values = np.full(len(rank_rows), np.nan, dtype=float)
+    expert_values[valid] = (rank_proxy[valid]
+                            + model.predict(rank_features.loc[valid],
+                                            thread_count=args.threads))
+    if not np.isfinite(expert_values[valid]).all():
+        raise ValueError("Eligible ranking expert predictions must be finite")
+    raw = pd.DataFrame({"MVT_ID_mvt": rank_rows.MVT_ID_mvt.to_numpy(copy=True),
+                        "expert": expert_values})
+    raw_path = args.output_dir / "ranking_expert.parquet"
+    raw.to_parquet(raw_path, index=False)
+    base = frozen.merge(raw, on="MVT_ID_mvt", validate="one_to_one", sort=False)
+    present = base.expert.notna().to_numpy()
+    if len(base) != EXPECTED_RANKING_ROWS or not np.array_equal(present, valid):
+        raise ValueError("Ranking expert coverage differs from the valid-AOBT gate")
+    # pandas 3 uses copy-on-write: the mutable blend array must own its storage.
+    values = base.TAXITIME_SEC_mvt.to_numpy(dtype=float, copy=True)
+    alternate = base.expert.to_numpy(dtype=float, copy=True)
+    weight = report["selected_weight"]
+    values[present] = np.maximum(values[present]
+                                 + weight * (alternate[present]-values[present]), 0)
+    if not np.isfinite(values).all() or (values < 0).any():
+        raise ValueError("Final ranking predictions must be finite and nonnegative")
+    result = pd.DataFrame({"MVT_ID_mvt": base.MVT_ID_mvt.to_numpy(copy=True),
+                           "TAXITIME_SEC_mvt": values})
+    result_path = args.output_dir / "predictions.parquet"
+    result.to_parquet(result_path, index=False)
+    write_json(args.output_dir / "manifest.json", {
+        "validation_sha256": digest(args.output_dir / "validation.json"),
+        "fresh_audit_sha256": digest(args.output_dir / "fresh_audit.json"),
+        "ranking_reference_sha256": digest(args.ranking_reference),
+        "ranking_rows_sha256": digest(args.cache_dir / "ranking_rows.parquet"),
+        "ranking_arrival_features_sha256": digest(
+            args.arrival_dir / "ranking_arrival_features.parquet"),
+        "ranking_expert_sha256": digest(raw_path),
+        "predictions_sha256": digest(result_path),
+        "model_sha256": digest(model_path),
+        "rows": len(result), "valid_aobt": int(valid.sum()),
+        "blend_weight": weight, "trees": model.tree_count_,
+        "full_fit_seconds": fit_seconds,
+        "feature_names": list(rank_features),
+        "selection": "2025 labels only; all predeclared local gates passed",
+    })
+    print(json.dumps({"rows": len(result), "valid_aobt": int(valid.sum()),
+                      "blend_weight": weight, "trees": model.tree_count_,
+                      "full_fit_seconds": fit_seconds}, indent=2), flush=True)
+
+
 def prepare(args: argparse.Namespace) -> None:
     value = protocol(args)
     print(json.dumps({"protocol_path": str(args.output_dir / "protocol.json"),
@@ -344,7 +435,8 @@ def prepare(args: argparse.Namespace) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--mode", choices=("prepare", "fit", "evaluate", "fresh-audit"),
+    p.add_argument("--mode", choices=("prepare", "fit", "evaluate", "fresh-audit",
+                                      "final-predict"),
                    default="prepare")
     p.add_argument("--data-dir", type=Path, default=Path("data"))
     p.add_argument("--cache-dir", type=Path, default=Path("artifacts/baseline"))
@@ -370,7 +462,8 @@ def main() -> None:
     args.depth = 10
     args.threads = 2
     {"prepare": prepare, "fit": fit, "evaluate": evaluate,
-     "fresh-audit": fresh_audit}[args.mode](args)
+     "fresh-audit": fresh_audit,
+     "final-predict": final_predict}[args.mode](args)
 
 
 if __name__ == "__main__":
