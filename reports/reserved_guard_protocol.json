@@ -1,0 +1,19 @@
+{
+  "status": "Reserved before any scored February/August model comparison",
+  "purpose": "One additional fixed model-change guard against repeated 2025 validation selection",
+  "guard_months": [2, 8],
+  "reserve_months": [5, 9],
+  "data_scope": "Released 2025 training labels only. Aggregate data-quality inspection and prior complement-month training already included these months; they are not previously unseen records.",
+  "trigger": "After the current candidate set has completed its predeclared Jan/Jul, Nov/Dec and Apr/Oct gates, freeze the proposed model architectures, feature lists, routing gates and weights before fitting or scoring this guard.",
+  "refit_requirement": "Refit both the accepted comparator architecture and each proposed replacement architecture with February/August departure labels excluded from fitting AND early stopping. Existing full-2025 predictions cannot serve as an independent guard comparator.",
+  "comparison": "Matched architecture comparisons on the exact finite held-out row IDs eligible for each proposed route, using only the previously selected weight. Every unchanged route remains outside that component comparison.",
+  "valid_aobt_comparator": "Refit the accepted depth-10 traffic residual architecture used by v7 on complementary months. Do not use its existing fitted model or in-sample predictions.",
+  "missing_clock_comparator": "Refit the accepted ordinary missing-clock CatBoost architecture on complementary months, for the invalid-AOBT no-NM non-Rome route.",
+  "coverage": "Unique non-null IDs, exact comparator/candidate ID and label agreement, finite predictions, and unchanged predeclared routing masks are mandatory.",
+  "statistics": "Report RMSE separately for February and August and the pooled paired UTC-day bootstrap gain interval (1000 resamples, seed 20261002).",
+  "pass_rule": "Each scored replacement improves RMSE in both individual months and has pooled 95% paired UTC-day gain interval lower bound greater than zero.",
+  "failure_rule": "Exclude a failed replacement from the proposed policy. Do not tune its weights, features or routing thresholds to these guard results.",
+  "after_guard": "Record all outcomes, including failures. February/August then cease to be a reserved guard. May/September remain reserved for a later separately frozen check.",
+  "limitations": "This verifies fixed component changes. It is not an unbiased estimate of the complete legacy ensemble or a guarantee of ranking-set performance.",
+  "leaderboard_use": "Official scores and ranking-set labels never select features, architectures, weights, routes or this guard."
+}

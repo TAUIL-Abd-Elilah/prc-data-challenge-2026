@@ -163,4 +163,10 @@ The separate `v8_combo_audit.py` protocol is frozen before v8 training. If both 
 
 ARR summaries likewise use the complete released batch and can include an arrival whose in-block time follows the queried departure. This is retrospective challenge prediction, not a claim that every field would be available in a real-time departure forecast.
 
+## Reserved model-change guard
+
+A source/protocol audit found no scored held-out model comparison on February/August or May/September. Those records have already entered complementary-month training, internal early stopping and aggregate data-quality checks, so scoring an existing fitted model on them would be in-sample. February/August are now reserved for one additional fixed model-change guard after the current candidate set completes its existing gates. Both comparator and replacement architectures must be refitted with those months excluded from fitting and early stopping. Features, weights and routes are locked before that guard; a failed replacement is excluded without adjusting it to the guard results. May/September remain reserved. The full prospective rules are in `reports/reserved_guard_protocol.json`.
+
+This additional check evaluates fixed component changes. It does not estimate the complete legacy ensemble independently, and it cannot guarantee a ranking result.
+
 OpenStreetMap geometry was considered only for a read-only extraction audit. No maps were obtained, matching coverage is unknown, and no OSM data enter a model or submission. ODbL is an open-data license; the challenge's external-data wording says open-source license without naming accepted data licenses. Geometry is excluded while that interpretation remains unresolved. No OurAirports or OpenAP data are used.
