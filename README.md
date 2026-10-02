@@ -59,11 +59,12 @@ The experts use held-out month labels for early stopping, so these validation nu
 
 ## Submit with MinIO Client
 
-The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, download the [current Windows `mc.exe`](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized v3 file:
+The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized v3 file. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.
 
 ```powershell
-$mc = Join-Path $env:TEMP 'mc.exe'
-Invoke-WebRequest 'https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe' -OutFile $mc
+$mc = Join-Path $env:TEMP 'mc-community.exe'
+Invoke-WebRequest 'https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe' -OutFile $mc
+if ((Get-FileHash $mc -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c8db13ebeda31497f354c0e950809db0ae9b2a2a69b8afee68c128c37300c157') { throw 'MinIO Client checksum mismatch' }
 & $mc alias set opensky 'https://s3.opensky-network.org/' '<ACCESS_KEY>' '<SECRET_KEY>'
 & $mc cp '.\submissions\merry-mushroom_v3.parquet' 'opensky/prc-2026-merry-mushroom/merry-mushroom_v3.parquet'
 ```
