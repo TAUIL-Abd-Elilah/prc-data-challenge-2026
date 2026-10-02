@@ -1,0 +1,81 @@
+{
+  "purpose": "Separate prospective v9b valid-AOBT route, preserving the frozen v9 history",
+  "training": "Reuse saved movement-only complement-fold models without changes; conditional fresh and full refits use exactly the frozen movement architecture",
+  "reference": "Locally promoted clipped v7 candidate on all finite 2025 OOF rows",
+  "source_sha256": {
+    "movement_protocol": "93b2f2f3ae48d97a57263695bfb2c55f3ff8af954403f5b6951ed1e262a355e5",
+    "frozen_v9_protocol": "a0626c679f00413fcdccdce44e9131f3ce9fb8ca3f1def6c809108ead10b6285",
+    "movement_features_manifest": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4f8d6084825",
+    "movement_row_ids": "ac1d9cf6a5b4665fe2abcf4b4aa73d9ada52feda482247bff4e1ae179d319ec3",
+    "v7_protocol": "27de40f395a76c98fb2fda5d2de4b677d0a2a7ddf43538234e3ca2d6b83a0680",
+    "baseline_training_rows": "b19e760a11b15e77996203ee84431fbcc225e0e2a325b15cd43bc38a00c47fcc"
+  },
+  "prediction_gate": "Held-out month, all finite target and own AOBT proxy in [0,7200] seconds",
+  "prediction_policy": "Saved model best_round, direct prediction clipped >=0; all finite valid-AOBT IDs; no model retraining",
+  "existing_fold_selection": {
+    "months": {
+      "seasonal_jan_jul": [
+        1,
+        7
+      ],
+      "forward_nov_dec": [
+        11,
+        12
+      ]
+    },
+    "weights": [
+      0.0,
+      0.1,
+      0.25,
+      0.5
+    ],
+    "formula": "clip(v7_candidate + weight*(movement_direct-v7_candidate), lower=0) on valid-AOBT only",
+    "selection": "minimum January/July all-finite RMSE, tie to smaller weight",
+    "forward": "same selected weight, no tuning",
+    "gate": "nonzero weight, RMSE gain and UTC-day bootstrap 95% lower gain >0 separately in both folds"
+  },
+  "fresh_audit": {
+    "months": [
+      4,
+      10
+    ],
+    "movement_model": "reuse saved movement-only April/October refit; if absent and valid-AOBT existing-fold gates pass, fit exactly once in the separate v9b namespace with unchanged movement-only architecture",
+    "fallback_fit_params": {
+      "objective": "regression",
+      "metric": "rmse",
+      "learning_rate": 0.04,
+      "num_leaves": 63,
+      "min_data_in_leaf": 90,
+      "lambda_l2": 8.0,
+      "feature_fraction": 0.85,
+      "bagging_fraction": 0.85,
+      "bagging_freq": 1,
+      "max_cat_threshold": 64,
+      "cat_smooth": 20,
+      "verbosity": -1,
+      "num_threads": 3,
+      "seed": 20261002,
+      "feature_fraction_seed": 20261002,
+      "bagging_seed": 20261002,
+      "deterministic": true,
+      "force_col_wise": true
+    },
+    "fallback_training": "same movement-only ordinary target [0,7200], same calendar-day modulo-11 early stop, with April/October excluded from fit and early stop",
+    "comparator": "v7 fixed fresh blend of depth10 ARR prior and v7 fresh expert",
+    "weight": "same January/July-selected movement weight",
+    "gate": "exact valid-AOBT IDs, both April and October point RMSE gains, and pooled UTC-day bootstrap 95% lower gain >0"
+  },
+  "final_model": {
+    "reuse": "if original no-NM movement route passes, reuse its saved full ordinary model",
+    "fallback": "if original no-NM route fails but v9b passes, one v9b full ordinary fit with unchanged movement-only params and median existing-fold best rounds",
+    "restart": "saved model requires matching model/fit-manifest hashes and feature schema"
+  },
+  "ranking": "blend only valid-AOBT rows of an exact-order v7 ranking reference; every invalid-AOBT value remains unchanged",
+  "decision": "accept only after both existing folds and fresh audit pass; otherwise reject without retuning",
+  "forbidden_uses": [
+    "flight/movement IDs as predictor values",
+    "departure BLOCK/TAXITIME as predictors",
+    "official result or ranking labels"
+  ],
+  "limitations": "Repeated 2025 comparisons; this estimates a model difference, not untouched 2026 accuracy."
+}

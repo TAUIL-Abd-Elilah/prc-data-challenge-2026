@@ -135,6 +135,19 @@ The locally validated v7 traffic blend was finalized and published before its up
 
 The separate `movement_only_expert.py` protocol tests transfer from all ordinary 2025 departures to the sparse invalid-AOBT/no-NM/non-Rome gate. Its predictor allowlist removes all NM fields and off-block proxies, while retaining common movement, schedule, traffic, NOAA and released ARR fields. It is a direct taxi-time model rather than a residual-to-NM expert. Preparation does not promote or upload it; the same independent local validation gates are required.
 
+Its first two complementary-fold fits are complete. January/July select full replacement on the predeclared missing-clock gate: all-finite RMSE changes from 325.822 to 324.910 seconds, with gain interval 0.556 to 1.346. November/December at the unchanged weight changes from 221.142 to 219.434, with gain interval 0.488 to 3.314. The April/October architecture audit is pending, so the component is not promoted and has no ranking prediction. Aggregate evidence is in `reports/movement_only_validation_v6.json`.
+
+The same saved ordinary movement models can be assessed on valid-AOBT rows independently. The original `v9_movement_valid_audit.py` protocol relies entirely on already saved models and is preserved. A separate prospective `v9b_movement_valid_audit.py` protocol adds a gated April/October refit if the original missing-clock route cannot produce one. It reuses the unchanged training architecture and requires valid-route improvement with positive day intervals in both original folds, followed by both April/October point gains and a positive pooled day interval. Any final full-data model and ranking prediction require all those gates. Invalid-AOBT predictions remain at the v7 reference. No valid-route selection result has been examined yet.
+
+```powershell
+python v9b_movement_valid_audit.py --mode prepare
+python v9b_movement_valid_audit.py --mode predict-fold --fold seasonal_jan_jul
+python v9b_movement_valid_audit.py --mode predict-fold --fold forward_nov_dec
+python v9b_movement_valid_audit.py --mode evaluate-folds
+```
+
+Use the guarded fresh/final modes only if the preceding gates pass; `python v9b_movement_valid_audit.py --help` lists them. Full source, prospective protocols and input hashes are public before this audit runs.
+
 The shared-flight covariate recovery audit (`v8_flight_covariate_recovery.py`) reads no block/taxi labels and uses flight IDs only as join keys. Missing departure NM clocks have no matching ARR counterpart in either the 2025 training set or the supplied 2026 ranking set. It recovers zero clocks, so this route is rejected. Shared records with available AOBT agree exactly in all 315,234 training pairs and all 50,923 ranking pairs. Reproduce with `python v8_flight_covariate_recovery.py`; the aggregate report is `reports/flight_covariate_recovery_audit_v8.json`.
 
 The fixed CPU alternative (`v8_lightgbm_residual.py`) uses the timestamp, ARR, neighbor and runway covariates with 255 LightGBM leaves, minimum leaf size 80, L2 penalty 30, learning rate 0.03 and at most 2,000 rounds. Early stopping uses complete calendar days inside complementary months. Its frozen comparator is v6; January/July select one coarse weight, November/December apply it unchanged, and a separate April/October paired architecture audit is mandatory. All raw files, caches, weather, references and the template are fingerprinted. No fitting outcome is available yet. Run its CPU stages serially with other training jobs:

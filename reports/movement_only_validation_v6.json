@@ -1,0 +1,71 @@
+{
+  "reference_sha256": "036da1502f4ae68238927e31a0479b9cb82a6fb31b7acdbab26aa0657b7a67f8",
+  "features_manifest_sha256": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4f8d6084825",
+  "selection": "Jan/Jul all-finite RMSE only; Nov/Dec unchanged weight",
+  "weights": [
+    0.0,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "scores": {
+    "seasonal_jan_jul": {
+      "n": 344419,
+      "gate_n": 4976,
+      "all_finite_rmse_sec": {
+        "0.0": 325.8216062799188,
+        "0.25": 325.3636156581947,
+        "0.5": 325.0588161022334,
+        "1.0": 324.91029801747567
+      },
+      "gate_rmse_sec": {
+        "0.0": 1558.1102372376326,
+        "0.25": 1551.4718003312494,
+        "0.5": 1547.0432359518657,
+        "1.0": 1544.882260819882
+      }
+    },
+    "forward_nov_dec": {
+      "n": 328009,
+      "gate_n": 2865,
+      "all_finite_rmse_sec": {
+        "0.0": 221.1420023730262,
+        "0.25": 220.4556848705467,
+        "0.5": 219.94155025368644,
+        "1.0": 219.43426549809766
+      },
+      "gate_rmse_sec": {
+        "0.0": 577.2176148741804,
+        "0.25": 546.3345965129884,
+        "0.5": 522.0715011206635,
+        "1.0": 497.03169685778795
+      }
+    }
+  },
+  "selected_weight": 1.0,
+  "day_stability": {
+    "seasonal_jan_jul": {
+      "days": 62,
+      "repeats": 1000,
+      "observed_gain_sec": 0.9113082624431286,
+      "gain_ci95_sec": [
+        0.5559973435673967,
+        1.345634053244717
+      ],
+      "fraction_positive": 1.0
+    },
+    "forward_nov_dec": {
+      "days": 61,
+      "repeats": 1000,
+      "observed_gain_sec": 1.7077368749285426,
+      "gain_ci95_sec": [
+        0.4883259091828407,
+        3.3137077140326134
+      ],
+      "fraction_positive": 1.0
+    }
+  },
+  "both_existing_folds_passed": true,
+  "promoted": false,
+  "promotion_pending": "Independent April/October paired architecture audit"
+}
