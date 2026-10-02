@@ -10,7 +10,7 @@ Both models use only fields available in `ranking.parquet`. Features include air
 
 ## Data and access
 
-The approved team is `merry-mushroom`. Download the twelve canonical 2025 training files, `ranking.parquet`, and `submitting.parquet` from `prc-2026-datasets` into `data/`, using the [OpenSky MinIO console](https://s3-console.opensky-network.org/) and **Other Authentication Methods → Login with SSO**. The submission bucket is `prc-2026-merry-mushroom`. Keep credentials and raw competition data out of this repository. Browser duplicate copies such as `... (1).parquet` are ignored by the loader.
+The approved team is `merry-mushroom`. Download the twelve canonical 2025 training files, `ranking.parquet`, and `submitting.parquet` from `prc-2026-datasets` into `data/`, using the [OpenSky MinIO console](https://s3-console.opensky-network.org/) and **Other Authentication Methods → Login with SSO**. The submission bucket is `prc-2026-merry-mushroom`. The [official ranking instructions](https://prc-data-challenge-2026.netlify.app/ranking.html) require the MinIO Client CLI to upload a submission. Keep credentials and raw competition data out of this repository. Browser duplicate copies such as `... (1).parquet` are ignored by the loader.
 
 Expected layout:
 
@@ -57,10 +57,23 @@ The experts use held-out month labels for early stopping, so these validation nu
 
 `finalize_submission.py` checks all 344,841 template IDs in their original order, verifies finite nonnegative predictions through a Parquet round trip, and writes the submission plus a SHA-256 manifest. It refuses to overwrite a finalized submission. Use a fresh output directory or version when repeating prediction. The reference runtime is Python 3.11 on Windows with 32 GB RAM; exact package versions are in `requirements-lock.txt`.
 
+## Submit with MinIO Client
+
+The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, download the [current Windows `mc.exe`](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized v3 file:
+
+```powershell
+$mc = Join-Path $env:TEMP 'mc.exe'
+Invoke-WebRequest 'https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe' -OutFile $mc
+& $mc alias set opensky 'https://s3.opensky-network.org/' '<ACCESS_KEY>' '<SECRET_KEY>'
+& $mc cp '.\submissions\merry-mushroom_v3.parquet' 'opensky/prc-2026-merry-mushroom/merry-mushroom_v3.parquet'
+```
+
+Keep access keys and secrets private; never commit them. Check the [official leaderboard](https://prc-data-challenge-2026.netlify.app/ranking.html) for the scored entry after upload. The repository does not perform the upload.
+
 The synthetic pipeline check is `python tests/smoke.py`. It tests execution and Parquet alignment; its generated RMSE has no competition meaning.
 
 ## Improving a submission
 
-Compare `validation.json` overall RMSE and per-airport RMSE with the `audit` proxy. Investigate missing AOBT and flight/movement mismatches before tuning. A validation gain is evidence for a candidate submission; there is no guarantee it transfers to January and July 2026. The [live ranking](https://prc-data-challenge-2026.netlify.app/ranking.html) accepts at most five submissions per team per day. Do not tune to individual leaderboard responses; the organizer prohibits exploiting the ranking process. Submit with your team's approved MinIO bucket instructions. The code here generates and checks the file but does not upload it.
+Compare `validation.json` overall RMSE and per-airport RMSE with the `audit` proxy. Investigate missing AOBT and flight/movement mismatches before tuning. A validation gain is evidence for a candidate submission; there is no guarantee it transfers to January and July 2026. The [live ranking](https://prc-data-challenge-2026.netlify.app/ranking.html) accepts at most five submissions per team per day. Do not tune to individual leaderboard responses; the organizer prohibits exploiting the ranking process.
 
 For prize eligibility, the [rules](https://prc-data-challenge-2026.netlify.app/eligibility.html) require public GPLv3 source code, sufficient reproduction instructions, and open licensing for any external data. Weather uses NOAA's CC0 GHCNh dataset; source citation, station substitutions, units and caveats are documented in [WEATHER_SOURCES.md](WEATHER_SOURCES.md). The exact download URLs and SHA-256 digests are recorded in [weather_sources.json](weather_sources.json). NOAA source files can be revised, so a later download may differ from this snapshot. Raw data, fitted artifacts, and submissions are excluded from Git.
