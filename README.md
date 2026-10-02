@@ -108,26 +108,35 @@ Local folds have been used repeatedly for model comparison. Improvements and boo
 
 ## Submit with MinIO Client
 
-The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized v4 file. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.
+The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized v5 file. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.
 
 ```powershell
 $mc = Join-Path $env:TEMP 'mc-community.exe'
 Invoke-WebRequest 'https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe' -OutFile $mc
 if ((Get-FileHash $mc -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c8db13ebeda31497f354c0e950809db0ae9b2a2a69b8afee68c128c37300c157') { throw 'MinIO Client checksum mismatch' }
 & $mc alias set opensky 'https://s3.opensky-network.org/' '<ACCESS_KEY>' '<SECRET_KEY>'
-& $mc cp '.\submissions\merry-mushroom_v4.parquet' 'opensky/prc-2026-merry-mushroom/merry-mushroom_v4.parquet'
+& $mc cp --disable-multipart '.\submissions\merry-mushroom_v5.parquet' 'opensky/prc-2026-merry-mushroom/merry-mushroom_v5.parquet'
 ```
 
 Keep access keys and secrets private; never commit them. Check the [official leaderboard](https://prc-data-challenge-2026.netlify.app/ranking.html) for the scored entry after upload. The repository does not perform the upload.
 
+To reproduce the verification, download the stored submission and result file with `mc`, then run the receipt command. It checks the remote bytes against the finalized SHA-256, requires acceptance of every pair, compares the result with the public API, and counts distinct teams with lower best scores. Raw result files stay under ignored `artifacts/`; only aggregate receipt fields are published.
+
+```powershell
+& $mc cp 'opensky/prc-2026-merry-mushroom/merry-mushroom_v5.parquet' '.\artifacts\submission-receipt\verified_merry-mushroom_v5.parquet'
+& $mc cp 'opensky/prc-2026-merry-mushroom/merry-mushroom_v5.parquet_result.json' '.\artifacts\submission-receipt\merry-mushroom_v5.parquet_result.json'
+python record_submission.py --version 5
+```
+
 ## Official result
 
-The accepted v4 submission improved the team's official score by 0.6842 seconds RMSE over v3. Both submissions were scored over all 344,841 pairs.
+The accepted v5 submission improved the team's official score by 5.4818 seconds RMSE over v4. All three submissions were scored over every one of the 344,841 pairs. The v5 remote readback exactly matches the finalized SHA-256.
 
 | Submission | Official RMSE | Best-score team rank at snapshot | Public receipt |
 |---|---:|---:|---|
 | `merry-mushroom_v3.parquet` | 289.2078 seconds | 88th at 2026-10-02 13:48:21 UTC | [v3 receipt](reports/submission_v3.json) |
-| `merry-mushroom_v4.parquet` | **288.5236 seconds** | **87th** at 2026-10-02 14:28:43 UTC | [v4 receipt](reports/submission_v4.json) |
+| `merry-mushroom_v4.parquet` | 288.5236 seconds | 87th at 2026-10-02 14:28:43 UTC | [v4 receipt](reports/submission_v4.json) |
+| `merry-mushroom_v5.parquet` | **283.0418 seconds** | **74th** at 2026-10-02 19:34:16 UTC | [v5 receipt](reports/submission_v5.json) |
 
 Ranks count distinct teams with a lower best score, plus one. They are leaderboard snapshots, and first place has not been achieved. The scores are available from the [official team results API](https://datacomp.opensky-network.org/api/competitions/bb3693e1-26bc-4a9e-8619-4fe78b4eab0c/leaderboard?teamName=merry-mushroom&limit=200).
 

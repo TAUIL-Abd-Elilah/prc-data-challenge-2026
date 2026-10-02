@@ -173,14 +173,26 @@
     },
     "validation_note": "Both 2025 folds have supported local model comparisons; these are not untouched final estimates."
   },
+  "arrival": {
+    "weight": 0.25,
+    "rounds": 1188,
+    "core_training_rows": 2061428,
+    "ranking_rows": 344841,
+    "valid_proxy_ranking_rows": 339377,
+    "fit_seconds": 401.343,
+    "frozen_v4_ranking": "artifacts\\catboost\\source\\sequential_predictions.parquet"
+  },
   "ensemble": {
-    "selected_stage": "deep_missing",
+    "selected_stage": "deep_missing_clean_arrival",
     "ranking_rows": 344841,
     "deep_gate_rows": 339377,
     "missing_gate_rows": 4907,
+    "clean_arrival_gate_rows": 339377,
+    "clean_arrival_weight": 0.25,
     "changed_rows": 344284,
     "unchanged_rows": 557,
-    "arrival_included": false,
+    "arrival_included": true,
+    "legacy_arrival_included": false,
     "exact_template_order": true,
     "finite_nonnegative": true,
     "prediction_file": "artifacts\\v5-ensemble\\predictions.parquet",
