@@ -1,0 +1,15 @@
+{
+  "checked_at_utc": "2026-10-02T23:07:17.452396+00:00",
+  "policy": "At most five submissions in any rolling 24 hours",
+  "existing_submission_count_24h": 5,
+  "remaining_slots_before_upload": 0,
+  "next_count_slot_at_utc": "2026-10-03T13:46:52.428000+00:00",
+  "seconds_until_count_slot": 52775,
+  "bucket_bytes": 23540059,
+  "projected_bucket_bytes": 28247684,
+  "bucket_limit_bytes_conservative": 1000000000,
+  "submission": "merry-mushroom_v7.parquet",
+  "version": 7,
+  "version_is_new": false,
+  "allowed": false
+}

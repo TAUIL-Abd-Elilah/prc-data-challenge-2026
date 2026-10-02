@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timedelta, timezone
 import json
+from math import ceil
 from pathlib import Path
 import re
 import subprocess
@@ -23,6 +24,10 @@ def check(mc: Path, remote: str, submission: Path) -> dict:
     prior = [obj for obj in objects if obj['key'].endswith('.parquet')]
     recent = [obj for obj in prior if datetime.fromisoformat(obj['lastModified'].replace('Z','+00:00'))
               > now-timedelta(hours=24)]
+    upload_times = sorted(datetime.fromisoformat(obj['lastModified'].replace('Z','+00:00'))
+                          for obj in recent)
+    next_count_slot = (upload_times[-5]+timedelta(hours=24)
+                       if len(upload_times) >= 5 else now)
     existing = {obj['key'] for obj in objects}
     match = re.fullmatch(r'(.+)_v([1-9][0-9]*)\.parquet', submission.name)
     if not match or not submission.is_file():
@@ -37,6 +42,8 @@ def check(mc: Path, remote: str, submission: Path) -> dict:
     report = {'checked_at_utc': now.isoformat(), 'policy': 'At most five submissions in any rolling 24 hours',
               'existing_submission_count_24h': len(recent),
               'remaining_slots_before_upload': max(0,5-len(recent)),
+              'next_count_slot_at_utc': next_count_slot.isoformat(),
+              'seconds_until_count_slot': max(0, ceil((next_count_slot-now).total_seconds())),
               'bucket_bytes': current_bytes, 'projected_bucket_bytes': projected,
               'bucket_limit_bytes_conservative': 1_000_000_000,
               'submission': submission.name, 'version': version,

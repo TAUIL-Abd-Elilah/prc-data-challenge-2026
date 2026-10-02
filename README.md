@@ -175,6 +175,8 @@ The accepted v7 submission improved the team's official score by 1.6912 seconds 
 
 Ranks count distinct teams with a lower best score, plus one. They are leaderboard snapshots, and first place has not been achieved. The scores are available from the [official team results API](https://datacomp.opensky-network.org/api/competitions/bb3693e1-26bc-4a9e-8619-4fe78b4eab0c/leaderboard?teamName=merry-mushroom&limit=200).
 
+After v7, the conservative preceding-24-hour upload count is five. The next count slot opens at **2026-10-03 13:46:52.428 UTC**. Each future file still needs a fresh quota/version/size check before upload. The post-upload audit is [reports/submission_quota_after_v7.json](reports/submission_quota_after_v7.json); it intentionally rejects re-uploading the already stored v7 file. Local research continues while quota is closed.
+
 The synthetic pipeline check is `python tests/smoke.py`. It tests execution and Parquet alignment; its generated RMSE has no competition meaning.
 
 ## Improving a submission
