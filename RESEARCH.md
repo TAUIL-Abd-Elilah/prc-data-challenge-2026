@@ -171,4 +171,18 @@ This additional check evaluates fixed component changes. It does not estimate th
 
 The current candidate portfolio is also fixed before any v8/v9b scored OOF outcome. The valid-AOBT route compares unchanged v7 with the already specified v8 combo and v9b blend using only common-universe January/July RMSE among candidates passing their existing gates. That choice is locked before the reserved guard; failure retains v7 without retuning. The missing-clock movement route is disjoint and requires its own complete gates. Any composition must pass exact-coverage and paired-day checks on both original folds, with every other prediction unchanged. Details are in `reports/current_candidate_policy_protocol.json`.
 
+## Prospective same-runway ARR taxi context
+
+`runway_arrival_taxi_features.py` defines ten fixed fields from released ARR covariates: counts, means and population standard deviations of completed taxi-in intervals in prior 15/60/180-minute windows, plus the number still taxiing on the same airport/runway. Completion windows are anchored to ARR in-block time, with strict upper bounds. Both summaries require finite taxi times in 0..7200 seconds and agreement with in-block minus landing time within one second. Zero taxi intervals can enter completed summaries but cannot count as active. Missing runway queries remain missing.
+
+The raw DEP allowlist contains only movement ID, airport, runway and movement time; DEP block/taxi fields are absent. The deterministic synthetic check verifies phase-specific provenance, window boundaries, active intervals, zero durations and missing runways. The source/raw/cache fingerprint protocol is frozen in `reports/runway_arrival_taxi_protocol_v10.json`. Full feature construction and model comparison have not run; this is a later research family, outside the current v8/v9b portfolio. No February/August labels have been scored for it.
+
+```powershell
+python runway_arrival_taxi_features.py --mode synthetic
+python runway_arrival_taxi_features.py --mode prepare
+python runway_arrival_taxi_features.py --mode build
+```
+
+The full build requires at least 4 GiB free memory and should be scheduled after current fitting jobs. A model protocol and local gates must be published before testing this family; the builder itself cannot promote a component or generate a submission.
+
 OpenStreetMap geometry was considered only for a read-only extraction audit. No maps were obtained, matching coverage is unknown, and no OSM data enter a model or submission. ODbL is an open-data license; the challenge's external-data wording says open-source license without naming accepted data licenses. Geometry is excluded while that interpretation remains unresolved. No OurAirports or OpenAP data are used.
