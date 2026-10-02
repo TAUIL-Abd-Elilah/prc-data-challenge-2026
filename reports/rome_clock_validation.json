@@ -1,0 +1,91 @@
+{
+  "reference": "Frozen clipped v4 all-finite OOF",
+  "policy": "Mixture only, blended on no-NM invalid-AOBT LIRF schedule>7200 gate; coarse scale chosen on January/July, frozen for November/December",
+  "gate_rows": {
+    "seasonal_jan_jul": 181,
+    "forward_nov_dec": 58
+  },
+  "scales": {
+    "0.0": {
+      "seasonal_jan_jul": {
+        "all_finite_n": 344419,
+        "all_finite_rmse_sec": 328.216132742099,
+        "gate_rmse_sec": 5544.989960208279,
+        "gate_n": 181
+      },
+      "forward_nov_dec": {
+        "all_finite_n": 328009,
+        "all_finite_rmse_sec": 224.4642175825371,
+        "gate_rmse_sec": 5093.744817846175,
+        "gate_n": 58
+      }
+    },
+    "0.25": {
+      "seasonal_jan_jul": {
+        "all_finite_n": 344419,
+        "all_finite_rmse_sec": 327.86307829551356,
+        "gate_rmse_sec": 5505.102113502924,
+        "gate_n": 181
+      },
+      "forward_nov_dec": {
+        "all_finite_n": 328009,
+        "all_finite_rmse_sec": 223.9822529832298,
+        "gate_rmse_sec": 4972.315377367822,
+        "gate_n": 58
+      }
+    },
+    "0.5": {
+      "seasonal_jan_jul": {
+        "all_finite_n": 344419,
+        "all_finite_rmse_sec": 328.36064711151477,
+        "gate_rmse_sec": 5561.246875695885,
+        "gate_n": 181
+      },
+      "forward_nov_dec": {
+        "all_finite_n": 328009,
+        "all_finite_rmse_sec": 223.8548913628395,
+        "gate_rmse_sec": 4939.772848760095,
+        "gate_n": 58
+      }
+    },
+    "1.0": {
+      "seasonal_jan_jul": {
+        "all_finite_n": 344419,
+        "all_finite_rmse_sec": 331.885811583161,
+        "gate_rmse_sec": 5946.120383098577,
+        "gate_n": 181
+      },
+      "forward_nov_dec": {
+        "all_finite_n": 328009,
+        "all_finite_rmse_sec": 224.66471025883257,
+        "gate_rmse_sec": 5143.489272470664,
+        "gate_n": 58
+      }
+    }
+  },
+  "selected_scale": 0.25,
+  "selected_day_bootstrap": {
+    "seasonal_jan_jul": {
+      "days": 62,
+      "observed_rmse_gain_sec": 0.35305444658541774,
+      "bootstrap_gain_95pct_interval_sec": [
+        -1.2274803160233205,
+        1.8467514205517563
+      ],
+      "bootstrap_probability_improvement": 0.694,
+      "days_with_positive_sse_gain_fraction": 0.4032258064516129
+    },
+    "forward_nov_dec": {
+      "days": 61,
+      "observed_rmse_gain_sec": 0.4819645993072754,
+      "bootstrap_gain_95pct_interval_sec": [
+        -0.9456542103500652,
+        1.6303498618206973
+      ],
+      "bootstrap_probability_improvement": 0.7745,
+      "days_with_positive_sse_gain_fraction": 0.4098360655737705
+    }
+  },
+  "passed_local_gate": false,
+  "gate_rule": "Positive all-finite gain and positive day-block 95% lower bound in both folds; otherwise reject"
+}

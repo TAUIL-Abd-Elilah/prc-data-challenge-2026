@@ -74,13 +74,17 @@ The comparator was corrected to match the submission's nonnegative output policy
 | Clipped frozen v4 | 328.216 | 224.464 | 282.409 |
 | 50% larger timestamp residual expert on valid AOBT | 327.366 | 223.227 | 281.423 |
 | Then 50% missing-NM direct expert outside Rome | **326.531** | **221.652** | **280.317** |
+| Then 25% independently trained ARR-ground residual expert | **325.822** | **221.142** | **279.697** |
 
 Paired UTC-day bootstrap intervals for the combination's RMSE gain over v4 are +0.962 to +2.750 seconds on January/July and +1.883 to +4.086 seconds on November/December (1,000 resamples, seed 20261002). The missing expert improves each held-out month separately; some airport subsets still regress. These repeatedly examined periods remain model comparisons, not untouched estimates.
+
+The independent arrival expert trains a direct taxi-time-minus-AOBT-proxy residual using released flight/weather fields plus 14 ARR-ground features. Every fold excludes its held-out departure labels from fitting and early stopping. Its weight is fixed at the seasonally selected 0.25. The gain after the timestamp/missing combination is +0.709 seconds on January/July (95% paired day-block interval +0.453 to +0.997) and +0.510 on November/December (+0.295 to +0.728). The entire ensemble still inherits the older baseline's validation limitations. This differs from the excluded arrival stack below.
 
 Additional candidates were rejected or withheld:
 
 - A Rome long-schedule ratio expert improves seasonal error but worsens forward error, so it is excluded. The related classifier mixture also fails the forward check.
 - A four-class alternate-timestamp classifier (`multisource_expert.py`) compares LOBT, IOBT and schedule candidates. Its best seasonal correction scale is zero; no ranking model is fit.
 - An arrival correction stack (`arrival_features.py`) improves both apparent periods, including when added to deep/missing predictions. Its seasonal v4 base experts were trained using November/December labels, however, so fitting the forward correction on seasonal residuals creates an indirect dependence on forward labels. This stack is excluded from submission. The separate direct residual expert in `arrival_residual_expert.py` uses complementary-month training to check arrival features without this path.
+- Adding scheduled clock time to the Rome missing-NM classifier/ratio mixture (`rome_clock_expert.py`) selects a 0.25 blend: seasonal RMSE 327.863 and forward RMSE 223.982 against clipped v4. Its day-block gain intervals include zero on both periods (seasonal -1.227 to +1.847 seconds; forward -0.946 to +1.630), so it fails its predeclared stability gate and is excluded. Reproduce with `python rome_clock_expert.py --mode fit --threads 4`.
 
 All arrival ground-truth inputs are restricted to PHASE=ARR. Departure block and taxi labels are never predictors. Arrival taxi/in-block fields are available in the complete supplied ranking batch. No new choice uses official ranking scores or ranking labels.

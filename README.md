@@ -90,6 +90,9 @@ python missing_catboost.py --fold both --threads 4
 python missing_catboost.py --evaluate-only
 python missing_catboost.py --fit-final-direct
 python arrival_features.py --mode traffic-eval
+python arrival_residual_expert.py --mode build-features --threads 4
+python arrival_residual_expert.py --mode validate --threads 4
+python arrival_residual_expert.py --mode final-predict --threads 4
 python v5_ensemble.py --mode evaluate
 python v5_ensemble.py --mode ranking
 python finalize_submission.py --predictions artifacts/v5-ensemble/predictions.parquet --team merry-mushroom --version 5
@@ -97,14 +100,9 @@ python finalize_submission.py --predictions artifacts/v5-ensemble/predictions.pa
 
 The timestamp expert adds second/minute precision, flight duration, planning revisions and NM callsign features from released fields. It uses internal training splits for early stopping and a fixed 50% blend on valid AOBT rows. Its final model trains on 2,061,428 eligible 2025 departures. The second 50% blend applies a direct CatBoost expert only to departures with missing NM off-block records outside Rome. The two gates are disjoint. Every prediction is clipped at zero.
 
-The fixed combination improves local all-finite RMSE from 328.216 to 326.531 seconds on January/July and from 224.464 to 221.652 on November/December; pooled RMSE improves from 282.409 to 280.317 over 672,428 rows. The v4 comparator now uses the same nonnegative policy as the actual submission; older saved diagnostics included 57 negative predictions. GPU fits can vary slightly by hardware, so historical score equality is an optional `v4_reference.py --verify-snapshot` audit.
+The fixed timestamp/missing combination improves local all-finite RMSE from 328.216 to 326.531 seconds on January/July and from 224.464 to 221.652 on November/December; pooled RMSE improves from 282.409 to 280.317 over 672,428 rows. The v4 comparator now uses the same nonnegative policy as the actual submission; older saved diagnostics included 57 negative predictions. GPU fits can vary slightly by hardware, so historical score equality is an optional `v4_reference.py --verify-snapshot` audit.
 
-Arrival ground features use the ARR block/taxi fields retained in the supplied ranking file. The initial correction stack is diagnostic only: its seasonal base models included November/December labels, which creates an indirect dependence in its forward check. `v5_ensemble.py` excludes that stack from submissions. A separate `arrival_residual_expert.py` trains directly on complementary months to assess arrival features without that dependence:
-
-```powershell
-python arrival_residual_expert.py --mode build-features --threads 4
-python arrival_residual_expert.py --mode validate --threads 4
-```
+Arrival ground features use the ARR block/taxi fields retained in the supplied ranking file. The initial correction stack is diagnostic only: its seasonal base models included November/December labels, which creates an indirect dependence in its forward check. `v5_ensemble.py` excludes that stack from submissions. The separate `arrival_residual_expert.py` trains directly on complementary months. Its seasonally selected 25% blend improves the stronger timestamp/missing combination in both periods: January/July RMSE becomes 325.822, November/December 221.142, and pooled 279.697. The incremental gain has positive day-bootstrap intervals in both folds. This direct arrival expert is included in v5.
 
 Local folds have been used repeatedly for model comparison. Improvements and bootstrap intervals do not guarantee a 2026 score or a prize. The public aggregate reports and final submission receipt record the accepted policy and observed outcome.
 
