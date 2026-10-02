@@ -1,0 +1,89 @@
+{
+  "training_2025": {
+    "coverage": {
+      "departures": 2085047,
+      "missing_flight_id": 22424,
+      "missing_AOBT_3_flt": 22470,
+      "missing_LOBT_flt": 22470,
+      "missing_IOBT_flt": 22470,
+      "missing_EOBT_1_flt": 22470,
+      "missing_ARVT_1_flt": 22470,
+      "missing_ARVT_3_flt": 22470,
+      "aobt_missing_with_id": 46
+    },
+    "recovery": {
+      "missing_aobt_with_id": 46,
+      "unique_missing_departure_ids": 46,
+      "with_arrival_counterpart": 0,
+      "with_route_consistent_counterpart": 0,
+      "recoverable_aobt": 0,
+      "recoverable_by_clock": {
+        "AOBT_3_flt": 0,
+        "LOBT_flt": 0,
+        "IOBT_flt": 0,
+        "EOBT_1_flt": 0,
+        "ARVT_1_flt": 0,
+        "ARVT_3_flt": 0
+      }
+    },
+    "shared_id_consistency": {
+      "shared_id_pairs": 315269,
+      "route_consistent_pairs": 312574,
+      "both_aobt_present": 315234,
+      "aobt_exact_equal_pairs": 315234
+    }
+  },
+  "ranking_2026": {
+    "coverage": {
+      "departures": 344841,
+      "missing_flight_id": 5283,
+      "missing_AOBT_3_flt": 5290,
+      "missing_LOBT_flt": 5290,
+      "missing_IOBT_flt": 5290,
+      "missing_EOBT_1_flt": 5290,
+      "missing_ARVT_1_flt": 5290,
+      "missing_ARVT_3_flt": 5290,
+      "aobt_missing_with_id": 7
+    },
+    "recovery": {
+      "missing_aobt_with_id": 7,
+      "unique_missing_departure_ids": 7,
+      "with_arrival_counterpart": 0,
+      "with_route_consistent_counterpart": 0,
+      "recoverable_aobt": 0,
+      "recoverable_by_clock": {
+        "AOBT_3_flt": 0,
+        "LOBT_flt": 0,
+        "IOBT_flt": 0,
+        "EOBT_1_flt": 0,
+        "ARVT_1_flt": 0,
+        "ARVT_3_flt": 0
+      }
+    },
+    "shared_id_consistency": {
+      "shared_id_pairs": 50923,
+      "route_consistent_pairs": 50427,
+      "both_aobt_present": 50923,
+      "aobt_exact_equal_pairs": 50923
+    }
+  },
+  "source_columns": [
+    "MVT_ID_mvt",
+    "FLIGHT_ID_mvt",
+    "PHASE_mvt",
+    "ADEP_mvt",
+    "ADES_mvt",
+    "AOBT_3_flt",
+    "LOBT_flt",
+    "IOBT_flt",
+    "EOBT_1_flt",
+    "ARVT_1_flt",
+    "ARVT_3_flt"
+  ],
+  "forbidden_source_columns": [
+    "BLOCK_TIME_UTC_mvt",
+    "TAXITIME_SEC_mvt"
+  ],
+  "label_reads": false,
+  "model_fit": false
+}

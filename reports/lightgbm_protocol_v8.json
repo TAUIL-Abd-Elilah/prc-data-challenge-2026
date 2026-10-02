@@ -1,0 +1,102 @@
+{
+  "purpose": "Independent local 2025 experiment; no leaderboard tuning",
+  "frozen_v6_reference": {
+    "source_sha256": "c75e50343bee6cee9c9f7366c4437a461d8156e3d96abca24bcae3bd40cfe92d",
+    "frozen_sha256": "a249be9ff5a4d26a8f7c1afe415d09180328ee2a922839c3b9c77d4790e954ed"
+  },
+  "source_sha256": {
+    "baseline_training_rows": "b19e760a11b15e77996203ee84431fbcc225e0e2a325b15cd43bc38a00c47fcc",
+    "baseline_features": "62b35f2ebb012cf85853c41c2aae55d72b2bd8cd7fb68243b23a9868afca0253",
+    "baseline_ranking_rows": "da1a018792fba6531616fd32e5bcb4021dac0690676ea28a5eefdbb021c28235",
+    "baseline_ranking_features": "4761235dc63160998955d09de234e5a733aeb78b8d52a2a574ebbb7f40dee38a",
+    "weather": "cf8b9d15f38a9f516cf47d18974caae87b1c9aba48cc3bf112853d49ab8cb925",
+    "arrival_training": "c4cad12b3a7d0bcf600f775fe12178bb2132fbfc9e0741c8fa35fd71257d76b5",
+    "arrival_ranking": "f7dad5ee2b62b38d41d4d7aef2fcb465a26150b9580f4cb6fee78ea8daec2bcc",
+    "neighbour_training": "2c46c58db6cf2b89a1d53034c215cf1f24618f2a097b00fd0e4faf20063fe26e",
+    "neighbour_ranking": "1931dec6be7b656ecf9980d2103677b33bd249106fa92a394525e2b4e1c3207a",
+    "runway_training": "1dbe8beaa5550f3974e628f3aa220ae6c32c4ff883ccc6655030c262089942bf",
+    "runway_ranking": "7f1c2bf4830dbe5526ed16c867a0552cface11d49a7f2175355f07ff190f10df",
+    "neighbour_protocol": "64a2c71ac7a941b797c8efbca343b417dfae0dc8bfeca9d6d5097a5ebc962343",
+    "runway_protocol": "3ea6ff89b37dc872fc7abd62f522697d7e6d754f702c65bc8a6af27d423ecfce",
+    "prior_apr_oct_oof": "7d252edb4b3abf158830367633b56d5e68d03d0a387b98edae18d79fa50f225d",
+    "ranking_reference": "3fa41955c243f2821626203b9c33f83b40f71271993f7204acdc6f0294dc161d",
+    "submission_template": "0d383408ed5ac27bfcfd12d6b961cee77c8a6364b10dad9fe3ec81115c79652b",
+    "raw_training_training_2025-01-01_2025-02-01.parquet": "a4dc8f152c082c650cd7eb745fe9c641089f34f74df127e6944a188990a0ed94",
+    "raw_training_training_2025-02-01_2025-03-01.parquet": "b6f9ff2cdb1cfe07c5442f4e1f11bbcdbeafe52852dcb0b8175f62ab84c6a066",
+    "raw_training_training_2025-03-01_2025-04-01.parquet": "58fde7e5f8b539546af63b41d7f6ec0f2884fdc3d3dd9b6bfca7c59a420dcdd3",
+    "raw_training_training_2025-04-01_2025-05-01.parquet": "9ffe0cf5741c4863799c41be81475dfaecedabe0ba687b8f8e4eacba992f9390",
+    "raw_training_training_2025-05-01_2025-06-01.parquet": "5481c0642a8fbb4dc395f93bc713c57f4cc16854fb361d404967077e1fce2ff9",
+    "raw_training_training_2025-06-01_2025-07-01.parquet": "c3ef5080f2cc636c3416baf1555f7d0ee3519f9046e8043c1c0c8f017a244025",
+    "raw_training_training_2025-07-01_2025-08-01.parquet": "34d1c5bba7c8596a1c20c09edd3cb2f63277b5a684fa801911660fe0eaf63c9d",
+    "raw_training_training_2025-08-01_2025-09-01.parquet": "6c8d2aa7a1b6c9dff9a0305a37eb02de1e87a68d07557264f41b77738272c540",
+    "raw_training_training_2025-09-01_2025-10-01.parquet": "955308a4000947e32a00586d3ee13928949d2231b67f84f6dfb0631893f3754a",
+    "raw_training_training_2025-10-01_2025-11-01.parquet": "4a31a35601c1bdcd74b8cd6379231ba516a48324e4c2478bf1c9360cd23e687f",
+    "raw_training_training_2025-11-01_2025-12-01.parquet": "ac36b17db7a537e3baeb682fa4763dacaa1fcc5d9bfa6bf32b3ee5d9f91300b0",
+    "raw_training_training_2025-12-01_2026-01-01.parquet": "2d357f2f403a86778a69e93f72d8754effe77f1ac0942399b3d1b7728241f724",
+    "raw_ranking": "9db75e3a56fa09b87aab72e191a53da3fe763d9887ad2b23aea9cde6a6325f86"
+  },
+  "predictors": "deep timestamp + 14 ARR + 24 neighbour + 8 runway; exact training/ranking cache ID alignment",
+  "forbidden_predictors": [
+    "departure BLOCK_TIME_UTC_mvt",
+    "departure TAXITIME_SEC_mvt",
+    "opaque flight ID values"
+  ],
+  "params": {
+    "objective": "regression",
+    "metric": "rmse",
+    "learning_rate": 0.03,
+    "num_leaves": 255,
+    "min_data_in_leaf": 80,
+    "lambda_l2": 30,
+    "feature_fraction": 0.9,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 1,
+    "num_threads": 3,
+    "seed": 2026,
+    "feature_fraction_seed": 2026,
+    "bagging_seed": 2026,
+    "deterministic": true,
+    "force_col_wise": true,
+    "verbosity": -1
+  },
+  "max_rounds": 2000,
+  "early_stop_rounds": 150,
+  "early_stop_days": "eligible complement-month UTC calendar days with (Unix day + 2026) modulo 10 == 0",
+  "training_gate": "finite target in [0,86400] and own AOBT proxy in [0,7200]",
+  "heldout_gate": "all finite targets with own AOBT proxy in [0,7200]",
+  "selection": {
+    "months": [
+      1,
+      7
+    ],
+    "weights": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "metric": "all finite clipped RMSE; ties smaller weight",
+    "forward_months": [
+      11,
+      12
+    ],
+    "forward_weight": "unchanged",
+    "promotion_gate": "nonzero selected weight and positive UTC-day bootstrap 95% gain lower bound in both folds"
+  },
+  "fresh_audit": {
+    "months": [
+      4,
+      10
+    ],
+    "train_and_early_stop_exclude": [
+      4,
+      10
+    ],
+    "prior": "saved depth-10 ARR fresh OOF",
+    "candidate": "new fixed LightGBM on all covariates",
+    "blend_weight": "seasonal selected weight unchanged",
+    "gate": "exact valid-ID coverage, finite predictions, paired day bootstrap lower gain > 0"
+  },
+  "limitations": "Repeated 2025 comparisons and inherited v6 base OOF overlap limit interpretation; 2026 ranking feedback is not used."
+}

@@ -7,7 +7,7 @@ identify the predeclared no-NM evaluation gate; they never enter the model.
 
 Protocol: prepare -> fit-fold for each complementary split -> evaluate. A
 positive local result is still provisional until an independent April/October
-paired architecture audit. This module does not create ranking predictions.
+paired architecture audit. Final ranking predictions require every gate.
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 
 import lightgbm as lgb
 import numpy as np
@@ -127,12 +128,14 @@ def protocol() -> dict:
         "selection": "Minimum all-finite Jan/Jul RMSE; ties favor smaller weight",
         "promotion": "Selected positive weight improves all-finite RMSE and UTC-day bootstrap 95% lower gain bound >0 on both folds; independent Apr/Oct paired architecture audit also required",
         "fresh_architecture_audit": {
-            "reference": "Refit the accepted v5 ordinary CatBoost direct architecture excluding April/October labels",
+            "reference": "Refit the accepted v5 ordinary CatBoost direct architecture (700-round cap, depth 6, internal early stop 70) excluding April/October labels",
             "candidate": "Refit movement-only LightGBM on ordinary departures excluding April/October labels",
             "comparison": "On finite no-NM invalid-AOBT non-LIRF April/October rows, compare CatBoost direct against the fixed Jan/Jul weight blend of CatBoost direct and movement-only direct, clipped at zero",
             "pass_rule": "Both individual months improve RMSE and pooled UTC-day bootstrap 95% gain lower bound is positive",
             "no_in_sample_v5": True,
         },
+        "final_model": "After all gates, fit every ordinary 2025 row for median of the two complementary-fold best rounds; no ranking labels",
+        "ranking": "Only after all gates, apply fixed selected weight to the no-NM invalid-AOBT non-LIRF gate of an explicitly SHA-pinned accepted ranking reference; preserve template order and all non-gate predictions",
         "leaderboard_use": "No leaderboard feedback enters model or selection",
         "status": "Predeclared protocol; fit and validation artifacts track completion",
     }
@@ -286,8 +289,9 @@ def model_params(threads: int) -> dict:
             "deterministic": True, "force_col_wise": True}
 
 
-def read_gate(cache_dir: Path, rows: pd.DataFrame) -> np.ndarray:
-    flags = pd.read_parquet(cache_dir / "features.parquet",
+def read_gate(cache_dir: Path, rows: pd.DataFrame, *, ranking: bool = False) -> np.ndarray:
+    filename = "ranking_features.parquet" if ranking else "features.parquet"
+    flags = pd.read_parquet(cache_dir / filename,
                             columns=["AOBT_3_flt_missing", "LOBT_flt_missing"])
     if len(flags) != len(rows):
         raise ValueError("Gate metadata does not align with baseline rows")
@@ -295,6 +299,35 @@ def read_gate(cache_dir: Path, rows: pd.DataFrame) -> np.ndarray:
             & flags.LOBT_flt_missing.to_numpy(dtype=bool)
             & ~np.isfinite(rows.proxy.to_numpy(dtype=float))
             & ~rows.airport.eq("LIRF").to_numpy(dtype=bool))
+
+
+def fit_movement_model(args: argparse.Namespace, features: pd.DataFrame,
+                       rows: pd.DataFrame, categorical: list[str],
+                       heldout_months: tuple[int, int]) -> tuple[lgb.Booster, dict]:
+    y = rows.target.to_numpy(dtype=np.float32)
+    heldout = np.isin(rows.month.to_numpy(dtype=np.int16), heldout_months)
+    ordinary = np.isfinite(y) & (y >= 0) & (y <= 7200) & ~heldout
+    day = pd.to_datetime(rows.time, utc=True, errors="coerce").dt.floor("D")
+    if day.isna().any():
+        raise ValueError("Every training departure must have a movement date")
+    day_number = day.dt.as_unit("ns").astype("int64").to_numpy() // 86_400_000_000_000
+    internal = ordinary & (day_number % 11 == 0)
+    fit_mask = ordinary & ~internal
+    if fit_mask.sum() < 100_000 or internal.sum() < 10_000:
+        raise ValueError("Insufficient ordinary fit or internal early-stop rows")
+    train_set = lgb.Dataset(features.loc[fit_mask], label=y[fit_mask],
+                            categorical_feature=categorical, free_raw_data=True)
+    early_set = lgb.Dataset(features.loc[internal], label=y[internal],
+                            reference=train_set, categorical_feature=categorical,
+                            free_raw_data=True)
+    model = lgb.train(model_params(args.threads), train_set, num_boost_round=1200,
+                      valid_sets=[early_set], callbacks=[
+                          lgb.early_stopping(100, verbose=True),
+                          lgb.log_evaluation(period=100)])
+    report = {"ordinary_complement_rows": int(ordinary.sum()),
+              "fit_rows": int(fit_mask.sum()), "internal_early_rows": int(internal.sum()),
+              "best_round": int(model.best_iteration or 1200)}
+    return model, report
 
 
 def fit_fold(args: argparse.Namespace) -> dict:
@@ -306,30 +339,13 @@ def fit_fold(args: argparse.Namespace) -> dict:
     y = rows.target.to_numpy(dtype=np.float32)
     month = rows.month.to_numpy(dtype=np.int16)
     heldout = np.isin(month, months)
-    ordinary = np.isfinite(y) & (y >= 0) & (y <= 7200) & ~heldout
-    day = pd.to_datetime(rows.time, utc=True, errors="coerce").dt.floor("D")
-    if day.isna().any():
-        raise ValueError("Every training departure must have a movement date")
-    day_number = day.dt.as_unit("ns").astype("int64").to_numpy() // 86_400_000_000_000
-    internal = ordinary & (day_number % 11 == 0)
-    fit_mask = ordinary & ~internal
-    if fit_mask.sum() < 100_000 or internal.sum() < 10_000:
-        raise ValueError("Insufficient ordinary fit or internal early-stop rows")
     gate = read_gate(args.cache_dir, rows)
     predict_mask = heldout & gate & np.isfinite(y)
     if predict_mask.sum() < 100:
         raise ValueError("Unexpectedly few held-out no-NM non-LIRF rows")
-    cats = manifest["categorical"]
-    train_set = lgb.Dataset(features.loc[fit_mask], label=y[fit_mask],
-                            categorical_feature=cats, free_raw_data=True)
-    early_set = lgb.Dataset(features.loc[internal], label=y[internal],
-                            reference=train_set, categorical_feature=cats,
-                            free_raw_data=True)
-    model = lgb.train(model_params(args.threads), train_set, num_boost_round=1200,
-                      valid_sets=[early_set], callbacks=[
-                          lgb.early_stopping(100, verbose=True),
-                          lgb.log_evaluation(period=100)])
-    best = int(model.best_iteration or 1200)
+    model, fit_report = fit_movement_model(args, features, rows,
+                                            manifest["categorical"], months)
+    best = fit_report["best_round"]
     expert = model.predict(features.loc[predict_mask], num_iteration=best,
                            num_threads=args.threads)
     if not np.isfinite(expert).all():
@@ -339,11 +355,10 @@ def fit_fold(args: argparse.Namespace) -> dict:
     output["expert"] = np.maximum(expert, 0).astype("float32")
     output.to_parquet(args.output_dir / f"{args.fold}_oof.parquet", index=False)
     model.save_model(str(args.output_dir / f"{args.fold}.txt"))
-    report = {"fold": args.fold, "heldout_months": list(months),
-              "ordinary_complement_rows": int(ordinary.sum()),
-              "fit_rows": int(fit_mask.sum()), "internal_early_rows": int(internal.sum()),
+    report = {"fold": args.fold, "heldout_months": list(months), **fit_report,
               "heldout_gate_rows": int(predict_mask.sum()),
               "best_round": best, "feature_count": len(features.columns),
+              "features_manifest_sha256": sha256(args.output_dir / "features_manifest.json"),
               "source": "2025 local train labels, no competition leaderboard feedback"}
     (args.output_dir / f"{args.fold}_fit.json").write_text(
         json.dumps(report, indent=2) + "\n", encoding="utf-8")
@@ -381,6 +396,7 @@ def evaluate(args: argparse.Namespace) -> dict:
     ensure_protocol(args.output_dir)
     verify_reference(args.v5_oof)
     manifest = json.loads((args.output_dir / "features_manifest.json").read_text(encoding="utf-8"))
+    manifest_sha = sha256(args.output_dir / "features_manifest.json")
     if sha256(args.cache_dir / "features.parquet") != manifest["baseline_features_sha256"]:
         raise ValueError("Baseline gate metadata changed after feature preparation")
     base = pd.read_parquet(args.v5_oof,
@@ -404,6 +420,9 @@ def evaluate(args: argparse.Namespace) -> dict:
     gate &= ~base.a_valid.to_numpy(dtype=bool)
     sources = []
     for fold in FOLDS:
+        fit_report = json.loads((args.output_dir / f"{fold}_fit.json").read_text(encoding="utf-8"))
+        if fit_report.get("features_manifest_sha256") != manifest_sha:
+            raise ValueError(f"Movement-only {fold} model used a different feature cache")
         part = pd.read_parquet(args.output_dir / f"{fold}_oof.parquet",
                                columns=["MVT_ID_mvt", "fold", "expert"])
         if not part.fold.eq(fold).all():
@@ -449,6 +468,7 @@ def evaluate(args: argparse.Namespace) -> dict:
         < scores[fold]["all_finite_rmse_sec"]["0.0"]
         and stability[fold]["gain_ci95_sec"][0] > 0 for fold in FOLDS))
     report = {"reference_sha256": REFERENCE_SHA256,
+              "features_manifest_sha256": manifest_sha,
               "selection": "Jan/Jul all-finite RMSE only; Nov/Dec unchanged weight",
               "weights": list(WEIGHTS), "scores": scores,
               "selected_weight": selected, "day_stability": stability,
@@ -468,9 +488,326 @@ def evaluate(args: argparse.Namespace) -> dict:
     return report
 
 
+def selected_weight_after_local_gates(output_dir: Path) -> float:
+    report = json.loads((output_dir / "validation.json").read_text(encoding="utf-8"))
+    if report.get("reference_sha256") != REFERENCE_SHA256:
+        raise ValueError("Movement-only local validation reference changed")
+    if report.get("features_manifest_sha256") != sha256(output_dir / "features_manifest.json"):
+        raise ValueError("Movement-only validation feature cache changed")
+    weight = float(report["selected_weight"])
+    if weight not in WEIGHTS or weight <= 0 or not report.get("both_existing_folds_passed"):
+        raise ValueError("Movement-only Jan/Jul and Nov/Dec gates did not pass")
+    for fold in FOLDS:
+        scores = report["scores"][fold]["all_finite_rmse_sec"]
+        stability = report["day_stability"][fold]
+        if not (scores[str(weight)] < scores["0.0"]
+                and stability["gain_ci95_sec"][0] > 0):
+            raise ValueError(f"Movement-only local gate changed or failed: {fold}")
+    return weight
+
+
+def fresh_audit(args: argparse.Namespace) -> dict:
+    """Paired April/October architecture refits, with no in-sample v5 base."""
+    require_memory(args.min_free_gib)
+    ensure_protocol(args.output_dir)
+    verify_reference(args.v5_oof)
+    weight = selected_weight_after_local_gates(args.output_dir)
+    features, rows, manifest = load_prepared(args)
+    months = (4, 10)
+    y = rows.target.to_numpy(dtype=float)
+    heldout = rows.month.isin(months).to_numpy(dtype=bool)
+    gate = heldout & read_gate(args.cache_dir, rows) & np.isfinite(y)
+    if gate.sum() < 100:
+        raise ValueError("Unexpectedly few finite April/October audit rows")
+    audit_idx = np.flatnonzero(gate)
+    audit_frame = rows.iloc[audit_idx][["MVT_ID_mvt", "target", "airport", "month", "time"]].copy()
+    audit_frame = audit_frame.rename(columns={"time": "MVT_TIME_UTC_mvt"})
+
+    movement, movement_fit = fit_movement_model(
+        args, features, rows, manifest["categorical"], months)
+    movement_prediction = np.maximum(movement.predict(
+        features.iloc[audit_idx], num_iteration=movement_fit["best_round"],
+        num_threads=args.threads), 0)
+    if not np.isfinite(movement_prediction).all():
+        raise ValueError("Fresh movement refit produced nonfinite audit predictions")
+    movement_file = args.output_dir / "april_october_movement.txt"
+    movement.save_model(str(movement_file))
+    del movement, features
+    gc.collect()
+
+    # Exactly the accepted v5 ordinary direct architecture, including its
+    # complementary-month early-stop procedure; April/October labels are not
+    # seen by the CatBoost reference or the movement model.
+    from missing_catboost import columns as catboost_columns
+    from missing_catboost import load_inputs as catboost_load_inputs
+    from missing_catboost import train_model as catboost_train_model
+    catboost_args = argparse.Namespace(cache_dir=args.cache_dir,
+                                        data_dir=args.data_dir,
+                                        weather_file=args.weather_file,
+                                        threads=args.threads, seed=2026)
+    cb_rows, cb_features = catboost_load_inputs(catboost_args)
+    if not np.array_equal(cb_rows.MVT_ID_mvt.to_numpy(), rows.MVT_ID_mvt.to_numpy()):
+        raise ValueError("CatBoost reference rows do not align with movement rows")
+    cb_y = cb_rows.target.to_numpy(dtype=float)
+    cb_proxy = cb_rows.proxy.to_numpy(dtype=float)
+    cb_no_nm = (cb_features.AOBT_3_flt_missing.to_numpy(dtype=bool)
+                & cb_features.LOBT_flt_missing.to_numpy(dtype=bool))
+    cb_train = (cb_no_nm & ~np.isfinite(cb_proxy) & np.isfinite(cb_y)
+                & (cb_y >= 0) & (cb_y <= 7200) & ~heldout)
+    cb_names, cb_cats = catboost_columns(cb_features, long=False)
+    reference, reference_fit = catboost_train_model(
+        catboost_args, "ordinary_direct", "regression",
+        cb_features, np.flatnonzero(cb_train), cb_y, cb_names, cb_cats, 700, 6)
+    reference_prediction = np.maximum(reference.predict(
+        cb_features.iloc[audit_idx][cb_names], thread_count=args.threads), 0)
+    if not np.isfinite(reference_prediction).all():
+        raise ValueError("Fresh CatBoost reference produced nonfinite audit predictions")
+    reference_file = args.output_dir / "april_october_reference.cbm"
+    reference.save_model(str(reference_file))
+    del reference, cb_features, cb_rows
+    gc.collect()
+
+    candidate = np.maximum((1 - weight) * reference_prediction
+                           + weight * movement_prediction, 0)
+    audit_y = audit_frame.target.to_numpy(dtype=float)
+    month = audit_frame.month.to_numpy(dtype=int)
+    month_scores = {str(m): {"n": int((month == m).sum()),
+                             "reference_rmse_sec": rmse(audit_y[month == m],
+                                                         reference_prediction[month == m]),
+                             "candidate_rmse_sec": rmse(audit_y[month == m],
+                                                         candidate[month == m])}
+                    for m in months}
+    pooled = day_bootstrap(audit_frame, reference_prediction, candidate,
+                           np.ones(len(audit_frame), dtype=bool), SEED + 19)
+    passed = (all(month_scores[str(m)]["candidate_rmse_sec"]
+                  < month_scores[str(m)]["reference_rmse_sec"] for m in months)
+              and pooled["gain_ci95_sec"][0] > 0)
+    audit_frame["reference_direct"] = reference_prediction.astype("float32")
+    audit_frame["movement_direct"] = movement_prediction.astype("float32")
+    audit_frame["fixed_blend"] = candidate.astype("float32")
+    audit_frame.to_parquet(args.output_dir / "april_october_predictions.parquet", index=False)
+    report = {"heldout_months": list(months), "fixed_weight": weight,
+              "validation_reference_sha256": REFERENCE_SHA256,
+              "features_manifest_sha256": sha256(args.output_dir / "features_manifest.json"),
+              "reference_architecture": "v5 ordinary CatBoost direct 700-round cap, depth 6, internal early stop 70",
+              "reference_training": reference_fit,
+              "movement_training": movement_fit,
+              "model_sha256": {"catboost": sha256(reference_file),
+                               "movement": sha256(movement_file)},
+              "month_scores": month_scores, "pooled_day_stability": pooled,
+              "passed": bool(passed), "no_in_sample_v5_predictions": True,
+              "promotion_pending": "Final full-data fit and ranking reference checks" if passed else
+                                   "Fresh paired architecture audit failed"}
+    (args.output_dir / "fresh_audit.json").write_text(
+        json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    return report
+
+
+def require_all_gates(output_dir: Path) -> tuple[float, dict]:
+    weight = selected_weight_after_local_gates(output_dir)
+    audit = json.loads((output_dir / "fresh_audit.json").read_text(encoding="utf-8"))
+    if not audit.get("passed") or float(audit.get("fixed_weight", -1)) != weight:
+        raise ValueError("Fresh April/October architecture audit did not pass")
+    if audit.get("features_manifest_sha256") != sha256(output_dir / "features_manifest.json"):
+        raise ValueError("Fresh architecture audit feature cache changed")
+    for month in (4, 10):
+        score = audit["month_scores"][str(month)]
+        if not score["candidate_rmse_sec"] < score["reference_rmse_sec"]:
+            raise ValueError(f"Fresh architecture audit month {month} failed")
+    if audit["pooled_day_stability"]["gain_ci95_sec"][0] <= 0:
+        raise ValueError("Fresh architecture audit day stability failed")
+    if not audit.get("no_in_sample_v5_predictions"):
+        raise ValueError("Fresh audit used an in-sample reference")
+    return weight, audit
+
+
+def fit_final(args: argparse.Namespace) -> dict:
+    require_memory(args.min_free_gib)
+    ensure_protocol(args.output_dir)
+    verify_reference(args.v5_oof)
+    weight, audit = require_all_gates(args.output_dir)
+    features, rows, manifest = load_prepared(args)
+    fold_reports = [json.loads((args.output_dir / f"{fold}_fit.json").read_text(
+        encoding="utf-8")) for fold in FOLDS]
+    rounds = int(np.median([report["best_round"] for report in fold_reports]))
+    if not 1 <= rounds <= 1200:
+        raise ValueError("Invalid predeclared final training round count")
+    y = rows.target.to_numpy(dtype=np.float32)
+    ordinary = np.isfinite(y) & (y >= 0) & (y <= 7200)
+    if ordinary.sum() < 1_000_000:
+        raise ValueError("Unexpectedly few ordinary full-data training rows")
+    train_set = lgb.Dataset(features.loc[ordinary], label=y[ordinary],
+                            categorical_feature=manifest["categorical"],
+                            free_raw_data=True)
+    model = lgb.train(model_params(args.threads), train_set,
+                      num_boost_round=rounds,
+                      callbacks=[lgb.log_evaluation(period=200)])
+    model_file = args.output_dir / "final_movement_only.txt"
+    model.save_model(str(model_file))
+    report = {"final_rounds": rounds,
+              "fold_best_rounds": {fold: int(fit["best_round"])
+                                   for fold, fit in zip(FOLDS, fold_reports)},
+              "training_rows": int(ordinary.sum()),
+              "feature_count": len(manifest["features"]),
+              "selected_weight": weight,
+              "model_sha256": sha256(model_file),
+              "features_manifest_sha256": sha256(args.output_dir / "features_manifest.json"),
+              "validation_sha256": sha256(args.output_dir / "validation.json"),
+              "fresh_audit_sha256": sha256(args.output_dir / "fresh_audit.json"),
+              "reference_sha256": REFERENCE_SHA256,
+              "audit_passed": bool(audit["passed"]),
+              "ranking_prediction_created": False}
+    (args.output_dir / "final_model.json").write_text(
+        json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    return report
+
+
+def build_ranking_features(args: argparse.Namespace,
+                           manifest: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
+    cached_names = list(SAFE_CACHED_NUMERIC + SAFE_CACHED_CATEGORICAL)
+    features = pd.read_parquet(args.cache_dir / "ranking_features.parquet",
+                               columns=cached_names)
+    rows = pd.read_parquet(args.cache_dir / "ranking_rows.parquet",
+                           columns=["MVT_ID_mvt", "proxy", "airport", "time"])
+    if (len(features) != len(rows) or rows.MVT_ID_mvt.isna().any()
+            or rows.MVT_ID_mvt.duplicated().any()):
+        raise ValueError("Ranking features/rows lack exact unique coverage")
+    if not features.ADEP_mvt.astype("string").eq(rows.airport.astype("string")).all():
+        raise ValueError("Ranking cached features/rows differ by airport")
+    raw = (pl.scan_parquet(str(args.data_dir / "ranking.parquet"))
+           .filter(pl.col("PHASE_mvt") == "DEP")
+           .select(["MVT_ID_mvt", "MVT_TIME_UTC_mvt", "SCHED_TIME_UTC_mvt",
+                    "FLIGHT_mvt"]).collect().to_pandas())
+    if not np.array_equal(raw.MVT_ID_mvt.to_numpy(), rows.MVT_ID_mvt.to_numpy()):
+        raise ValueError("Raw ranking departure IDs differ from baseline ranking cache")
+    mvt = pd.to_datetime(raw.MVT_TIME_UTC_mvt, utc=True, errors="coerce")
+    sched = pd.to_datetime(raw.SCHED_TIME_UTC_mvt, utc=True, errors="coerce")
+    if not mvt.eq(pd.to_datetime(rows.time, utc=True)).all():
+        raise ValueError("Raw ranking movement times differ from cached times")
+    features["flight_name_mvt"] = (raw.FLIGHT_mvt.astype("string")
+                                   .fillna("__MISSING__").astype("category"))
+    features["mvt_utc_minute"] = mvt.dt.minute.astype("float32")
+    features["mvt_utc_second"] = mvt.dt.second.astype("float32")
+    features["schedule_utc_hour"] = sched.dt.hour.astype("float32")
+    features["schedule_utc_minute"] = sched.dt.minute.astype("float32")
+    features["schedule_utc_second"] = sched.dt.second.astype("float32")
+    features["schedule_utc_weekday"] = sched.dt.dayofweek.astype("float32")
+    local_hour = np.full(len(rows), np.nan, dtype=np.float32)
+    local_weekday = np.full(len(rows), np.nan, dtype=np.float32)
+    for airport, timezone_name in AIRPORT_TZ.items():
+        idx = np.flatnonzero(rows.airport.eq(airport).to_numpy())
+        if len(idx):
+            local = sched.iloc[idx].dt.tz_convert(timezone_name)
+            local_hour[idx] = local.dt.hour.to_numpy(dtype=np.float32)
+            local_weekday[idx] = local.dt.dayofweek.to_numpy(dtype=np.float32)
+    features["schedule_local_hour"] = local_hour
+    features["schedule_local_weekday"] = local_weekday
+    gap = (mvt - sched).dt.total_seconds()
+    features["mvt_schedule_gap_seconds"] = gap.clip(-604800, 604800).astype("float32")
+    features["mvt_schedule_day_offset"] = np.floor(gap / 86400).clip(-30, 30).astype("float32")
+    features["schedule_missing"] = sched.isna().astype("int8")
+    del raw, mvt, sched, gap
+    gc.collect()
+    features = add_weather(features, rows[["airport", "time"]], args.weather_file)
+    arrivals = pd.read_parquet(args.ranking_arrival_cache,
+                               columns=["MVT_ID_mvt", *ARRIVAL_COLUMNS])
+    if not np.array_equal(arrivals.MVT_ID_mvt.to_numpy(), rows.MVT_ID_mvt.to_numpy()):
+        raise ValueError("Ranking ARR features differ in movement ID order")
+    for name in ARRIVAL_COLUMNS:
+        features[name] = pd.to_numeric(arrivals[name], errors="coerce").astype("float32")
+    assert_safe_matrix(features, manifest["features"])
+    if [name for name in features
+            if isinstance(features[name].dtype, pd.CategoricalDtype)] != manifest["categorical"]:
+        raise ValueError("Ranking categorical schema differs from training")
+    return features, rows
+
+
+def final_predict(args: argparse.Namespace) -> dict:
+    require_memory(args.min_free_gib)
+    ensure_protocol(args.output_dir)
+    verify_reference(args.v5_oof)
+    weight, _ = require_all_gates(args.output_dir)
+    if args.ranking_reference is None or args.reference_sha256 is None:
+        raise ValueError("Final prediction requires --ranking-reference and --reference-sha256")
+    if not re.fullmatch(r"[0-9a-fA-F]{64}", args.reference_sha256):
+        raise ValueError("Expected a 64-character SHA-256 reference hash")
+    actual_reference_hash = sha256(args.ranking_reference)
+    if actual_reference_hash != args.reference_sha256.lower():
+        raise ValueError("Ranking reference does not match the explicitly pinned SHA-256")
+    final = json.loads((args.output_dir / "final_model.json").read_text(encoding="utf-8"))
+    model_file = args.output_dir / "final_movement_only.txt"
+    if (final["model_sha256"] != sha256(model_file)
+            or final["features_manifest_sha256"] != sha256(args.output_dir / "features_manifest.json")
+            or final["validation_sha256"] != sha256(args.output_dir / "validation.json")
+            or final["fresh_audit_sha256"] != sha256(args.output_dir / "fresh_audit.json")
+            or final["selected_weight"] != weight):
+        raise ValueError("Final model, features, validation or audit changed")
+    manifest = json.loads((args.output_dir / "features_manifest.json").read_text(
+        encoding="utf-8"))
+    if sha256(args.weather_file) != manifest["weather_file_sha256"]:
+        raise ValueError("NOAA weather source changed after feature preparation")
+    features, rows = build_ranking_features(args, manifest)
+    template = pd.read_parquet(args.data_dir / "submitting.parquet")
+    reference = pd.read_parquet(args.ranking_reference)
+    expected_columns = ["MVT_ID_mvt", "TAXITIME_SEC_mvt"]
+    if list(template) != expected_columns or list(reference) != expected_columns:
+        raise ValueError("Template and ranking reference must have the exact two-column schema")
+    ids = template.MVT_ID_mvt.to_numpy()
+    if (len(ids) != len(rows) or template.MVT_ID_mvt.isna().any()
+            or template.MVT_ID_mvt.duplicated().any()
+            or not np.array_equal(rows.MVT_ID_mvt.to_numpy(), ids)
+            or not np.array_equal(reference.MVT_ID_mvt.to_numpy(), ids)):
+        raise ValueError("Ranking rows/reference lack exact template order and coverage")
+    old = reference.TAXITIME_SEC_mvt.to_numpy(dtype=np.float64, copy=True)
+    if not np.isfinite(old).all() or np.any(old < 0):
+        raise ValueError("Accepted ranking reference is not finite and nonnegative")
+    gate = read_gate(args.cache_dir, rows, ranking=True)
+    model = lgb.Booster(model_file=str(model_file))
+    raw_expert = model.predict(features.loc[gate], num_iteration=final["final_rounds"],
+                               num_threads=args.threads)
+    if len(raw_expert) != int(gate.sum()) or not np.isfinite(raw_expert).all():
+        raise ValueError("Movement-only ranking expert has incomplete or nonfinite coverage")
+    expert = np.maximum(raw_expert, 0)
+    updated = old.copy()
+    updated[gate] = np.maximum((1 - weight) * old[gate] + weight * expert, 0)
+    if (not np.array_equal(updated[~gate], old[~gate])
+            or not np.array_equal(updated[np.isfinite(rows.proxy.to_numpy(dtype=float))],
+                                  old[np.isfinite(rows.proxy.to_numpy(dtype=float))])
+            or not np.isfinite(updated).all() or np.any(updated < 0)):
+        raise ValueError("Final movement correction changed a non-gate row or is invalid")
+    expert_full = np.full(len(rows), np.nan, dtype=np.float32)
+    expert_full[gate] = expert.astype(np.float32)
+    pd.DataFrame({"MVT_ID_mvt": ids, "gate": gate,
+                  "movement_expert": expert_full}).to_parquet(
+                      args.output_dir / "ranking_expert.parquet", index=False)
+    output_file = args.output_dir / "predictions.parquet"
+    pd.DataFrame({"MVT_ID_mvt": ids,
+                  "TAXITIME_SEC_mvt": updated}).to_parquet(output_file, index=False)
+    readback = pd.read_parquet(output_file)
+    if (not np.array_equal(readback.MVT_ID_mvt.to_numpy(), ids)
+            or not np.array_equal(readback.TAXITIME_SEC_mvt.to_numpy(), updated)):
+        raise ValueError("Final movement prediction readback differs from exact template")
+    report = {"ranking_rows": len(rows), "gate_rows": int(gate.sum()),
+              "changed_rows": int(np.count_nonzero(updated != old)),
+              "selected_weight": weight,
+              "ranking_reference": str(args.ranking_reference),
+              "ranking_reference_sha256": actual_reference_hash,
+              "model_sha256": final["model_sha256"],
+              "prediction_sha256": sha256(output_file),
+              "prediction_bytes": output_file.stat().st_size,
+              "template_order_verified": True,
+              "non_gate_unchanged": True,
+              "finite_nonnegative": True,
+              "uploaded": False}
+    (args.output_dir / "ranking_manifest.json").write_text(
+        json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    return report
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("protocol", "prepare", "fit-fold", "evaluate"),
+    parser.add_argument("--mode", choices=("protocol", "prepare", "fit-fold", "evaluate",
+                                          "fresh-audit", "fit-final", "final-predict"),
                         required=True)
     parser.add_argument("--fold", choices=tuple(FOLDS))
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
@@ -479,12 +816,16 @@ def main() -> None:
                         default=Path("artifacts/v5-arrival-clean/training_arrival_features.parquet"))
     parser.add_argument("--weather-file", type=Path,
                         default=Path("data/external/weather.parquet"))
+    parser.add_argument("--ranking-arrival-cache", type=Path,
+                        default=Path("artifacts/v5-arrival-clean/ranking_arrival_features.parquet"))
     parser.add_argument("--v5-oof", type=Path,
                         default=Path("artifacts/v5-ensemble/validation_predictions.parquet"))
     parser.add_argument("--output-dir", type=Path,
                         default=Path("artifacts/v6-movement-only"))
     parser.add_argument("--threads", type=int, default=3)
     parser.add_argument("--min-free-gib", type=float, default=10.0)
+    parser.add_argument("--ranking-reference", type=Path)
+    parser.add_argument("--reference-sha256")
     args = parser.parse_args()
     if args.threads < 1 or args.threads > 3:
         raise ValueError("Movement-only fit is limited to 3 CPU threads")
@@ -496,8 +837,14 @@ def main() -> None:
         result = prepare(args)
     elif args.mode == "fit-fold":
         result = fit_fold(args)
-    else:
+    elif args.mode == "evaluate":
         result = evaluate(args)
+    elif args.mode == "fresh-audit":
+        result = fresh_audit(args)
+    elif args.mode == "fit-final":
+        result = fit_final(args)
+    else:
+        result = final_predict(args)
     print(json.dumps(result, indent=2))
 
 

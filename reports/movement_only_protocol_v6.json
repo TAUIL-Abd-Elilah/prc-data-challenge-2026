@@ -47,6 +47,15 @@
   ],
   "selection": "Minimum all-finite Jan/Jul RMSE; ties favor smaller weight",
   "promotion": "Selected positive weight improves all-finite RMSE and UTC-day bootstrap 95% lower gain bound >0 on both folds; independent Apr/Oct paired architecture audit also required",
+  "fresh_architecture_audit": {
+    "reference": "Refit the accepted v5 ordinary CatBoost direct architecture (700-round cap, depth 6, internal early stop 70) excluding April/October labels",
+    "candidate": "Refit movement-only LightGBM on ordinary departures excluding April/October labels",
+    "comparison": "On finite no-NM invalid-AOBT non-LIRF April/October rows, compare CatBoost direct against the fixed Jan/Jul weight blend of CatBoost direct and movement-only direct, clipped at zero",
+    "pass_rule": "Both individual months improve RMSE and pooled UTC-day bootstrap 95% gain lower bound is positive",
+    "no_in_sample_v5": true
+  },
+  "final_model": "After all gates, fit every ordinary 2025 row for median of the two complementary-fold best rounds; no ranking labels",
+  "ranking": "Only after all gates, apply fixed selected weight to the no-NM invalid-AOBT non-LIRF gate of an explicitly SHA-pinned accepted ranking reference; preserve template order and all non-gate predictions",
   "leaderboard_use": "No leaderboard feedback enters model or selection",
   "status": "Predeclared protocol; fit and validation artifacts track completion"
 }
