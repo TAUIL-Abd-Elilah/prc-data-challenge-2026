@@ -71,6 +71,10 @@ if ((Get-FileHash $mc -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c8db13ebed
 
 Keep access keys and secrets private; never commit them. Check the [official leaderboard](https://prc-data-challenge-2026.netlify.app/ranking.html) for the scored entry after upload. The repository does not perform the upload.
 
+## Official result
+
+The accepted `merry-mushroom_v3.parquet` submission scored **289.2078 seconds RMSE** over 344,841 pairs. At 2026-10-02 13:48:21 UTC, the team's best-score rank was **88th**, counting distinct teams with a lower best score. This is a leaderboard snapshot; first place has not been achieved. The public aggregate receipt is [reports/submission_v3.json](reports/submission_v3.json), and the score is available from the [official team results API](https://datacomp.opensky-network.org/api/competitions/bb3693e1-26bc-4a9e-8619-4fe78b4eab0c/leaderboard?teamName=merry-mushroom&limit=200).
+
 The synthetic pipeline check is `python tests/smoke.py`. It tests execution and Parquet alignment; its generated RMSE has no competition meaning.
 
 ## Improving a submission
