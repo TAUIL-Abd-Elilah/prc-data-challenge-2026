@@ -1,0 +1,188 @@
+{
+  "protocol": {
+    "purpose": "2025 local comparison; no leaderboard, upload, or ranking selection",
+    "references": {
+      "source_reference_sha256": "c75e50343bee6cee9c9f7366c4437a461d8156e3d96abca24bcae3bd40cfe92d",
+      "frozen_reference_sha256": "a249be9ff5a4d26a8f7c1afe415d09180328ee2a922839c3b9c77d4790e954ed"
+    },
+    "input_sha256": {
+      "training_rows": "b19e760a11b15e77996203ee84431fbcc225e0e2a325b15cd43bc38a00c47fcc",
+      "arrival_training": "c4cad12b3a7d0bcf600f775fe12178bb2132fbfc9e0741c8fa35fd71257d76b5",
+      "neighbour_training": "2c46c58db6cf2b89a1d53034c215cf1f24618f2a097b00fd0e4faf20063fe26e",
+      "neighbour_ranking": "1931dec6be7b656ecf9980d2103677b33bd249106fa92a394525e2b4e1c3207a",
+      "runway_training": "1dbe8beaa5550f3974e628f3aa220ae6c32c4ff883ccc6655030c262089942bf",
+      "runway_ranking": "7f1c2bf4830dbe5526ed16c867a0552cface11d49a7f2175355f07ff190f10df",
+      "fresh_prior_depth10_arrival_oof": "7d252edb4b3abf158830367633b56d5e68d03d0a387b98edae18d79fa50f225d",
+      "neighbour_feature_protocol": "64a2c71ac7a941b797c8efbca343b417dfae0dc8bfeca9d6d5097a5ebc962343",
+      "runway_feature_protocol": "3ea6ff89b37dc872fc7abd62f522697d7e6d754f702c65bc8a6af27d423ecfce"
+    },
+    "source_paths": {
+      "v6_oof": "artifacts\\v6-deep-arrival\\validation_predictions.parquet",
+      "frozen_v6_oof": "artifacts\\v7-runway-traffic\\frozen_v6_oof_reference.parquet",
+      "ranking_reference_if_promoted": "submissions\\merry-mushroom_v6.parquet",
+      "fresh_prior_oof": "artifacts\\v6-deep-arrival\\fresh_new\\fresh_apr_oct_oof.parquet"
+    },
+    "architecture": {
+      "algorithm": "CatBoost GPU residual to own AOBT proxy",
+      "depth": 10,
+      "max_iterations": 10000,
+      "random_seed": 2026,
+      "other_params": "deep_timestamp_expert.params unchanged",
+      "training_labels": "finite 2025 labels in 0..86400 seconds, own proxy 0..7200",
+      "heldout_scoring_labels": "all finite, including extreme and negative",
+      "features": "deep timestamp + fixed 14 ARR + fixed 24 neighbour + fixed 8 runway sequence covariates",
+      "neighbour_feature_names": [
+        "nbr_airport_past15m_count",
+        "nbr_airport_past15m_mean",
+        "nbr_airport_past15m_std",
+        "nbr_airport_past60m_count",
+        "nbr_airport_past60m_mean",
+        "nbr_airport_past60m_std",
+        "nbr_airport_future15m_count",
+        "nbr_airport_future15m_mean",
+        "nbr_airport_future15m_std",
+        "nbr_airport_future60m_count",
+        "nbr_airport_future60m_mean",
+        "nbr_airport_future60m_std",
+        "nbr_runway_past15m_count",
+        "nbr_runway_past15m_mean",
+        "nbr_runway_past15m_std",
+        "nbr_runway_past60m_count",
+        "nbr_runway_past60m_mean",
+        "nbr_runway_past60m_std",
+        "nbr_runway_future15m_count",
+        "nbr_runway_future15m_mean",
+        "nbr_runway_future15m_std",
+        "nbr_runway_future60m_count",
+        "nbr_runway_future60m_mean",
+        "nbr_runway_future60m_std"
+      ],
+      "runway_feature_names": [
+        "runway_arr_past15m_count",
+        "runway_arr_future15m_count",
+        "runway_arr_past60m_count",
+        "runway_arr_future60m_count",
+        "runway_arr_prev_gap_sec",
+        "runway_arr_next_gap_sec",
+        "runway_dep_prev_gap_sec",
+        "runway_dep_next_gap_sec"
+      ]
+    },
+    "selection": {
+      "months": [
+        1,
+        7
+      ],
+      "forward_months": [
+        11,
+        12
+      ],
+      "weights": [
+        0.0,
+        0.1,
+        0.25,
+        0.5,
+        1.0
+      ],
+      "criterion": "minimum seasonal all-finite RMSE, ties to smaller weight",
+      "forward": "same selected weight without adjustment",
+      "paired_day_bootstrap": "1000 UTC-day resamples, 95% percentile interval",
+      "gate": "nonzero weight and CI lower > 0 separately in both folds"
+    },
+    "fresh_audit": {
+      "months": [
+        4,
+        10
+      ],
+      "excluded_from_both_fits": [
+        4,
+        10
+      ],
+      "prior": "saved depth10 ARR OOF from v6 fresh_new",
+      "candidate": "new depth10 ARR+neighbour+runway OOF with the same architecture",
+      "weight": "same selected seasonal weight; no retuning",
+      "gate": "exact full valid-ID coverage, finite predictions, paired day CI lower > 0"
+    },
+    "limitations": "Repeated 2025 model comparisons and inherited base OOF training overlap make this a comparison estimate, not untouched 2026 performance."
+  },
+  "folds": {
+    "seasonal_jan_jul": {
+      "n_all_finite": 344419,
+      "n_valid_aobt": 338802,
+      "scores": {
+        "0.0": 323.7231616861707,
+        "0.1": 323.2870766482778,
+        "0.25": 322.7765630061345,
+        "0.5": 322.3105287178819,
+        "1.0": 322.82633220084523
+      },
+      "trees": 10000,
+      "fit_seconds": 438.2810000000027,
+      "bootstrap": {
+        "days": 62,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          1.114189271170781,
+          1.8000984362041577
+        ],
+        "fraction_positive": 1.0,
+        "observed_gain_sec": 1.4126329682888468
+      },
+      "oof_sha256": "5b92820eb312cb1c3bf8b3826b0fc56d75f25d6d81507519a55ca9824886c7eb"
+    },
+    "forward_nov_dec": {
+      "n_all_finite": 328009,
+      "n_valid_aobt": 324862,
+      "scores": {
+        "0.0": 217.90305012559384,
+        "0.1": 217.17213773804207,
+        "0.25": 216.25272812466596,
+        "0.5": 215.19860172054857,
+        "1.0": 214.90906794758868
+      },
+      "trees": 9998,
+      "fit_seconds": 445.29699999999866,
+      "bootstrap": {
+        "days": 61,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          2.3279101267149978,
+          3.129513024386736
+        ],
+        "fraction_positive": 1.0,
+        "observed_gain_sec": 2.7044484050452695
+      },
+      "oof_sha256": "d3974501adde89ca16a7bbdbce95f4706c981dae4c9f0a3592aa1bbf97d8dfcc"
+    }
+  },
+  "selected_weight": 0.5,
+  "existing_folds_passed": true,
+  "promoted": true,
+  "fresh_audit": {
+    "months": [
+      4,
+      10
+    ],
+    "weight": 0.5,
+    "n_valid_aobt": 357813,
+    "coverage_verified": true,
+    "prior_depth10_arrival_rmse": 198.49122204044616,
+    "blended_depth10_arrival_neighbour_runway_rmse": 195.88822176558412,
+    "bootstrap": {
+      "days": 61,
+      "repeats": 1000,
+      "gain_ci95_sec": [
+        2.282184224275144,
+        2.945924397268591
+      ],
+      "fraction_positive": 1.0,
+      "observed_gain_sec": 2.6030002748620404
+    },
+    "passed": true,
+    "prior_oof_sha256": "7d252edb4b3abf158830367633b56d5e68d03d0a387b98edae18d79fa50f225d",
+    "new_oof_sha256": "504635b93fb0e4caa3fdb316b2d93ab3651fff9c86596b0223cafbc07b5bc6c7",
+    "paired_predictions_sha256": "d1b204ceaec7693d0e6a916dc2e9e721d504d7d7f0c5026dbeaf79fdafcb35e1",
+    "scope": "Independent paired architecture comparison, not full ensemble OOF"
+  },
+  "validation_predictions_sha256": "a5e1e8911f30d1c346be17b6b2d666c2571cfa7eb8727a85c082d9b0bab8d095"
+}

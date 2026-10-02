@@ -144,6 +144,8 @@ python v8_lightgbm_residual.py --mode fresh-audit
 python v8_lightgbm_residual.py --mode final-predict
 ```
 
+The separate `v8_combo_audit.py` protocol is frozen before v8 training. If both standalone candidates pass, it applies the same v8 seasonally selected weight toward the v8 expert from the v7 candidate, without choosing another weight. Promotion requires improvement over v7 and positive day confidence bounds in both OOF folds and the paired April/October audit. A failed combination is rejected without retuning. Reproduce with `python v8_combo_audit.py --mode prepare`, then `python v8_combo_audit.py --mode audit` once both standalone validation reports are promoted.
+
 ARR summaries likewise use the complete released batch and can include an arrival whose in-block time follows the queried departure. This is retrospective challenge prediction, not a claim that every field would be available in a real-time departure forecast.
 
 OpenStreetMap geometry was considered only for a read-only extraction audit. No maps were obtained, matching coverage is unknown, and no OSM data enter a model or submission. ODbL is an open-data license; the challenge's external-data wording says open-source license without naming accepted data licenses. Geometry is excluded while that interpretation remains unresolved. No OurAirports or OpenAP data are used.

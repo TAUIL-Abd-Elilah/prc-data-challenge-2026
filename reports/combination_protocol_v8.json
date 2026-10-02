@@ -1,0 +1,39 @@
+{
+  "purpose": "Fixed v7+v8 local OOF comparison, no training or leaderboard feedback",
+  "prerequisite": "Both standalone v7 and v8 reports promoted under their own frozen gates",
+  "reference": "same frozen v6 all-finite 2025 OOF movement IDs and labels",
+  "source_protocol_sha256": {
+    "v7": "27de40f395a76c98fb2fda5d2de4b677d0a2a7ddf43538234e3ca2d6b83a0680",
+    "v8": "437f6615cee18732291cb627b9534fda127824be161c19dd7357a3dd6fe21f18"
+  },
+  "existing_fold_policy": {
+    "months": {
+      "seasonal_jan_jul": [
+        1,
+        7
+      ],
+      "forward_nov_dec": [
+        11,
+        12
+      ]
+    },
+    "base": "v7 clipped candidate on every finite row",
+    "expert": "v8 raw OOF expert on exact valid-AOBT IDs",
+    "weight": "v8 standalone January/July-selected weight, unchanged",
+    "formula": "clip(v7_candidate + weight*(v8_expert-v7_candidate), lower=0) only on valid AOBT",
+    "gate": "RMSE improvement and UTC-day bootstrap 95% lower gain >0 separately in both folds"
+  },
+  "fresh_audit_policy": {
+    "months": [
+      4,
+      10
+    ],
+    "base": "v7 saved fixed fresh blend: depth10 ARR prior + v7 selected weight*(v7 fresh expert-prior)",
+    "expert": "v8 separately refitted April/October raw fresh expert",
+    "weight": "same v8 standalone January/July-selected weight",
+    "formula": "clip(v7_fresh_base + weight*(v8_fresh_expert-v7_fresh_base), lower=0)",
+    "gate": "exact valid-AOBT IDs, aligned labels/time, positive paired UTC-day bootstrap 95% lower gain"
+  },
+  "decision": "accept fixed combination only if both existing folds and fresh paired audit pass; otherwise reject combination without retuning",
+  "limitations": "Repeated 2025 comparison decisions; no untouched 2026 accuracy estimate."
+}

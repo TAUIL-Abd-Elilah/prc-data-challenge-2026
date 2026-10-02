@@ -124,6 +124,12 @@ The additional April/October audit retrains both the previous depth-9 timestamp 
 
 The read-only quota check counts uploads in the preceding 24 hours because the official five-per-day rule does not publish a reset timezone. It also checks a conservative 1,000,000,000-byte bucket limit, the team destination and a fresh higher version number. No submissions are deleted. Upload the frozen v6 file with the same MinIO command below, then download it and its result and run `python record_submission.py --version 6`. Only aggregate receipts are published. Ranking results never select model settings.
 
+## Reproduce v7
+
+After completing v6, build the released neighbor/runway features and run the fixed traffic architecture. See the exact commands in [RESEARCH.md](RESEARCH.md). January/July select a 0.5 blend with v6; the unchanged blend improves local all-finite RMSE from 323.723 to 322.311 seconds on January/July and from 217.903 to 215.199 on November/December, with positive paired UTC-day confidence intervals. The matched April/October architecture audit improves from 198.491 to 195.888 over all 357,813 eligible flights, with a gain interval of 2.282 to 2.946 seconds. The architecture and protocol were frozen before the v6 official result. Aggregate validation is in [reports/traffic_validation_v7.json](reports/traffic_validation_v7.json).
+
+Final ranking prediction is still being prepared. A version is finalized and uploaded only after every local gate, exact template alignment and the quota check pass.
+
 ## Submit with MinIO Client
 
 The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized file for the selected version. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.
