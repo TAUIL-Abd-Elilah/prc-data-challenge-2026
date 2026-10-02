@@ -1,6 +1,6 @@
 # Post-v3 local research
 
-These experiments use labeled 2025 training data and the frozen v3 out-of-fold predictions. They do not use ranking labels or leaderboard feedback to choose model settings. Outputs go under `artifacts/`, which is excluded from Git. The completed experiments in the table below were rejected; the source-classifier result is provisional.
+These experiments use labeled 2025 training data and the frozen v3 out-of-fold predictions. They do not use ranking labels or leaderboard feedback to choose model settings. Outputs go under `artifacts/`, which is excluded from Git. Four exploratory candidates were rejected; the fixed GPU residual followed by source correction was selected locally for v4.
 
 The January/July and November/December 2025 labels have been examined repeatedly across experiments. The forward period is therefore no longer an untouched final estimate. The frozen v3 experts also used held-out month labels for some early stopping. Treat all local scores as diagnostic estimates, not guarantees for 2026.
 
@@ -26,6 +26,41 @@ python catboost_expert.py --fold seasonal_jan_jul --sample-max 400000 --iteratio
 
 `diagnostic_v3.py` produced aggregate error breakdowns that motivated these experiments. Its target bins and largest-error rows are post-prediction diagnostics and are not model inputs.
 
-## Pending
+## Selected local v4 candidate
 
-`catboost_source.py` has provisional candidate-segment results for a 0.5 probability blend selected on January/July. On 33,591 Rome/Istanbul January/July rows, v3 RMSE is 402.728 and the blend is 399.517 seconds. Applied unchanged to 26,490 November/December rows, v3 is 327.08 and the blend is 324.28 seconds. Full finite-label scoring and final-model training are still running, so no submission decision follows yet. A GPU CatBoost experiment also remains pending. Document the complete prediction path and all-row evaluation before considering another submission.
+The GPU residual expert changes only rows with a valid departure proxy. Its blend weight, 0.25, was selected on January/July. The source classifier estimates the probability of a scheduled-time match for Rome/Istanbul departures whose valid AOBT and schedule proxies disagree by more than 600 seconds. Its correction weight, 0.5, was also selected on January/July. The sequential rule applies the fixed GPU blend first, then the fixed source correction; its combined weights were not optimized on the forward months. Every score below uses **all finite-label rows**, including rows where neither expert changes v3.
+
+| Fixed prediction rule | January/July RMSE, 344,419 rows | November/December RMSE, 328,009 rows | Pooled RMSE, 672,428 rows |
+|---|---:|---:|---:|
+| Frozen v3 | 329.403 | 225.625 | 283.566 |
+| Source correction alone | 329.022 | 225.299 | 283.212 |
+| GPU residual alone | 328.664 | 224.837 | 282.820 |
+| GPU then source (selected locally for v4) | **328.221** | **224.465** | **282.412** |
+
+Reproduce the expert OOF predictions and final ranking predictions after the v3 pipeline has built its caches and `data/external/weather.parquet`:
+
+```powershell
+python catboost_gpu.py --mode fit --iterations 1500 --depth 8 --threads 2
+python catboost_gpu.py --mode final-predict --iterations 1500 --depth 8 --threads 2
+python catboost_source.py --fold both --iterations 600 --depth 7 --threads 4
+python catboost_source.py --evaluate-only
+python catboost_source.py --evaluate-sequential-gpu
+python catboost_source.py --fit-final-rank
+python catboost_source.py --combine-gpu
+```
+
+The `source_stability.py` diagnostic reads only IDs, event times, airports, labels, and saved OOF predictions. It does not fit or choose a prediction rule. It compares paired squared errors and resamples UTC calendar days within each held-out month:
+
+```powershell
+python source_stability.py --candidate source --repetitions 1000 --seed 2026
+python source_stability.py --candidate gpu --repetitions 1000 --seed 2026
+python source_stability.py --candidate gpu_then_source --repetitions 1000 --seed 2026
+```
+
+| Paired comparison | January/July RMSE gain, 95% day-block interval | November/December RMSE gain, 95% day-block interval | Pooled RMSE gain, 95% day-block interval |
+|---|---:|---:|---:|
+| Source over v3 | 0.382 [0.050, 0.711] | 0.326 [0.020, 0.670] | 0.354 [0.135, 0.600] |
+| GPU over v3 | 0.739 [0.535, 0.988] | 0.789 [0.642, 0.932] | 0.746 [0.595, 0.915] |
+| Sequential over GPU | 0.443 [0.095, 0.791] | 0.371 [0.065, 0.718] | 0.408 [0.178, 0.668] |
+
+The sequential-over-GPU gain is positive in 99.6% of the seasonal day resamples and 99.2% of the forward resamples. These intervals describe day-to-day variation in the repeatedly examined 2025 folds, not an untouched estimate of 2026 accuracy. Source gains are concentrated on several dates, and its standalone forward Rome/Istanbul result includes a slight Istanbul regression. The GPU expert improves pooled forward error but worsens Frankfurt and Amsterdam airport-specific forward error. The selected sequential rule has not been validated by a new, untouched year.

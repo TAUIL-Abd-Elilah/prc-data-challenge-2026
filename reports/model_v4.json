@@ -1,0 +1,24 @@
+{
+  "gpu": {
+    "training_eligible_rows": 2061428,
+    "ranking_gpu_eligible_rows": 339377,
+    "ranking_v3_unchanged_rows": 5464,
+    "depth": 8,
+    "iterations": 1500,
+    "fit_seconds": 59.157,
+    "feature_count": 88,
+    "category_count": 23
+  },
+  "source": {
+    "training_rows": 187840,
+    "iterations": 599,
+    "fit_seconds": 115.01599999999962,
+    "ranking_source_candidates": 32817,
+    "ranking_predictions_changed": 32817
+  },
+  "fixed_weights": {
+    "gpu": 0.25,
+    "source_probability": 0.5
+  },
+  "submission_manifest": "submission_manifest_v4.json"
+}

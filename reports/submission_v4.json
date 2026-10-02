@@ -1,0 +1,15 @@
+{
+  "team": "merry-mushroom",
+  "filename": "merry-mushroom_v4.parquet",
+  "status": "Succeeded",
+  "used_pairs": 344841,
+  "official_rmse_seconds": 288.5236,
+  "processed_at": "2026-10-02T14:26:44Z",
+  "uploaded_at": "2026-10-02T14:26:21Z",
+  "sha256": "6f237f017d6a4ffdcd47688507a9ca2f31a68f6c9114f33cc95b50b115ba6bac",
+  "size_bytes": 4707553,
+  "team_rank": 87,
+  "rank_as_of": "2026-10-02T14:28:43Z",
+  "team_rank_method": "Distinct teams with a lower best score, plus one",
+  "public_team_results_url": "https://datacomp.opensky-network.org/api/competitions/bb3693e1-26bc-4a9e-8619-4fe78b4eab0c/leaderboard?teamName=merry-mushroom&limit=200"
+}

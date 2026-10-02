@@ -1,0 +1,76 @@
+{
+  "generated_utc": "2026-10-02T14:23:07.987252+00:00",
+  "scope": "2025 out-of-fold labels only; fixed gpu_then_source correction; no policy optimization",
+  "candidate": "gpu_then_source",
+  "baseline_name": "fixed_gpu_blend",
+  "fixed_weight": {
+    "gpu": 0.25,
+    "source": 0.5
+  },
+  "bootstrap_note": "Describes day-to-day variation in repeatedly examined 2025 folds; not an untouched 2026 performance interval.",
+  "folds": {
+    "seasonal_jan_jul": {
+      "n": 344419,
+      "candidate_n": 33591,
+      "changed_n": 33591,
+      "baseline_rmse_sec": 328.6639285388663,
+      "corrected_rmse_sec": 328.22110661668097,
+      "rmse_gain_sec": 0.4428219221853169,
+      "paired_sse_gain_sec2": 100185664.32564545,
+      "bootstrap": {
+        "method": "Paired UTC-day resampling within each calendar month",
+        "repetitions": 1000,
+        "seed": 2026,
+        "calendar_days": 62,
+        "rmse_gain_ci95_sec": [
+          0.09503068259557496,
+          0.7905486430960963
+        ],
+        "rmse_gain_median_sec": 0.43873649558244665,
+        "resamples_with_positive_gain_fraction": 0.996
+      }
+    },
+    "forward_nov_dec": {
+      "n": 328009,
+      "candidate_n": 26490,
+      "changed_n": 26490,
+      "baseline_rmse_sec": 224.83658590808471,
+      "corrected_rmse_sec": 224.46516451215632,
+      "rmse_gain_sec": 0.37142139592839385,
+      "paired_sse_gain_sec2": 54738234.85615158,
+      "bootstrap": {
+        "method": "Paired UTC-day resampling within each calendar month",
+        "repetitions": 1000,
+        "seed": 2027,
+        "calendar_days": 61,
+        "rmse_gain_ci95_sec": [
+          0.06476556393213215,
+          0.7175074094719824
+        ],
+        "rmse_gain_median_sec": 0.3670601950433223,
+        "resamples_with_positive_gain_fraction": 0.992
+      }
+    }
+  },
+  "combined": {
+    "n": 672428,
+    "candidate_n": 60081,
+    "changed_n": 60081,
+    "baseline_rmse_sec": 282.8196731041113,
+    "corrected_rmse_sec": 282.4120619194716,
+    "rmse_gain_sec": 0.40761118463967705,
+    "paired_sse_gain_sec2": 154923899.1817932,
+    "bootstrap": {
+      "method": "Paired UTC-day resampling within each calendar month",
+      "repetitions": 1000,
+      "seed": 2028,
+      "calendar_days": 123,
+      "rmse_gain_ci95_sec": [
+        0.17849493911605663,
+        0.6683090787947342
+      ],
+      "rmse_gain_median_sec": 0.40327227968947454,
+      "resamples_with_positive_gain_fraction": 0.999
+    }
+  }
+}
