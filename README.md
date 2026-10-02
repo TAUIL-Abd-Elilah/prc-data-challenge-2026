@@ -128,7 +128,12 @@ The read-only quota check counts uploads in the preceding 24 hours because the o
 
 After completing v6, build the released neighbor/runway features and run the fixed traffic architecture. See the exact commands in [RESEARCH.md](RESEARCH.md). January/July select a 0.5 blend with v6; the unchanged blend improves local all-finite RMSE from 323.723 to 322.311 seconds on January/July and from 217.903 to 215.199 on November/December, with positive paired UTC-day confidence intervals. The matched April/October architecture audit improves from 198.491 to 195.888 over all 357,813 eligible flights, with a gain interval of 2.282 to 2.946 seconds. The architecture and protocol were frozen before the v6 official result. Aggregate validation is in [reports/traffic_validation_v7.json](reports/traffic_validation_v7.json).
 
-Final ranking prediction is still being prepared. A version is finalized and uploaded only after every local gate, exact template alignment and the quota check pass.
+The final model uses 9,999 trees fitted on all eligible 2025 departures. Its 344,841 ranking predictions preserve the v6 policy on all 5,464 invalid-AOBT rows. The prediction file and input/model hashes are recorded in [reports/model_v7.json](reports/model_v7.json). Finalize and check quota with:
+
+```powershell
+python finalize_submission.py --predictions artifacts/v7-runway-traffic/predictions.parquet --team merry-mushroom --version 7
+python submission_quota.py --submission submissions/merry-mushroom_v7.parquet --report reports/submission_quota_v7.json
+```
 
 ## Submit with MinIO Client
 
