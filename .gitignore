@@ -4,3 +4,4 @@ submissions/
 *.parquet
 __pycache__/
 .venv/
+catboost_info/

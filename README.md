@@ -57,16 +57,36 @@ The experts use held-out month labels for early stopping, so these validation nu
 
 `finalize_submission.py` checks all 344,841 template IDs in their original order, verifies finite nonnegative predictions through a Parquet round trip, and writes the submission plus a SHA-256 manifest. It refuses to overwrite a finalized submission. Use a fresh output directory or version when repeating prediction. The reference runtime is Python 3.11 on Windows with 32 GB RAM; exact package versions are in `requirements-lock.txt`.
 
+## Reproduce v4
+
+After running the v3 pipeline above, install the additional pinned dependencies and run:
+
+```powershell
+python -m pip install -r requirements-research.txt
+python catboost_gpu.py --mode fit --iterations 1500 --depth 8 --threads 2
+python catboost_source.py --fold both --iterations 600 --depth 7 --threads 4
+python catboost_source.py --evaluate-only
+python catboost_source.py --evaluate-sequential-gpu
+python catboost_gpu.py --mode final-predict --iterations 1500 --depth 8 --threads 2
+python catboost_source.py --fit-final-rank --threads 4
+python catboost_source.py --combine-gpu
+python finalize_submission.py --predictions artifacts/catboost/source/sequential_predictions.parquet --team merry-mushroom --version 4
+```
+
+The additional residual CatBoost model uses all eligible 2025 labels, recurring flight categories and the same NOAA weather features. It requires a CUDA-capable NVIDIA GPU; the reference run uses an RTX 3090. A 25% blend with v3 was selected on January/July. A separate classifier estimates whether Rome and Istanbul records use the scheduled timestamp; its fixed half-probability correction follows the GPU blend. Invalid AOBT rows retain the v3 prediction. Both stages use only ranking-available covariates.
+
+The fixed sequential policy reduced local all-finite RMSE from 329.403 to 328.221 seconds on January/July and from 225.625 to 224.465 on November/December, over 672,428 rows in total. Combined RMSE was 283.566 to 282.412. These periods have been examined across multiple experiments, so this is a model comparison rather than an untouched forecast. The aggregate report is [reports/validation_v4.json](reports/validation_v4.json). [RESEARCH.md](RESEARCH.md) records rejected experiments and validation limitations.
+
 ## Submit with MinIO Client
 
-The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized v3 file. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.
+The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized v4 file. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.
 
 ```powershell
 $mc = Join-Path $env:TEMP 'mc-community.exe'
 Invoke-WebRequest 'https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe' -OutFile $mc
 if ((Get-FileHash $mc -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c8db13ebeda31497f354c0e950809db0ae9b2a2a69b8afee68c128c37300c157') { throw 'MinIO Client checksum mismatch' }
 & $mc alias set opensky 'https://s3.opensky-network.org/' '<ACCESS_KEY>' '<SECRET_KEY>'
-& $mc cp '.\submissions\merry-mushroom_v3.parquet' 'opensky/prc-2026-merry-mushroom/merry-mushroom_v3.parquet'
+& $mc cp '.\submissions\merry-mushroom_v4.parquet' 'opensky/prc-2026-merry-mushroom/merry-mushroom_v4.parquet'
 ```
 
 Keep access keys and secrets private; never commit them. Check the [official leaderboard](https://prc-data-challenge-2026.netlify.app/ranking.html) for the scored entry after upload. The repository does not perform the upload.

@@ -1,0 +1,98 @@
+{
+  "rule": "Fixed GPU .25 followed by source .5; no tuning on these combined OOF rows",
+  "counts": {
+    "all_finite": 672428,
+    "gpu_valid": 663664,
+    "source_candidate": 60081
+  },
+  "folds": {
+    "seasonal_jan_jul": {
+      "v3": {
+        "n": 344419,
+        "overall_rmse_sec": 329.40321110510314,
+        "valid_n": 338802,
+        "valid_rmse_sec": 231.56992225405216,
+        "invalid_n": 5617,
+        "invalid_rmse_sec": 1849.0074642592742
+      },
+      "gpu_only": {
+        "n": 344419,
+        "overall_rmse_sec": 328.6639285388663,
+        "valid_n": 338802,
+        "valid_rmse_sec": 230.49960018084283,
+        "invalid_n": 5617,
+        "invalid_rmse_sec": 1849.0074642592742
+      },
+      "gpu_plus_source": {
+        "n": 344419,
+        "overall_rmse_sec": 328.22110661668097,
+        "valid_n": 338802,
+        "valid_rmse_sec": 229.85726013633365,
+        "invalid_n": 5617,
+        "invalid_rmse_sec": 1849.0074642592742
+      },
+      "source_subset": {
+        "n": 33591,
+        "gpu_rmse_sec": 401.42712412145954,
+        "combined_rmse_sec": 397.6948841666031
+      }
+    },
+    "forward_nov_dec": {
+      "v3": {
+        "n": 328009,
+        "overall_rmse_sec": 225.62531276464227,
+        "valid_n": 324862,
+        "valid_rmse_sec": 204.32253184406028,
+        "invalid_n": 3147,
+        "invalid_rmse_sec": 998.1938295226564
+      },
+      "gpu_only": {
+        "n": 328009,
+        "overall_rmse_sec": 224.83658590808471,
+        "valid_n": 324862,
+        "valid_rmse_sec": 203.44277781839935,
+        "invalid_n": 3147,
+        "invalid_rmse_sec": 998.1938295226564
+      },
+      "gpu_plus_source": {
+        "n": 328009,
+        "overall_rmse_sec": 224.46516451215632,
+        "valid_n": 324862,
+        "valid_rmse_sec": 203.02824178443333,
+        "invalid_n": 3147,
+        "invalid_rmse_sec": 998.1938295226564
+      },
+      "source_subset": {
+        "n": 26490,
+        "gpu_rmse_sec": 324.7778449409548,
+        "combined_rmse_sec": 321.5808996702655
+      }
+    }
+  },
+  "combined": {
+    "v3": {
+      "n": 672428,
+      "overall_rmse_sec": 283.56562372658954,
+      "valid_n": 663664,
+      "valid_rmse_sec": 218.65703301224988,
+      "invalid_n": 8764,
+      "invalid_rmse_sec": 1596.5504551913316
+    },
+    "gpu_only": {
+      "n": 672428,
+      "overall_rmse_sec": 282.8196731041113,
+      "valid_n": 663664,
+      "valid_rmse_sec": 217.67595955145302,
+      "invalid_n": 8764,
+      "invalid_rmse_sec": 1596.5504551913316
+    },
+    "gpu_plus_source": {
+      "n": 672428,
+      "overall_rmse_sec": 282.4120619194716,
+      "valid_n": 663664,
+      "valid_rmse_sec": 217.13909393865137,
+      "invalid_n": 8764,
+      "invalid_rmse_sec": 1596.5504551913316
+    }
+  }
+}
