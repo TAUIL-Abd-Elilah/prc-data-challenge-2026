@@ -16,10 +16,12 @@ import argparse
 import ctypes
 import gc
 import hashlib
+from itertools import zip_longest
 import json
 import os
 from pathlib import Path
 import re
+import tempfile
 
 import lightgbm as lgb
 import numpy as np
@@ -33,6 +35,7 @@ from weather_model import add_weather
 FOLDS = {"seasonal_jan_jul": (1, 7), "forward_nov_dec": (11, 12)}
 WEIGHTS = (0.0, 0.25, 0.5, 1.0)
 REFERENCE_SHA256 = "036da1502f4ae68238927e31a0479b9cb82a6fb31b7acdbab26aa0657b7a67f8"
+RESERVED_GUARD_SHA256 = "caae60a1d84b7266c98d870e885d5ddf14b3ee1badacaa85ee282381968ebe9d"
 SEED = 20261002
 
 # Every cached column here has movement-only provenance in solution.build_features.
@@ -184,6 +187,10 @@ def prepare(args: argparse.Namespace) -> dict:
     require_memory(args.min_free_gib)
     ensure_protocol(args.output_dir)
     verify_reference(args.v5_oof)
+    if any((args.output_dir / name).exists() for name in
+           ("features.parquet", "row_ids.parquet", "features_manifest.json",
+            "prepared_integrity.json")):
+        raise FileExistsError("Prepared cache already exists; use --mode verify-prepared")
     cached_names = list(SAFE_CACHED_NUMERIC + SAFE_CACHED_CATEGORICAL)
     features = pd.read_parquet(args.cache_dir / "features.parquet", columns=cached_names)
     rows = read_baseline_rows(args.cache_dir,
@@ -258,10 +265,140 @@ def prepare(args: argparse.Namespace) -> dict:
                 "arrival_source": "Released ARR movement cache"}
     (args.output_dir / "features_manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    write_prepared_integrity(args, method="constructed_directly")
     return {"rows": len(rows), "features": len(names), "categorical": len(categorical)}
 
 
+def prepared_provenance(args: argparse.Namespace) -> dict:
+    return {
+        "baseline_training_rows": sha256(args.cache_dir / "training_rows.parquet"),
+        "baseline_features": sha256(args.cache_dir / "features.parquet"),
+        "released_arrival_cache": sha256(args.arrival_cache),
+        "noaa_weather": sha256(args.weather_file),
+        "frozen_v5_oof": sha256(args.v5_oof),
+        "training_parquet": {path.name: sha256(path)
+                             for path in _training_files(args.data_dir)},
+    }
+
+
+def write_prepared_integrity(args: argparse.Namespace, *, method: str,
+                             comparison: dict | None = None) -> dict:
+    """Write the one-time immutable physical-cache and source provenance seal."""
+    output_dir = args.output_dir
+    manifest_path = output_dir / "features_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    provenance = prepared_provenance(args)
+    if (manifest["baseline_rows_sha256"] != provenance["baseline_training_rows"]
+            or manifest["baseline_features_sha256"] != provenance["baseline_features"]
+            or manifest["arrival_cache_sha256"] != provenance["released_arrival_cache"]
+            or manifest["weather_file_sha256"] != provenance["noaa_weather"]
+            or manifest["reference_sha256"] != provenance["frozen_v5_oof"]):
+        raise ValueError("Prepared manifest does not match its provenance inputs")
+    report = {"method": method,
+              "original_manifest_sha256": sha256(manifest_path),
+              "prepared_features_sha256": sha256(output_dir / "features.parquet"),
+              "row_ids_sha256": sha256(output_dir / "row_ids.parquet"),
+              "rows": int(manifest["rows"]),
+              "feature_names": manifest["features"],
+              "categorical_names": manifest["categorical"],
+              "provenance_input_sha256": provenance,
+              "comparison": comparison or {}}
+    path = output_dir / "prepared_integrity.json"
+    with path.open("x", encoding="utf-8") as destination:
+        destination.write(json.dumps(report, indent=2) + "\n")
+    return report
+
+
+def verify_prepared_integrity(args: argparse.Namespace) -> dict:
+    path = args.output_dir / "prepared_integrity.json"
+    if not path.exists():
+        raise FileNotFoundError("Prepared feature seal missing; run --mode verify-prepared")
+    report = json.loads(path.read_text(encoding="utf-8"))
+    manifest_path = args.output_dir / "features_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if (report.get("original_manifest_sha256") != sha256(manifest_path)
+            or report.get("prepared_features_sha256")
+            != sha256(args.output_dir / "features.parquet")
+            or report.get("row_ids_sha256")
+            != sha256(args.output_dir / "row_ids.parquet")
+            or report.get("rows") != manifest["rows"]
+            or report.get("feature_names") != manifest["features"]
+            or report.get("categorical_names") != manifest["categorical"]
+            or report.get("provenance_input_sha256") != prepared_provenance(args)):
+        raise ValueError("Prepared feature seal or source provenance changed")
+    if report.get("method") == "independent_rebuild_exact":
+        required = ("schema_equal", "categorical_levels_equal",
+                    "feature_values_equal", "row_id_order_equal", "manifest_equal")
+        if not all(report.get("comparison", {}).get(key) is True for key in required):
+            raise ValueError("Independent prepared-feature rebuild was not verified")
+    elif report.get("method") != "constructed_directly":
+        raise ValueError("Unknown prepared feature verification method")
+    return report
+
+
+def verify_prepared(args: argparse.Namespace) -> dict:
+    """Migrate an existing cache seal after an exact independent rebuild."""
+    require_memory(args.min_free_gib)
+    ensure_protocol(args.output_dir)
+    seal = args.output_dir / "prepared_integrity.json"
+    if seal.exists():
+        return verify_prepared_integrity(args)
+    for name in ("features.parquet", "row_ids.parquet", "features_manifest.json"):
+        if not (args.output_dir / name).exists():
+            raise FileNotFoundError(f"Original prepared cache is incomplete: {name}")
+    rebuild_dir = Path(tempfile.mkdtemp(prefix="verification-rebuild-",
+                                        dir=args.output_dir))
+    rebuild_args = argparse.Namespace(**vars(args))
+    rebuild_args.output_dir = rebuild_dir
+    prepare(rebuild_args)
+    import pyarrow.parquet as pq
+    original_file = pq.ParquetFile(args.output_dir / "features.parquet")
+    rebuilt_file = pq.ParquetFile(rebuild_dir / "features.parquet")
+    if (original_file.metadata.num_rows != rebuilt_file.metadata.num_rows
+            or not original_file.schema_arrow.equals(rebuilt_file.schema_arrow,
+                                                     check_metadata=True)):
+        raise ValueError("Independently rebuilt feature schema differs")
+    original_manifest = json.loads((args.output_dir / "features_manifest.json").read_text(
+        encoding="utf-8"))
+    rebuilt_manifest = json.loads((rebuild_dir / "features_manifest.json").read_text(
+        encoding="utf-8"))
+    if original_manifest != rebuilt_manifest:
+        raise ValueError("Independently rebuilt feature manifest differs")
+    original_ids = pd.read_parquet(args.output_dir / "row_ids.parquet")
+    rebuilt_ids = pd.read_parquet(rebuild_dir / "row_ids.parquet")
+    if list(original_ids) != ["MVT_ID_mvt"] or not original_ids.equals(rebuilt_ids):
+        raise ValueError("Independently rebuilt movement ID order differs")
+    for name in original_manifest["categorical"]:
+        old = pd.read_parquet(args.output_dir / "features.parquet", columns=[name])[name]
+        new = pd.read_parquet(rebuild_dir / "features.parquet", columns=[name])[name]
+        if (not isinstance(old.dtype, pd.CategoricalDtype)
+                or not isinstance(new.dtype, pd.CategoricalDtype)
+                or not old.cat.categories.equals(new.cat.categories)
+                or old.cat.ordered != new.cat.ordered):
+            raise ValueError(f"Independently rebuilt categories differ: {name}")
+    old_batches = original_file.iter_batches(batch_size=65536)
+    new_batches = rebuilt_file.iter_batches(batch_size=65536)
+    for number, (old, new) in enumerate(zip_longest(old_batches, new_batches)):
+        if old is None or new is None or not old.to_pandas().equals(new.to_pandas()):
+            raise ValueError(f"Independently rebuilt feature values differ in batch {number}")
+    comparison = {"schema_equal": True, "categorical_levels_equal": True,
+                  "feature_values_equal": True, "row_id_order_equal": True,
+                  "manifest_equal": True,
+                  "rebuild_features_sha256": sha256(rebuild_dir / "features.parquet"),
+                  "rebuild_row_ids_sha256": sha256(rebuild_dir / "row_ids.parquet")}
+    report = write_prepared_integrity(args, method="independent_rebuild_exact",
+                                      comparison=comparison)
+    verify_prepared_integrity(args)
+    return {"method": report["method"], "rows": report["rows"],
+            "feature_count": len(report["feature_names"]),
+            "original_manifest_sha256": report["original_manifest_sha256"],
+            "prepared_features_sha256": report["prepared_features_sha256"],
+            "row_ids_sha256": report["row_ids_sha256"],
+            "comparison": comparison}
+
+
 def load_prepared(args: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
+    verify_prepared_integrity(args)
     manifest = json.loads((args.output_dir / "features_manifest.json").read_text(encoding="utf-8"))
     if sha256(args.cache_dir / "training_rows.parquet") != manifest["baseline_rows_sha256"]:
         raise ValueError("Baseline training rows changed after feature preparation")
@@ -585,10 +722,15 @@ def fresh_audit(args: argparse.Namespace) -> dict:
     audit_frame["reference_direct"] = reference_prediction.astype("float32")
     audit_frame["movement_direct"] = movement_prediction.astype("float32")
     audit_frame["fixed_blend"] = candidate.astype("float32")
-    audit_frame.to_parquet(args.output_dir / "april_october_predictions.parquet", index=False)
+    audit_predictions_file = args.output_dir / "april_october_predictions.parquet"
+    audit_frame.to_parquet(audit_predictions_file, index=False)
     report = {"heldout_months": list(months), "fixed_weight": weight,
               "validation_reference_sha256": REFERENCE_SHA256,
               "features_manifest_sha256": sha256(args.output_dir / "features_manifest.json"),
+              "prepared_features_sha256": sha256(args.output_dir / "features.parquet"),
+              "row_ids_sha256": sha256(args.output_dir / "row_ids.parquet"),
+              "prediction_sha256": sha256(audit_predictions_file),
+              "gate_rows": int(len(audit_frame)), "coverage_verified": True,
               "reference_architecture": "v5 ordinary CatBoost direct 700-round cap, depth 6, internal early stop 70",
               "reference_training": reference_fit,
               "movement_training": movement_fit,
@@ -598,15 +740,75 @@ def fresh_audit(args: argparse.Namespace) -> dict:
               "passed": bool(passed), "no_in_sample_v5_predictions": True,
               "promotion_pending": "Final full-data fit and ranking reference checks" if passed else
                                    "Fresh paired architecture audit failed"}
+    verify_audit_artifacts(args.output_dir, args.cache_dir, report,
+                           "april_october", months)
     (args.output_dir / "fresh_audit.json").write_text(
         json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return report
 
 
-def require_all_gates(output_dir: Path) -> tuple[float, dict]:
+def verify_audit_artifacts(output_dir: Path, cache_dir: Path, report: dict,
+                           stem: str, months: tuple[int, int]) -> None:
+    """Rebuild the finite gate and validate exact saved paired-prediction rows."""
+    manifest = json.loads((output_dir / "features_manifest.json").read_text(encoding="utf-8"))
+    if (report.get("features_manifest_sha256")
+            != sha256(output_dir / "features_manifest.json")
+            or report.get("prepared_features_sha256")
+            != sha256(output_dir / "features.parquet")
+            or report.get("row_ids_sha256")
+            != sha256(output_dir / "row_ids.parquet")
+            or manifest["baseline_features_sha256"]
+            != sha256(cache_dir / "features.parquet")
+            or manifest["baseline_rows_sha256"]
+            != sha256(cache_dir / "training_rows.parquet")):
+        raise ValueError(f"{stem} source artifacts changed")
+    prediction_file = output_dir / f"{stem}_predictions.parquet"
+    if report.get("prediction_sha256") != sha256(prediction_file):
+        raise ValueError(f"{stem} paired prediction file changed")
+    paired = pd.read_parquet(prediction_file)
+    expected_columns = ["MVT_ID_mvt", "target", "airport", "month",
+                        "MVT_TIME_UTC_mvt", "reference_direct",
+                        "movement_direct", "fixed_blend"]
+    if (list(paired) != expected_columns
+            or paired.MVT_ID_mvt.isna().any()
+            or paired.MVT_ID_mvt.duplicated().any()
+            or not report.get("coverage_verified")
+            or report.get("gate_rows") != len(paired)
+            or report.get("heldout_months") != list(months)):
+        raise ValueError(f"{stem} saved prediction schema/coverage flag is invalid")
+    rows = read_baseline_rows(cache_dir, ["MVT_ID_mvt", "target", "proxy",
+                                           "airport", "month", "time"])
+    prepared_ids = pd.read_parquet(output_dir / "row_ids.parquet",
+                                   columns=["MVT_ID_mvt"])
+    if not np.array_equal(prepared_ids.MVT_ID_mvt.to_numpy(),
+                          rows.MVT_ID_mvt.to_numpy()):
+        raise ValueError(f"{stem} prepared row ID order changed")
+    mask = (rows.month.isin(months).to_numpy(dtype=bool)
+            & read_gate(cache_dir, rows)
+            & np.isfinite(rows.target.to_numpy(dtype=float)))
+    expected = rows.loc[mask]
+    if (not np.array_equal(paired.MVT_ID_mvt.to_numpy(),
+                           expected.MVT_ID_mvt.to_numpy())
+            or not np.array_equal(paired.target.to_numpy(dtype=float),
+                                  expected.target.to_numpy(dtype=float))
+            or not np.array_equal(paired.airport.astype("string").to_numpy(),
+                                  expected.airport.astype("string").to_numpy())
+            or not np.array_equal(paired.month.to_numpy(), expected.month.to_numpy())
+            or not np.array_equal(
+                pd.to_datetime(paired.MVT_TIME_UTC_mvt, utc=True).dt.as_unit("ns").astype("int64").to_numpy(),
+                pd.to_datetime(expected.time, utc=True).dt.as_unit("ns").astype("int64").to_numpy())):
+        raise ValueError(f"{stem} paired predictions do not cover exact finite gate IDs")
+    for name in ("reference_direct", "movement_direct", "fixed_blend"):
+        values = paired[name].to_numpy(dtype=float)
+        if not np.isfinite(values).all() or np.any(values < 0):
+            raise ValueError(f"{stem} has invalid {name} predictions")
+
+
+def require_april_october_gate(output_dir: Path, cache_dir: Path) -> tuple[float, dict]:
     weight = selected_weight_after_local_gates(output_dir)
     audit = json.loads((output_dir / "fresh_audit.json").read_text(encoding="utf-8"))
-    if not audit.get("passed") or float(audit.get("fixed_weight", -1)) != weight:
+    if (not audit.get("passed") or audit.get("heldout_months") != [4, 10]
+            or float(audit.get("fixed_weight", -1)) != weight):
         raise ValueError("Fresh April/October architecture audit did not pass")
     if audit.get("features_manifest_sha256") != sha256(output_dir / "features_manifest.json"):
         raise ValueError("Fresh architecture audit feature cache changed")
@@ -618,14 +820,151 @@ def require_all_gates(output_dir: Path) -> tuple[float, dict]:
         raise ValueError("Fresh architecture audit day stability failed")
     if not audit.get("no_in_sample_v5_predictions"):
         raise ValueError("Fresh audit used an in-sample reference")
+    verify_audit_artifacts(output_dir, cache_dir, audit, "april_october", (4, 10))
+    if (audit["model_sha256"]["movement"]
+            != sha256(output_dir / "april_october_movement.txt")
+            or audit["model_sha256"]["catboost"]
+            != sha256(output_dir / "april_october_reference.cbm")):
+        raise ValueError("Fresh audit model artifacts changed")
     return weight, audit
+
+
+def reserved_audit(args: argparse.Namespace) -> dict:
+    """One fixed February/August guard from the separately published protocol."""
+    require_memory(args.min_free_gib)
+    ensure_protocol(args.output_dir)
+    verify_reference(args.v5_oof)
+    guard_protocol = Path("reports/reserved_guard_protocol.json")
+    if sha256(guard_protocol) != RESERVED_GUARD_SHA256:
+        raise ValueError("Published February/August guard protocol changed")
+    weight, _ = require_april_october_gate(args.output_dir, args.cache_dir)
+    features, rows, manifest = load_prepared(args)
+    months = (2, 8)
+    y = rows.target.to_numpy(dtype=float)
+    heldout = rows.month.isin(months).to_numpy(dtype=bool)
+    gate = heldout & read_gate(args.cache_dir, rows) & np.isfinite(y)
+    if gate.sum() < 100:
+        raise ValueError("Unexpectedly few finite February/August guard rows")
+    idx = np.flatnonzero(gate)
+    frame = rows.iloc[idx][["MVT_ID_mvt", "target", "airport", "month", "time"]].copy()
+    frame = frame.rename(columns={"time": "MVT_TIME_UTC_mvt"})
+
+    movement, movement_fit = fit_movement_model(
+        args, features, rows, manifest["categorical"], months)
+    movement_prediction = np.maximum(movement.predict(
+        features.iloc[idx], num_iteration=movement_fit["best_round"],
+        num_threads=args.threads), 0)
+    if not np.isfinite(movement_prediction).all():
+        raise ValueError("Reserved movement refit produced nonfinite predictions")
+    movement_file = args.output_dir / "february_august_movement.txt"
+    movement.save_model(str(movement_file))
+    del movement, features
+    gc.collect()
+
+    from missing_catboost import columns as catboost_columns
+    from missing_catboost import load_inputs as catboost_load_inputs
+    from missing_catboost import train_model as catboost_train_model
+    catboost_args = argparse.Namespace(cache_dir=args.cache_dir,
+                                        data_dir=args.data_dir,
+                                        weather_file=args.weather_file,
+                                        threads=args.threads, seed=2026)
+    cb_rows, cb_features = catboost_load_inputs(catboost_args)
+    if not np.array_equal(cb_rows.MVT_ID_mvt.to_numpy(), rows.MVT_ID_mvt.to_numpy()):
+        raise ValueError("Reserved CatBoost rows do not align with movement rows")
+    cb_y = cb_rows.target.to_numpy(dtype=float)
+    cb_proxy = cb_rows.proxy.to_numpy(dtype=float)
+    cb_no_nm = (cb_features.AOBT_3_flt_missing.to_numpy(dtype=bool)
+                & cb_features.LOBT_flt_missing.to_numpy(dtype=bool))
+    cb_train = (cb_no_nm & ~np.isfinite(cb_proxy) & np.isfinite(cb_y)
+                & (cb_y >= 0) & (cb_y <= 7200) & ~heldout)
+    cb_names, cb_cats = catboost_columns(cb_features, long=False)
+    reference, reference_fit = catboost_train_model(
+        catboost_args, "ordinary_direct", "regression",
+        cb_features, np.flatnonzero(cb_train), cb_y, cb_names, cb_cats, 700, 6)
+    reference_prediction = np.maximum(reference.predict(
+        cb_features.iloc[idx][cb_names], thread_count=args.threads), 0)
+    if not np.isfinite(reference_prediction).all():
+        raise ValueError("Reserved CatBoost refit produced nonfinite predictions")
+    reference_file = args.output_dir / "february_august_reference.cbm"
+    reference.save_model(str(reference_file))
+    del reference, cb_features, cb_rows
+    gc.collect()
+
+    candidate = np.maximum((1 - weight) * reference_prediction
+                           + weight * movement_prediction, 0)
+    yy = frame.target.to_numpy(dtype=float)
+    month = frame.month.to_numpy(dtype=int)
+    month_scores = {str(m): {"n": int((month == m).sum()),
+                             "reference_rmse_sec": rmse(yy[month == m],
+                                                         reference_prediction[month == m]),
+                             "candidate_rmse_sec": rmse(yy[month == m],
+                                                         candidate[month == m])}
+                    for m in months}
+    pooled = day_bootstrap(frame, reference_prediction, candidate,
+                           np.ones(len(frame), dtype=bool), SEED)
+    passed = (all(month_scores[str(m)]["candidate_rmse_sec"]
+                  < month_scores[str(m)]["reference_rmse_sec"] for m in months)
+              and pooled["gain_ci95_sec"][0] > 0)
+    frame["reference_direct"] = reference_prediction.astype("float32")
+    frame["movement_direct"] = movement_prediction.astype("float32")
+    frame["fixed_blend"] = candidate.astype("float32")
+    reserved_predictions_file = args.output_dir / "february_august_predictions.parquet"
+    frame.to_parquet(reserved_predictions_file, index=False)
+    report = {"heldout_months": list(months), "fixed_weight": weight,
+              "reserved_protocol_sha256": RESERVED_GUARD_SHA256,
+              "features_manifest_sha256": sha256(args.output_dir / "features_manifest.json"),
+              "prepared_features_sha256": sha256(args.output_dir / "features.parquet"),
+              "row_ids_sha256": sha256(args.output_dir / "row_ids.parquet"),
+              "prediction_sha256": sha256(reserved_predictions_file),
+              "gate_rows": int(len(frame)), "coverage_verified": True,
+              "reference_architecture": "v5 ordinary CatBoost direct 700-round cap, depth 6, internal early stop 70",
+              "reference_training": reference_fit,
+              "movement_training": movement_fit,
+              "model_sha256": {"catboost": sha256(reference_file),
+                               "movement": sha256(movement_file)},
+              "month_scores": month_scores, "pooled_day_stability": pooled,
+              "passed": bool(passed), "no_in_sample_v5_predictions": True,
+              "May_September_remain_reserved": True}
+    verify_audit_artifacts(args.output_dir, args.cache_dir, report,
+                           "february_august", months)
+    (args.output_dir / "reserved_audit.json").write_text(
+        json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    return report
+
+
+def require_all_gates(output_dir: Path, cache_dir: Path) -> tuple[float, dict]:
+    weight, fresh = require_april_october_gate(output_dir, cache_dir)
+    if sha256(Path("reports/reserved_guard_protocol.json")) != RESERVED_GUARD_SHA256:
+        raise ValueError("Published February/August guard protocol changed")
+    reserved = json.loads((output_dir / "reserved_audit.json").read_text(encoding="utf-8"))
+    if (reserved.get("reserved_protocol_sha256") != RESERVED_GUARD_SHA256
+            or reserved.get("features_manifest_sha256")
+            != sha256(output_dir / "features_manifest.json")
+            or reserved.get("heldout_months") != [2, 8]
+            or float(reserved.get("fixed_weight", -1)) != weight
+            or not reserved.get("passed")
+            or not reserved.get("no_in_sample_v5_predictions")):
+        raise ValueError("Fixed February/August guard did not pass")
+    for month in (2, 8):
+        score = reserved["month_scores"][str(month)]
+        if not score["candidate_rmse_sec"] < score["reference_rmse_sec"]:
+            raise ValueError(f"Reserved guard month {month} failed")
+    if reserved["pooled_day_stability"]["gain_ci95_sec"][0] <= 0:
+        raise ValueError("Reserved guard UTC-day stability failed")
+    verify_audit_artifacts(output_dir, cache_dir, reserved, "february_august", (2, 8))
+    if (reserved["model_sha256"]["movement"]
+            != sha256(output_dir / "february_august_movement.txt")
+            or reserved["model_sha256"]["catboost"]
+            != sha256(output_dir / "february_august_reference.cbm")):
+        raise ValueError("Reserved guard model artifacts changed")
+    return weight, fresh
 
 
 def fit_final(args: argparse.Namespace) -> dict:
     require_memory(args.min_free_gib)
     ensure_protocol(args.output_dir)
     verify_reference(args.v5_oof)
-    weight, audit = require_all_gates(args.output_dir)
+    weight, audit = require_all_gates(args.output_dir, args.cache_dir)
     features, rows, manifest = load_prepared(args)
     fold_reports = [json.loads((args.output_dir / f"{fold}_fit.json").read_text(
         encoding="utf-8")) for fold in FOLDS]
@@ -654,8 +993,10 @@ def fit_final(args: argparse.Namespace) -> dict:
               "features_manifest_sha256": sha256(args.output_dir / "features_manifest.json"),
               "validation_sha256": sha256(args.output_dir / "validation.json"),
               "fresh_audit_sha256": sha256(args.output_dir / "fresh_audit.json"),
+              "reserved_audit_sha256": sha256(args.output_dir / "reserved_audit.json"),
               "reference_sha256": REFERENCE_SHA256,
               "audit_passed": bool(audit["passed"]),
+              "reserved_guard_passed": True,
               "ranking_prediction_created": False}
     (args.output_dir / "final_model.json").write_text(
         json.dumps(report, indent=2) + "\n", encoding="utf-8")
@@ -722,11 +1063,46 @@ def build_ranking_features(args: argparse.Namespace,
     return features, rows
 
 
+def ranking_input_paths(args: argparse.Namespace) -> dict[str, Path]:
+    return {"raw_ranking": args.data_dir / "ranking.parquet",
+            "baseline_ranking_rows": args.cache_dir / "ranking_rows.parquet",
+            "baseline_ranking_features": args.cache_dir / "ranking_features.parquet",
+            "released_arrival_ranking_cache": args.ranking_arrival_cache,
+            "noaa_weather": args.weather_file,
+            "submission_template": args.data_dir / "submitting.parquet"}
+
+
+def verify_ranking_inputs(args: argparse.Namespace) -> dict:
+    path = args.output_dir / "ranking_inputs.json"
+    if not path.exists():
+        raise FileNotFoundError("Immutable ranking input inventory is missing")
+    report = json.loads(path.read_text(encoding="utf-8"))
+    expected = {name: {"path": str(source), "sha256": sha256(source)}
+                for name, source in ranking_input_paths(args).items()}
+    if report.get("inputs") != expected:
+        raise ValueError("Frozen raw ranking/cache/weather/template inputs changed")
+    return report
+
+
+def freeze_ranking_inputs(args: argparse.Namespace) -> dict:
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    path = args.output_dir / "ranking_inputs.json"
+    if path.exists():
+        return verify_ranking_inputs(args)
+    report = {"purpose": "Immutable source inventory before movement-only ranking feature reads",
+              "inputs": {name: {"path": str(source), "sha256": sha256(source)}
+                         for name, source in ranking_input_paths(args).items()}}
+    with path.open("x", encoding="utf-8") as destination:
+        destination.write(json.dumps(report, indent=2) + "\n")
+    verify_ranking_inputs(args)
+    return report
+
+
 def final_predict(args: argparse.Namespace) -> dict:
     require_memory(args.min_free_gib)
     ensure_protocol(args.output_dir)
     verify_reference(args.v5_oof)
-    weight, _ = require_all_gates(args.output_dir)
+    weight, _ = require_all_gates(args.output_dir, args.cache_dir)
     if args.ranking_reference is None or args.reference_sha256 is None:
         raise ValueError("Final prediction requires --ranking-reference and --reference-sha256")
     if not re.fullmatch(r"[0-9a-fA-F]{64}", args.reference_sha256):
@@ -740,12 +1116,14 @@ def final_predict(args: argparse.Namespace) -> dict:
             or final["features_manifest_sha256"] != sha256(args.output_dir / "features_manifest.json")
             or final["validation_sha256"] != sha256(args.output_dir / "validation.json")
             or final["fresh_audit_sha256"] != sha256(args.output_dir / "fresh_audit.json")
+            or final["reserved_audit_sha256"] != sha256(args.output_dir / "reserved_audit.json")
             or final["selected_weight"] != weight):
         raise ValueError("Final model, features, validation or audit changed")
     manifest = json.loads((args.output_dir / "features_manifest.json").read_text(
         encoding="utf-8"))
     if sha256(args.weather_file) != manifest["weather_file_sha256"]:
         raise ValueError("NOAA weather source changed after feature preparation")
+    ranking_inputs = freeze_ranking_inputs(args)
     features, rows = build_ranking_features(args, manifest)
     template = pd.read_parquet(args.data_dir / "submitting.parquet")
     reference = pd.read_parquet(args.ranking_reference)
@@ -777,6 +1155,7 @@ def final_predict(args: argparse.Namespace) -> dict:
         raise ValueError("Final movement correction changed a non-gate row or is invalid")
     expert_full = np.full(len(rows), np.nan, dtype=np.float32)
     expert_full[gate] = expert.astype(np.float32)
+    verify_ranking_inputs(args)
     pd.DataFrame({"MVT_ID_mvt": ids, "gate": gate,
                   "movement_expert": expert_full}).to_parquet(
                       args.output_dir / "ranking_expert.parquet", index=False)
@@ -792,6 +1171,9 @@ def final_predict(args: argparse.Namespace) -> dict:
               "selected_weight": weight,
               "ranking_reference": str(args.ranking_reference),
               "ranking_reference_sha256": actual_reference_hash,
+              "ranking_inputs_sha256": sha256(args.output_dir / "ranking_inputs.json"),
+              "ranking_input_sha256": {name: item["sha256"]
+                                       for name, item in ranking_inputs["inputs"].items()},
               "model_sha256": final["model_sha256"],
               "prediction_sha256": sha256(output_file),
               "prediction_bytes": output_file.stat().st_size,
@@ -806,8 +1188,10 @@ def final_predict(args: argparse.Namespace) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("protocol", "prepare", "fit-fold", "evaluate",
-                                          "fresh-audit", "fit-final", "final-predict"),
+    parser.add_argument("--mode", choices=("protocol", "prepare", "verify-prepared",
+                                          "freeze-ranking-inputs", "fit-fold", "evaluate",
+                                          "fresh-audit", "reserved-audit", "fit-final",
+                                          "final-predict"),
                         required=True)
     parser.add_argument("--fold", choices=tuple(FOLDS))
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
@@ -835,12 +1219,18 @@ def main() -> None:
         result = ensure_protocol(args.output_dir)
     elif args.mode == "prepare":
         result = prepare(args)
+    elif args.mode == "verify-prepared":
+        result = verify_prepared(args)
+    elif args.mode == "freeze-ranking-inputs":
+        result = freeze_ranking_inputs(args)
     elif args.mode == "fit-fold":
         result = fit_fold(args)
     elif args.mode == "evaluate":
         result = evaluate(args)
     elif args.mode == "fresh-audit":
         result = fresh_audit(args)
+    elif args.mode == "reserved-audit":
+        result = reserved_audit(args)
     elif args.mode == "fit-final":
         result = fit_final(args)
     else:

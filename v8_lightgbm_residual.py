@@ -520,6 +520,8 @@ def load_or_fit_full(args: argparse.Namespace, report: dict,
 
 
 def final_predict(args: argparse.Namespace) -> None:
+    if Path("reports/current_candidate_policy_protocol.json").exists():
+        raise ValueError("The v6-based standalone v8 ranking route is excluded by the frozen current-candidate policy; use the guarded v7-based final-v8-combo route")
     report = evaluate(args)
     if not report["promoted"]:
         raise ValueError("Promotion requires both existing folds and fresh audit")

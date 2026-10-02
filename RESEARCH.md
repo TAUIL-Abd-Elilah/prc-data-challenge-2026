@@ -140,6 +140,7 @@ Its first two complementary-fold fits are complete. January/July select full rep
 The same saved ordinary movement models can be assessed on valid-AOBT rows independently. The original `v9_movement_valid_audit.py` protocol relies entirely on already saved models and is preserved. A separate prospective `v9b_movement_valid_audit.py` protocol adds a gated April/October refit if the original missing-clock route cannot produce one. It reuses the unchanged training architecture and requires valid-route improvement with positive day intervals in both original folds, followed by both April/October point gains and a positive pooled day interval. Any final full-data model and ranking prediction require all those gates. Invalid-AOBT predictions remain at the v7 reference. No valid-route selection result has been examined yet.
 
 ```powershell
+python movement_only_expert.py --mode verify-prepared
 python v9b_movement_valid_audit.py --mode prepare
 python v9b_movement_valid_audit.py --mode predict-fold --fold seasonal_jan_jul
 python v9b_movement_valid_audit.py --mode predict-fold --fold forward_nov_dec
@@ -156,7 +157,6 @@ The fixed CPU alternative (`v8_lightgbm_residual.py`) uses the timestamp, ARR, n
 python v8_lightgbm_residual.py --mode prepare
 python v8_lightgbm_residual.py --mode fit
 python v8_lightgbm_residual.py --mode fresh-audit
-python v8_lightgbm_residual.py --mode final-predict
 ```
 
 The separate `v8_combo_audit.py` protocol is frozen before v8 training. If both standalone candidates pass, it applies the same v8 seasonally selected weight toward the v8 expert from the v7 candidate, without choosing another weight. Promotion requires improvement over v7 and positive day confidence bounds in both OOF folds and the paired April/October audit. A failed combination is rejected without retuning. Reproduce with `python v8_combo_audit.py --mode prepare`, then `python v8_combo_audit.py --mode audit` once both standalone validation reports are promoted.
@@ -170,6 +170,12 @@ A source/protocol audit found no scored held-out model comparison on February/Au
 This additional check evaluates fixed component changes. It does not estimate the complete legacy ensemble independently, and it cannot guarantee a ranking result.
 
 The current candidate portfolio is also fixed before any v8/v9b scored OOF outcome. The valid-AOBT route compares unchanged v7 with the already specified v8 combo and v9b blend using only common-universe January/July RMSE among candidates passing their existing gates. That choice is locked before the reserved guard; failure retains v7 without retuning. The missing-clock movement route is disjoint and requires its own complete gates. Any composition must pass exact-coverage and paired-day checks on both original folds, with every other prediction unchanged. Details are in `reports/current_candidate_policy_protocol.json`.
+
+`reserved_valid_guard.py --mode select-policy` refuses to freeze a choice while either candidate's original folds or necessary fresh audit are pending. It writes the fixed choice to `artifacts/reserved-valid-guard/selected_policy.json`. If that choice is a replacement, `reserved_v7_comparator.py --mode prepare` and `--mode fit` bind the choice and refit the v7 comparator. Prepare the matching route with `reserved_valid_guard.py --mode prepare --route v8_combo` or `--route v9b`, fit only its replacement with `--mode fit-v8` or `--mode fit-movement`, then run `--mode score --route ...`. These resource-heavy stages run serially. A failed guard retains v7.
+
+The missing-clock movement branch independently runs `movement_only_expert.py --mode fresh-audit`, then `--mode reserved-audit` only if the preceding audit passes. Its final modes require both audits and the original two-fold gates. Existing prepared movement caches must first pass `--mode verify-prepared`, which rebuilds the unchanged allowed covariates in a separate directory and proves exact schema, categorical levels, values and ID order before adding an immutable sidecar. The original cache, manifest and model-fold evidence remain intact. Future preparations create that sidecar directly. Ranking inputs are separately sealed before feature reads and rechecked before output.
+
+The older v6-based standalone v8 ranking path is excluded from this portfolio. Its `--mode final-predict` now refuses that path. Only the selected and guarded v7 combination can use `reserved_valid_guard.py --mode final-v8-combo`; v9b's final modes likewise require its selected-route guard. No reserved guard result or new ranking prediction is available yet.
 
 ## Prospective same-runway ARR taxi context
 

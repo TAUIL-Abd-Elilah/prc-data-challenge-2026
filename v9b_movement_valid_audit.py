@@ -49,6 +49,11 @@ def assert_ids(actual: pd.Series, expected: pd.Series, label: str) -> None:
 
 
 def protocol(args: argparse.Namespace) -> dict:
+    movement_manifest = json.loads((args.movement_dir / "features_manifest.json")
+                                   .read_text(encoding="utf-8"))
+    if (movement_manifest["arrival_cache_sha256"] != sha256(args.arrival_cache)
+            or movement_manifest["reference_sha256"] != sha256(args.v5_oof)):
+        raise ValueError("Movement prepared feature sources differ from their frozen hashes")
     value = {
         "purpose": "Separate prospective v9b valid-AOBT route, preserving the frozen v9 history",
         "training": "Reuse saved movement-only complement-fold models without changes; conditional fresh and full refits use exactly the frozen movement architecture",
@@ -100,21 +105,12 @@ def protocol(args: argparse.Namespace) -> dict:
 
 
 def load_movement_features(args: argparse.Namespace):
-    manifest = json.loads((args.movement_dir / "features_manifest.json")
-                          .read_text(encoding="utf-8"))
-    ids = pd.read_parquet(args.movement_dir / "row_ids.parquet",
-                          columns=["MVT_ID_mvt"])
-    rows = pd.read_parquet(args.cache_dir / "training_rows.parquet",
-                           columns=["MVT_ID_mvt", "target", "proxy", "month",
-                                    "time"])
-    features = pd.read_parquet(args.movement_dir / "features.parquet")
-    if (len(features) != len(rows) or len(ids) != len(rows)
-            or list(features) != manifest["features"]
-            or not ids.MVT_ID_mvt.equals(rows.MVT_ID_mvt)
+    source_args = argparse.Namespace(**vars(args))
+    source_args.output_dir = args.movement_dir
+    features, rows, manifest = movement.load_prepared(source_args)
+    if (list(features) != manifest["features"]
             or rows.MVT_ID_mvt.isna().any()
-            or rows.MVT_ID_mvt.duplicated().any()
-            or sha256(args.cache_dir / "training_rows.parquet") !=
-               manifest["baseline_rows_sha256"]):
+            or rows.MVT_ID_mvt.duplicated().any()):
         raise ValueError("Prepared movement matrix differs from exact baseline rows")
     return rows, features, manifest
 
@@ -150,6 +146,8 @@ def fresh_model_info(args: argparse.Namespace) -> tuple[Path, int, Path, str]:
                    sha256(args.movement_dir / "features_manifest.json")
                 or fit["prepared_features_sha256"] !=
                    sha256(args.movement_dir / "features.parquet")
+                or fit["arrival_cache_sha256"] != sha256(args.arrival_cache)
+                or fit["v5_oof_sha256"] != sha256(args.v5_oof)
                 or fit["existing_fold_validation_sha256"] !=
                    sha256(args.output_dir / "existing_fold_validation.json")
                 or fit["protocol_sha256"] != sha256(args.output_dir / "protocol.json")):
@@ -205,6 +203,8 @@ def predict(args: argparse.Namespace, name: str, months: tuple[int, int]) -> Non
                                             "features_manifest.json"),
         "prepared_features_sha256": sha256(args.movement_dir /
                                             "features.parquet"),
+        "arrival_cache_sha256": sha256(args.arrival_cache),
+        "v5_oof_sha256": sha256(args.v5_oof),
         "output_sha256": sha256(path),
     })
     print(json.dumps({"scope": name, "n_valid_finite": len(output),
@@ -240,6 +240,8 @@ def verify_prediction(args: argparse.Namespace, name: str,
                sha256(args.movement_dir / "features_manifest.json")
             or manifest["prepared_features_sha256"] !=
                sha256(args.movement_dir / "features.parquet")
+            or manifest["arrival_cache_sha256"] != sha256(args.arrival_cache)
+            or manifest["v5_oof_sha256"] != sha256(args.v5_oof)
             or manifest["model_sha256"] != sha256(model_path)):
         raise ValueError(f"{name} saved movement prediction inputs changed")
     frame = pd.read_parquet(path)
@@ -478,6 +480,8 @@ def fit_fresh(args: argparse.Namespace) -> None:
         "model_sha256": sha256(own_model),
         "features_manifest_sha256": sha256(args.movement_dir / "features_manifest.json"),
         "prepared_features_sha256": sha256(args.movement_dir / "features.parquet"),
+        "arrival_cache_sha256": sha256(args.arrival_cache),
+        "v5_oof_sha256": sha256(args.v5_oof),
         "existing_fold_validation_sha256": sha256(args.output_dir / "existing_fold_validation.json"),
         "protocol_sha256": sha256(args.output_dir / "protocol.json"),
         "model_params": movement.model_params(args.threads),
@@ -553,7 +557,7 @@ def original_final_info(args: argparse.Namespace) -> tuple[Path, int, Path] | No
         return None
     if not model_file.exists() or not report_file.exists():
         raise ValueError("Original movement final model/report are incomplete")
-    movement.require_all_gates(args.movement_dir)
+    movement.require_all_gates(args.movement_dir, args.cache_dir)
     report = json.loads(report_file.read_text(encoding="utf-8"))
     if (report["model_sha256"] != sha256(model_file)
             or report["features_manifest_sha256"] !=
@@ -563,13 +567,19 @@ def original_final_info(args: argparse.Namespace) -> tuple[Path, int, Path] | No
 
 
 def original_route_passed(args: argparse.Namespace) -> bool:
-    if not (args.movement_dir / "validation.json").exists() or not (
-            args.movement_dir / "fresh_audit.json").exists():
+    validation_path = args.movement_dir / "validation.json"
+    fresh_path = args.movement_dir / "fresh_audit.json"
+    reserved_path = args.movement_dir / "reserved_audit.json"
+    if not all(path.exists() for path in (validation_path, fresh_path,
+                                          reserved_path)):
         return False
-    try:
-        movement.require_all_gates(args.movement_dir)
-    except ValueError:
+    fresh = json.loads(fresh_path.read_text(encoding="utf-8"))
+    reserved = json.loads(reserved_path.read_text(encoding="utf-8"))
+    if not fresh.get("passed") or not reserved.get("passed"):
         return False
+    # A completed passing report with damaged hashes or coverage is an error,
+    # rather than a reason to silently fit a different full model.
+    movement.require_all_gates(args.movement_dir, args.cache_dir)
     return True
 
 
@@ -582,17 +592,24 @@ def own_final_info(args: argparse.Namespace) -> tuple[Path, int, Path]:
     if (report.get("status") != "complete"
             or report["model_sha256"] != sha256(model_file)
             or report["audit_sha256"] != sha256(args.output_dir / "audit.json")
+            or report["reserved_guard_sha256"] !=
+               sha256(args.reserved_guard_dir / "v9b" / "guard_report.json")
             or report["protocol_sha256"] != sha256(args.output_dir / "protocol.json")
             or report["features_manifest_sha256"] !=
                sha256(args.movement_dir / "features_manifest.json")
             or report["prepared_features_sha256"] !=
-               sha256(args.movement_dir / "features.parquet")):
+               sha256(args.movement_dir / "features.parquet")
+            or report["arrival_cache_sha256"] != sha256(args.arrival_cache)
+            or report["v5_oof_sha256"] != sha256(args.v5_oof)):
         raise ValueError("v9b full model provenance differs")
     return model_file, int(report["final_rounds"]), report_file
 
 
 def fit_final(args: argparse.Namespace) -> None:
+    from reserved_valid_guard import require_route_guard
+
     audit_report = require_accepted_audit(args)
+    require_route_guard(args.reserved_guard_dir, "v9b")
     original = original_final_info(args)
     if original:
         print(json.dumps({"model_source": "original_movement",
@@ -641,9 +658,13 @@ def fit_final(args: argparse.Namespace) -> None:
                               for name in FOLDS},
         "model_params": movement.model_params(args.threads),
         "audit_sha256": sha256(args.output_dir / "audit.json"),
+        "reserved_guard_sha256": sha256(args.reserved_guard_dir / "v9b" /
+                                          "guard_report.json"),
         "protocol_sha256": sha256(args.output_dir / "protocol.json"),
         "features_manifest_sha256": sha256(args.movement_dir / "features_manifest.json"),
         "prepared_features_sha256": sha256(args.movement_dir / "features.parquet"),
+        "arrival_cache_sha256": sha256(args.arrival_cache),
+        "v5_oof_sha256": sha256(args.v5_oof),
         "selected_weight": float(audit_report["selected_weight"]),
     })
     print(json.dumps({"model_source": "v9b_full", "model": str(own_model),
@@ -651,7 +672,10 @@ def fit_final(args: argparse.Namespace) -> None:
 
 
 def final_predict(args: argparse.Namespace) -> None:
+    from reserved_valid_guard import require_route_guard
+
     audit_report = require_accepted_audit(args)
+    require_route_guard(args.reserved_guard_dir, "v9b")
     original = original_final_info(args)
     if original is None and original_route_passed(args):
         raise ValueError("Original movement route passed; use its pending full ordinary model")
@@ -661,6 +685,7 @@ def final_predict(args: argparse.Namespace) -> None:
                           .read_text(encoding="utf-8"))
     if sha256(args.weather_file) != manifest["weather_file_sha256"]:
         raise ValueError("Weather source changed after movement feature preparation")
+    ranking_inputs = movement.freeze_ranking_inputs(args)
     features, rows = movement.build_ranking_features(args, manifest)
     template = pd.read_parquet(args.data_dir / "submitting.parquet")
     reference_path = args.v7_dir / "predictions.parquet"
@@ -698,6 +723,7 @@ def final_predict(args: argparse.Namespace) -> None:
         raise ValueError("v9b final predictions changed invalid rows or are nonfinite")
     expert_full = np.full(len(output), np.nan, dtype=np.float32)
     expert_full[valid] = expert.astype(np.float32)
+    movement.verify_ranking_inputs(args)
     expert_path = args.output_dir / "ranking_expert.parquet"
     pd.DataFrame({"MVT_ID_mvt": ids, "expert": expert_full}).to_parquet(
         expert_path, index=False)
@@ -711,7 +737,14 @@ def final_predict(args: argparse.Namespace) -> None:
     write_json(args.output_dir / "ranking_manifest.json", {
         "model_source": source, "model_sha256": sha256(model_file),
         "model_fit_sha256": sha256(fit_path), "model_rounds": rounds,
+        "arrival_cache_sha256": sha256(args.arrival_cache),
+        "v5_oof_sha256": sha256(args.v5_oof),
+        "ranking_inputs_sha256": sha256(args.output_dir / "ranking_inputs.json"),
+        "ranking_input_sha256": {name: item["sha256"]
+                                   for name, item in ranking_inputs["inputs"].items()},
         "audit_sha256": sha256(args.output_dir / "audit.json"),
+        "reserved_guard_sha256": sha256(args.reserved_guard_dir / "v9b" /
+                                          "guard_report.json"),
         "v7_manifest_sha256": sha256(v7_manifest_path),
         "v7_reference_sha256": sha256(reference_path),
         "ranking_rows": len(ids), "valid_aobt": int(valid.sum()),
@@ -740,10 +773,16 @@ def main() -> None:
     p.add_argument("--data-dir", type=Path, default=Path("data"))
     p.add_argument("--weather-file", type=Path,
                    default=Path("data/external/weather.parquet"))
+    p.add_argument("--arrival-cache", type=Path,
+                   default=Path("artifacts/v5-arrival-clean/training_arrival_features.parquet"))
+    p.add_argument("--v5-oof", type=Path,
+                   default=Path("artifacts/v5-ensemble/validation_predictions.parquet"))
     p.add_argument("--ranking-arrival-cache", type=Path,
                    default=Path("artifacts/v5-arrival-clean/ranking_arrival_features.parquet"))
     p.add_argument("--threads", type=int, default=3)
     p.add_argument("--min-free-gib", type=float, default=10.0)
+    p.add_argument("--reserved-guard-dir", type=Path,
+                   default=Path("artifacts/reserved-valid-guard"))
     p.add_argument("--output-dir", type=Path,
                    default=Path("artifacts/v9b-movement-valid"))
     args = p.parse_args()
