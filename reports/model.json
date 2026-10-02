@@ -1,38 +1,7 @@
 {
-  "segment": "convex_mix",
-  "strength": 0,
-  "valid_experts": [
-    "hybrid",
-    "direct",
-    "grouped",
-    "airport_prediction",
-    "weather_prediction"
-  ],
-  "convex_weights": [
-    0.0,
-    0.11847901228608158,
-    0.0,
-    0.4331959038414202,
-    0.44832508387249825
-  ],
-  "global_grouped_weight": null,
-  "segment_groups": [
-    {}
-  ],
-  "segment_weights": null,
-  "missing_method": "global",
-  "missing_strength": 0,
-  "missing_global_choice": "lirf_ratio_high_schedule",
-  "missing_airport_choices": {
-    "EDDF": "lirf_ratio_high_schedule",
-    "EDDM": "lirf_ratio_high_schedule",
-    "EGLL": "lirf_ratio_high_schedule",
-    "EHAM": "lirf_ratio_high_schedule",
-    "LEBL": "lirf_ratio_high_schedule",
-    "LEMD": "lirf_ratio_high_schedule",
-    "LFPG": "lirf_ratio_high_schedule",
-    "LIRF": "lirf_ratio_high_schedule",
-    "LSZH": "lirf_ratio_high_schedule",
-    "LTFM": "lirf_ratio_high_schedule"
-  }
+  "selected_valid_disagreement_weight": 1.0,
+  "invalid_aobt_lobt_fallback_weight": 1.0,
+  "valid_disagreement_threshold_sec": 3600,
+  "selection_fold": "seasonal_jan_jul",
+  "forward_check_fold": "forward_nov_dec"
 }

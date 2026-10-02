@@ -44,14 +44,16 @@ python airport_models.py --threads 6 --rounds 1000
 python schedule_tail.py
 python lirf_expert.py --threads 2 --rounds 220
 python ensemble.py
-python finalize_submission.py --team merry-mushroom --version 1
+python lobt_expert.py --threads 8 --rounds 900
+python lobt_blend.py
+python finalize_submission.py --predictions artifacts/lobt_ensemble/predictions.parquet --team merry-mushroom --version 3
 ```
 
 `audit` reports the direct proxy's coverage, RMSE and bias. Base models validate on whole January and July 2025 months, and separately on November and December 2025. The first split imitates the scoring months; the second tests a forward time shift. Ranking prediction also writes feature and expert caches for the specialist stages. Core shared trees use labels between 0 and 86,400 seconds; separate specialists retain the exceptional overnight labels. Every finite label, including negative and above-24-hour records, is included in the final ensemble validation. `complete_oof.py` can expand an earlier baseline export to include those records.
 
 The weather and airport models predict corrections to the supplied off-block proxy. A Rome specialist models taxi time divided by the supplied schedule difference, allowing extrapolation on rare long records. `ensemble.py` learns nonnegative expert weights using nested calibration folds within the seasonal holdout, and evaluates those weights unchanged on the forward holdout. Final models train on the complete 2025 data. The authoritative report is `artifacts/ensemble/validation.json`.
 
-The experts use held-out month labels for early stopping, so these validation numbers are indicative and are not strictly unbiased estimates. The first candidate's aggregate report, model weights, and file manifest are saved in `reports/`. `lobt_expert.py` is an additional timestamp experiment and is not part of the first candidate.
+The experts use held-out month labels for early stopping, so these validation numbers are indicative and are not strictly unbiased estimates. The candidate's aggregate report, model weights, and file manifest are saved in `reports/`. `lobt_expert.py` predicts a correction to the last off-block estimate; `lobt_blend.py` applies it only when the actual off-block estimate is invalid or differs by more than one hour. This conditional policy was selected on seasonal calibration and checked unchanged on the forward period.
 
 `finalize_submission.py` checks all 344,841 template IDs in their original order, verifies finite nonnegative predictions through a Parquet round trip, and writes the submission plus a SHA-256 manifest. It refuses to overwrite a finalized submission. Use a fresh output directory or version when repeating prediction. The reference runtime is Python 3.11 on Windows with 32 GB RAM; exact package versions are in `requirements-lock.txt`.
 

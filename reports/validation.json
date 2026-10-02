@@ -1,674 +1,201 @@
 {
-  "valid_experts": [
-    "hybrid",
-    "direct",
-    "grouped",
-    "airport_prediction",
-    "weather_prediction"
+  "source_ensemble": "D:\\Competition\\prc-data-challenge-2026.netlify\\artifacts\\ensemble",
+  "source_lobt": "D:\\Competition\\prc-data-challenge-2026.netlify\\artifacts\\lobt",
+  "selection": "January/July 2025 only; forward fold receives unchanged rule",
+  "selected_valid_disagreement_weight": 1.0,
+  "invalid_aobt_lobt_fallback_weight": 1.0,
+  "valid_disagreement_threshold_sec": 3600,
+  "candidate_weights": [
+    0.25,
+    0.5,
+    1.0
   ],
-  "baseline": {
-    "overall_rmse_sec": 404.0721160192067,
-    "valid_proxy_rmse_sec": 224.44377944163332,
-    "invalid_proxy_rmse_sec": 2951.728512724693,
-    "n": 672428,
-    "valid_proxy_n": 663664,
-    "invalid_proxy_n": 8764
+  "candidate_seasonal_scores": {
+    "0.25": 329.6739543081527,
+    "0.5": 329.462922110912,
+    "1.0": 329.40321110510314
   },
-  "grouped": {
-    "overall_rmse_sec": 419.91528617193393,
-    "valid_proxy_rmse_sec": 284.09104090067444,
-    "invalid_proxy_rmse_sec": 2723.4810383474705,
-    "n": 672428,
-    "valid_proxy_n": 663664,
-    "invalid_proxy_n": 8764
+  "candidate_forward_scores": {
+    "0.25": 225.66115619450798,
+    "0.5": 225.60067930193063,
+    "1.0": 225.62531276464227
   },
-  "nested_seasonal_plus_forward_transfer": {
-    "overall_rmse_sec": 284.5305563072427,
-    "valid_proxy_rmse_sec": 219.20154231600145,
-    "invalid_proxy_rmse_sec": 1604.050558512286,
-    "n": 672428,
-    "valid_proxy_n": 663664,
-    "invalid_proxy_n": 8764
+  "candidate_combined_scores": {
+    "0.25": 283.740640522346,
+    "0.5": 283.5915932930502,
+    "1.0": 283.56562372658954
   },
-  "seasonal_nested_baseline": {
-    "overall_rmse_sec": 473.91170488857233,
-    "valid_proxy_rmse_sec": 236.84680260281655,
-    "invalid_proxy_rmse_sec": 3223.011262343454,
-    "n": 344419,
-    "valid_proxy_n": 338802,
-    "invalid_proxy_n": 5617
-  },
-  "seasonal_nested_ensemble": {
-    "overall_rmse_sec": 330.4738066526067,
-    "valid_proxy_rmse_sec": 232.44003965843078,
-    "invalid_proxy_rmse_sec": 1854.1289591665627,
-    "n": 344419,
-    "valid_proxy_n": 338802,
-    "invalid_proxy_n": 5617
-  },
-  "forward_transfer_baseline": {
-    "overall_rmse_sec": 314.46551341284203,
-    "valid_proxy_rmse_sec": 210.73230449230456,
-    "invalid_proxy_rmse_sec": 2392.249418279535,
-    "n": 328009,
-    "valid_proxy_n": 324862,
-    "invalid_proxy_n": 3147
-  },
-  "forward_transfer_ensemble": {
-    "overall_rmse_sec": 226.4701976782285,
-    "valid_proxy_rmse_sec": 204.48397449475988,
-    "invalid_proxy_rmse_sec": 1014.5886740680291,
-    "n": 328009,
-    "valid_proxy_n": 324862,
-    "invalid_proxy_n": 3147
-  },
-  "excluded_from_baseline_oof": {
-    "n": 0,
-    "grouped_only_rmse_sec": null
-  },
-  "LIRF_invalid_proxy_without_tail_expert": 12,
-  "seasonal_selection": {
-    "method": "convex_mix",
-    "strength": 0,
-    "valid_weights": [
-      0.004222908096006339,
-      0.16563547381444893,
-      0.0,
-      0.40191468554325077,
-      0.428226932546294
-    ],
-    "missing_method": "global",
-    "missing_strength": 0,
-    "missing_global_choice": "lirf_ratio_high_schedule",
-    "inner_valid_proxy_scores": {
-      "convex_mix:0": 232.43840881456802,
-      "global:250": 236.8374270517254,
-      "airport:250": 236.8841718486761,
-      "airport_gap:1000": 236.85312288016274,
-      "airport_disagreement:1000": 236.87734398420645
-    },
-    "inner_invalid_proxy_scores": {
-      "baseline:0": 3223.011262343454,
-      "global:0": 1861.0030474747896,
-      "airport:0": 1981.6691306417501,
-      "airport:20": 1986.2860850890543,
-      "airport:50": 1986.9989154942316,
-      "airport:200": 1861.0030474747896,
-      "airport:1000": 1861.0030474747896
-    }
-  },
-  "final_selection": {
-    "segment": "convex_mix",
-    "strength": 0,
-    "valid_weights": [
-      0.0,
-      0.11847901228608158,
-      0.0,
-      0.4331959038414202,
-      0.44832508387249825
-    ],
-    "global_grouped_weight": null,
-    "inner_valid_proxy_scores": {
-      "convex_mix:0": 219.17225522964966,
-      "global:250": 224.40937121092978,
-      "airport:250": 224.3899872364827,
-      "airport_gap:1000": 224.3091166575147,
-      "airport_disagreement:1000": 224.38204385016542
-    },
-    "missing_method": "global",
-    "missing_strength": 0,
-    "missing_global_choice": "lirf_ratio_high_schedule",
-    "missing_airport_choices": {
-      "EDDF": "lirf_ratio_high_schedule",
-      "EDDM": "lirf_ratio_high_schedule",
-      "EGLL": "lirf_ratio_high_schedule",
-      "EHAM": "lirf_ratio_high_schedule",
-      "LEBL": "lirf_ratio_high_schedule",
-      "LEMD": "lirf_ratio_high_schedule",
-      "LFPG": "lirf_ratio_high_schedule",
-      "LIRF": "lirf_ratio_high_schedule",
-      "LSZH": "lirf_ratio_high_schedule",
-      "LTFM": "lirf_ratio_high_schedule"
-    },
-    "inner_invalid_proxy_scores": {
-      "baseline:0": 2951.728512724693,
-      "global:0": 1604.9599979971572,
-      "airport:0": 1607.0264186021257,
-      "airport:20": 1612.2589496894907,
-      "airport:50": 1609.8082541660228,
-      "airport:200": 1609.8082541660228,
-      "airport:1000": 1604.9599979971572
-    }
-  },
-  "missing_experts": {
-    "baseline_direct": 2951.728512724693,
-    "missing_direct": 2016.1768004442756,
-    "missing_schedule": 2303.5195174364103,
-    "grouped": 2723.4810383474705,
-    "tail_gate_12000": 1872.4597023058107,
-    "tail_gate_20000": 1901.3045397146527,
-    "tail_gate_30000": 1908.8608947865669,
-    "tail_schedule_12000": 1670.6907730205803,
-    "tail_schedule_20000": 1658.9410376441706,
-    "tail_schedule_30000": 1678.032120655984,
-    "lirf_ratio_missing": 1711.2164342138228,
-    "lirf_ratio_baseline": 1612.2797693915738,
-    "lirf_ratio_analog": 1642.1207765866304,
-    "lirf_ratio_high_schedule": 1604.959997997157
-  },
-  "by_airport": {
-    "EDDF": {
-      "baseline": {
-        "overall_rmse_sec": 190.03383696271246,
-        "valid_proxy_rmse_sec": 185.34977905215786,
-        "invalid_proxy_rmse_sec": 431.9157661381895,
-        "n": 72276,
-        "valid_proxy_n": 71441,
-        "invalid_proxy_n": 835
-      },
-      "nested_seasonal_plus_forward_transfer": {
-        "overall_rmse_sec": 185.56461261624102,
-        "valid_proxy_rmse_sec": 180.71050618270644,
-        "invalid_proxy_rmse_sec": 431.9157661381895,
-        "n": 72276,
-        "valid_proxy_n": 71441,
-        "invalid_proxy_n": 835
-      },
-      "missing_experts": {
-        "baseline_direct": 431.9157661381895,
-        "missing_direct": 1476.8168154235316,
-        "missing_schedule": 2765.0028952526372,
-        "grouped": 457.1120950358293,
-        "tail_gate_12000": 431.9157661381895,
-        "tail_gate_20000": 431.9157661381895,
-        "tail_gate_30000": 431.9157661381895,
-        "tail_schedule_12000": 431.9157661381895,
-        "tail_schedule_20000": 431.9157661381895,
-        "tail_schedule_30000": 431.9157661381895,
-        "lirf_ratio_missing": 1476.8168154235316,
-        "lirf_ratio_baseline": 431.9157661381895,
-        "lirf_ratio_analog": 431.9157661381895,
-        "lirf_ratio_high_schedule": 431.9157661381895
-      }
-    },
-    "EDDM": {
-      "baseline": {
-        "overall_rmse_sec": 198.8910791183934,
-        "valid_proxy_rmse_sec": 187.19730974978654,
-        "invalid_proxy_rmse_sec": 774.6516038560668,
-        "n": 51688,
-        "valid_proxy_n": 51275,
-        "invalid_proxy_n": 413
-      },
-      "nested_seasonal_plus_forward_transfer": {
-        "overall_rmse_sec": 191.29019420414727,
-        "valid_proxy_rmse_sec": 179.0341366582463,
-        "invalid_proxy_rmse_sec": 774.6516038560668,
-        "n": 51688,
-        "valid_proxy_n": 51275,
-        "invalid_proxy_n": 413
-      },
-      "missing_experts": {
-        "baseline_direct": 774.6516038560668,
-        "missing_direct": 1650.0752597534195,
-        "missing_schedule": 1333.0714430006142,
-        "grouped": 850.7921454821037,
-        "tail_gate_12000": 774.6516038560668,
-        "tail_gate_20000": 774.6516038560668,
-        "tail_gate_30000": 774.6516038560668,
-        "tail_schedule_12000": 774.6516038560668,
-        "tail_schedule_20000": 774.6516038560668,
-        "tail_schedule_30000": 774.6516038560668,
-        "lirf_ratio_missing": 1650.0752597534195,
-        "lirf_ratio_baseline": 774.6516038560668,
-        "lirf_ratio_analog": 774.6516038560668,
-        "lirf_ratio_high_schedule": 774.6516038560668
-      }
-    },
-    "EGLL": {
-      "baseline": {
-        "overall_rmse_sec": 253.72401048769558,
-        "valid_proxy_rmse_sec": 236.61891943063384,
-        "invalid_proxy_rmse_sec": 1015.4016913040336,
-        "n": 79633,
-        "valid_proxy_n": 78948,
-        "invalid_proxy_n": 685
-      },
-      "nested_seasonal_plus_forward_transfer": {
-        "overall_rmse_sec": 250.3009899631744,
-        "valid_proxy_rmse_sec": 233.10427177751413,
-        "invalid_proxy_rmse_sec": 1010.3183832521578,
-        "n": 79633,
-        "valid_proxy_n": 78948,
-        "invalid_proxy_n": 685
-      },
-      "missing_experts": {
-        "baseline_direct": 1015.4016913040336,
-        "missing_direct": 1038.1897274265586,
-        "missing_schedule": 1167.7685688418358,
-        "grouped": 1026.8760305603628,
-        "tail_gate_12000": 1015.4016913040336,
-        "tail_gate_20000": 1015.4016913040336,
-        "tail_gate_30000": 1015.4016913040336,
-        "tail_schedule_12000": 1015.4016913040336,
-        "tail_schedule_20000": 1015.4016913040336,
-        "tail_schedule_30000": 1015.4016913040336,
-        "lirf_ratio_missing": 1038.1897274265586,
-        "lirf_ratio_baseline": 1015.4016913040336,
-        "lirf_ratio_analog": 1015.4016913040336,
-        "lirf_ratio_high_schedule": 1015.4016913040336
-      }
-    },
-    "EHAM": {
-      "baseline": {
-        "overall_rmse_sec": 185.35083405005813,
-        "valid_proxy_rmse_sec": 170.7754779303669,
-        "invalid_proxy_rmse_sec": 571.2668867833635,
-        "n": 79639,
-        "valid_proxy_n": 78248,
-        "invalid_proxy_n": 1391
-      },
-      "nested_seasonal_plus_forward_transfer": {
-        "overall_rmse_sec": 178.07309841579846,
-        "valid_proxy_rmse_sec": 162.70323478472773,
-        "invalid_proxy_rmse_sec": 571.2668867833635,
-        "n": 79639,
-        "valid_proxy_n": 78248,
-        "invalid_proxy_n": 1391
-      },
-      "missing_experts": {
-        "baseline_direct": 571.2668867833635,
-        "missing_direct": 600.8188397379885,
-        "missing_schedule": 2974.110336429741,
-        "grouped": 619.1359497159472,
-        "tail_gate_12000": 571.2668867833635,
-        "tail_gate_20000": 571.2668867833635,
-        "tail_gate_30000": 571.2668867833635,
-        "tail_schedule_12000": 571.2668867833635,
-        "tail_schedule_20000": 571.2668867833635,
-        "tail_schedule_30000": 571.2668867833635,
-        "lirf_ratio_missing": 600.8188397379885,
-        "lirf_ratio_baseline": 571.2668867833635,
-        "lirf_ratio_analog": 571.2668867833635,
-        "lirf_ratio_high_schedule": 571.2668867833635
-      }
-    },
-    "LEBL": {
-      "baseline": {
-        "overall_rmse_sec": 208.94153660020973,
-        "valid_proxy_rmse_sec": 206.39926990414858,
-        "invalid_proxy_rmse_sec": 361.8906169646513,
-        "n": 56153,
-        "valid_proxy_n": 55482,
-        "invalid_proxy_n": 671
-      },
-      "nested_seasonal_plus_forward_transfer": {
-        "overall_rmse_sec": 204.50566721749584,
-        "valid_proxy_rmse_sec": 201.9124376378938,
-        "invalid_proxy_rmse_sec": 359.12086267643946,
-        "n": 56153,
-        "valid_proxy_n": 55482,
-        "invalid_proxy_n": 671
-      },
-      "missing_experts": {
-        "baseline_direct": 361.8906169646513,
-        "missing_direct": 662.9470772892432,
-        "missing_schedule": 1050.1210886070066,
-        "grouped": 360.8600413601191,
-        "tail_gate_12000": 361.8906169646513,
-        "tail_gate_20000": 361.8906169646513,
-        "tail_gate_30000": 361.8906169646513,
-        "tail_schedule_12000": 361.8906169646513,
-        "tail_schedule_20000": 361.8906169646513,
-        "tail_schedule_30000": 361.8906169646513,
-        "lirf_ratio_missing": 662.9470772892432,
-        "lirf_ratio_baseline": 361.8906169646513,
-        "lirf_ratio_analog": 361.8906169646513,
-        "lirf_ratio_high_schedule": 361.8906169646513
-      }
-    },
-    "LEMD": {
-      "baseline": {
-        "overall_rmse_sec": 180.16689193944455,
-        "valid_proxy_rmse_sec": 178.8250122846026,
-        "invalid_proxy_rmse_sec": 332.3977833731672,
-        "n": 70732,
-        "valid_proxy_n": 70298,
-        "invalid_proxy_n": 434
-      },
-      "nested_seasonal_plus_forward_transfer": {
-        "overall_rmse_sec": 176.05807025107805,
-        "valid_proxy_rmse_sec": 174.65876420767015,
-        "invalid_proxy_rmse_sec": 332.3977833731672,
-        "n": 70732,
-        "valid_proxy_n": 70298,
-        "invalid_proxy_n": 434
-      },
-      "missing_experts": {
-        "baseline_direct": 332.3977833731672,
-        "missing_direct": 362.5294583216662,
-        "missing_schedule": 419.37126548060075,
-        "grouped": 352.6953231118273,
-        "tail_gate_12000": 332.3977833731672,
-        "tail_gate_20000": 332.3977833731672,
-        "tail_gate_30000": 332.3977833731672,
-        "tail_schedule_12000": 332.3977833731672,
-        "tail_schedule_20000": 332.3977833731672,
-        "tail_schedule_30000": 332.3977833731672,
-        "lirf_ratio_missing": 362.5294583216662,
-        "lirf_ratio_baseline": 332.3977833731672,
-        "lirf_ratio_analog": 332.3977833731672,
-        "lirf_ratio_high_schedule": 332.3977833731672
-      }
-    },
-    "LFPG": {
-      "baseline": {
-        "overall_rmse_sec": 455.20177958011703,
-        "valid_proxy_rmse_sec": 254.51475913540992,
-        "invalid_proxy_rmse_sec": 2611.00597408272,
-        "n": 78036,
-        "valid_proxy_n": 76390,
-        "invalid_proxy_n": 1646
-      },
-      "nested_seasonal_plus_forward_transfer": {
-        "overall_rmse_sec": 451.57065597769304,
-        "valid_proxy_rmse_sec": 248.04055967734718,
-        "invalid_proxy_rmse_sec": 2610.0290242778055,
-        "n": 78036,
-        "valid_proxy_n": 76390,
-        "invalid_proxy_n": 1646
-      },
-      "missing_experts": {
-        "baseline_direct": 2611.00597408272,
-        "missing_direct": 2611.5943462043524,
-        "missing_schedule": 2782.683680966827,
-        "grouped": 2594.7204981848445,
-        "tail_gate_12000": 2611.00597408272,
-        "tail_gate_20000": 2611.00597408272,
-        "tail_gate_30000": 2611.00597408272,
-        "tail_schedule_12000": 2611.00597408272,
-        "tail_schedule_20000": 2611.00597408272,
-        "tail_schedule_30000": 2611.00597408272,
-        "lirf_ratio_missing": 2611.5943462043524,
-        "lirf_ratio_baseline": 2611.00597408272,
-        "lirf_ratio_analog": 2611.00597408272,
-        "lirf_ratio_high_schedule": 2611.00597408272
-      }
-    },
-    "LIRF": {
-      "baseline": {
-        "overall_rmse_sec": 1174.3222448071426,
-        "valid_proxy_rmse_sec": 355.38268609010777,
-        "invalid_proxy_rmse_sec": 10679.203962224023,
-        "n": 49924,
-        "valid_proxy_n": 49375,
-        "invalid_proxy_n": 549
-      },
-      "nested_seasonal_plus_forward_transfer": {
-        "overall_rmse_sec": 545.2488806360831,
-        "valid_proxy_rmse_sec": 349.00959732863976,
-        "invalid_proxy_rmse_sec": 4009.998303485655,
-        "n": 49924,
-        "valid_proxy_n": 49375,
-        "invalid_proxy_n": 549
-      },
-      "missing_experts": {
-        "baseline_direct": 10679.203962224023,
-        "missing_direct": 5882.340098998271,
-        "missing_schedule": 4635.635261353687,
-        "grouped": 9648.456349232445,
-        "tail_gate_12000": 5561.4331672256685,
-        "tail_gate_20000": 5715.52545317165,
-        "tail_gate_30000": 5755.591868890508,
-        "tail_schedule_12000": 4417.829745646019,
-        "tail_schedule_20000": 4346.572005480835,
-        "tail_schedule_30000": 4462.025357034983,
-        "lirf_ratio_missing": 4056.6020071039256,
-        "lirf_ratio_baseline": 4056.6020071039256,
-        "lirf_ratio_analog": 4243.384900481527,
-        "lirf_ratio_high_schedule": 4009.998303485655
-      }
-    },
-    "LSZH": {
-      "baseline": {
-        "overall_rmse_sec": 195.83214254444613,
-        "valid_proxy_rmse_sec": 176.22035715253747,
-        "invalid_proxy_rmse_sec": 675.061950700111,
-        "n": 43009,
-        "valid_proxy_n": 42270,
-        "invalid_proxy_n": 739
-      },
-      "nested_seasonal_plus_forward_transfer": {
-        "overall_rmse_sec": 192.4551611085399,
-        "valid_proxy_rmse_sec": 172.62786028701782,
-        "invalid_proxy_rmse_sec": 671.6246688686807,
-        "n": 43009,
-        "valid_proxy_n": 42270,
-        "invalid_proxy_n": 739
-      },
-      "missing_experts": {
-        "baseline_direct": 675.061950700111,
-        "missing_direct": 700.9771497138532,
-        "missing_schedule": 606.6868874198719,
-        "grouped": 584.8190853356308,
-        "tail_gate_12000": 675.061950700111,
-        "tail_gate_20000": 675.061950700111,
-        "tail_gate_30000": 675.061950700111,
-        "tail_schedule_12000": 675.061950700111,
-        "tail_schedule_20000": 675.061950700111,
-        "tail_schedule_30000": 675.061950700111,
-        "lirf_ratio_missing": 700.9771497138532,
-        "lirf_ratio_baseline": 675.061950700111,
-        "lirf_ratio_analog": 675.061950700111,
-        "lirf_ratio_high_schedule": 675.061950700111
-      }
-    },
-    "LTFM": {
-      "baseline": {
-        "overall_rmse_sec": 253.28476923503302,
-        "valid_proxy_rmse_sec": 244.35786852923263,
-        "invalid_proxy_rmse_sec": 591.0438526623623,
-        "n": 91338,
-        "valid_proxy_n": 89937,
-        "invalid_proxy_n": 1401
-      },
-      "nested_seasonal_plus_forward_transfer": {
-        "overall_rmse_sec": 248.81668292259408,
-        "valid_proxy_rmse_sec": 239.7750180026059,
-        "invalid_proxy_rmse_sec": 587.7943953569165,
-        "n": 91338,
-        "valid_proxy_n": 89937,
-        "invalid_proxy_n": 1401
-      },
-      "missing_experts": {
-        "baseline_direct": 591.0438526623623,
-        "missing_direct": 598.2243943468737,
-        "missing_schedule": 607.2035392979474,
-        "grouped": 703.2448078961156,
-        "tail_gate_12000": 591.0438526623623,
-        "tail_gate_20000": 591.0438526623623,
-        "tail_gate_30000": 591.0438526623623,
-        "tail_schedule_12000": 591.0438526623623,
-        "tail_schedule_20000": 591.0438526623623,
-        "tail_schedule_30000": 591.0438526623623,
-        "lirf_ratio_missing": 598.2243943468737,
-        "lirf_ratio_baseline": 591.0438526623623,
-        "lirf_ratio_analog": 591.0438526623623,
-        "lirf_ratio_high_schedule": 591.0438526623623
-      }
-    }
-  },
-  "outer_folds": [
+  "seasonal_nested_selections": [
     {
       "outer_fold": 0,
-      "selected": "convex_mix",
-      "strength": 0,
-      "valid_weights": [
-        0.014238241382020345,
-        0.1613298881598099,
-        1.8153642967730342e-18,
-        0.41055449110603737,
-        0.4138773793521324
-      ],
-      "global_grouped_weight": null,
-      "missing_selected": "global",
-      "missing_strength": 0,
-      "missing_global_choice": "lirf_ratio_high_schedule",
-      "outer_rmse_sec": 276.23092758518794,
-      "inner_valid_proxy_scores": {
-        "convex_mix:0": 232.68513198454116,
-        "global:250": 237.14803846381787,
-        "airport:250": 237.1682547930008,
-        "airport_gap:1000": 237.17785081807077,
-        "airport_disagreement:1000": 237.15167668029179
+      "selected_valid_weight": 1.0,
+      "training_scores": {
+        "0.25": 341.89506972457184,
+        "0.5": 341.67977216361925,
+        "1.0": 341.6154117973031
       },
-      "inner_invalid_proxy_scores": {
-        "baseline:0": 3367.64744984075,
-        "global:0": 2008.801975694453,
-        "airport:0": 2008.9775251195633,
-        "airport:20": 2009.645166645822,
-        "airport:50": 2009.5615769891667,
-        "airport:200": 2008.801975694453,
-        "airport:1000": 2008.801975694453
-      }
+      "test_rmse_sec": 275.6019877865133
     },
     {
       "outer_fold": 1,
-      "selected": "convex_mix",
-      "strength": 0,
-      "valid_weights": [
-        0.0070719633900535595,
-        0.16632101239644265,
-        0.0,
-        0.3986332322422207,
-        0.42797379197128316
-      ],
-      "global_grouped_weight": null,
-      "missing_selected": "global",
-      "missing_strength": 0,
-      "missing_global_choice": "lirf_ratio_high_schedule",
-      "outer_rmse_sec": 280.3209325016858,
-      "inner_valid_proxy_scores": {
-        "convex_mix:0": 232.18435888141775,
-        "global:250": 236.50196385641823,
-        "airport:250": 236.59130762011898,
-        "airport_gap:1000": 236.53445395149353,
-        "airport_disagreement:1000": 236.62140598366602
+      "selected_valid_weight": 1.0,
+      "training_scores": {
+        "0.25": 341.00377547587925,
+        "0.5": 340.8347974495575,
+        "1.0": 340.7654497560781
       },
-      "inner_invalid_proxy_scores": {
-        "baseline:0": 3535.569327577152,
-        "global:0": 1993.7991612199805,
-        "airport:0": 2125.4915919942623,
-        "airport:20": 2127.1607333564234,
-        "airport:50": 2127.731534376185,
-        "airport:200": 1993.9975695095686,
-        "airport:1000": 1993.7991612199805
-      }
+      "test_rmse_sec": 279.22915112331276
     },
     {
       "outer_fold": 2,
-      "selected": "convex_mix",
-      "strength": 0,
-      "valid_weights": [
-        0.006416271861331424,
-        0.15991343843620412,
-        1.0855735498742586e-18,
-        0.3916912779868097,
-        0.44197901171565485
-      ],
-      "global_grouped_weight": null,
-      "missing_selected": "airport",
-      "missing_strength": 200,
-      "missing_global_choice": "lirf_ratio_high_schedule",
-      "outer_rmse_sec": 282.1799296253855,
-      "inner_valid_proxy_scores": {
-        "convex_mix:0": 232.51004123565198,
-        "global:250": 236.90665298646323,
-        "airport:250": 236.91522454240814,
-        "airport_gap:1000": 236.90360399440286,
-        "airport_disagreement:1000": 236.9061261841267
+      "selected_valid_weight": 1.0,
+      "training_scores": {
+        "0.25": 340.5872481064672,
+        "0.5": 340.37485435049723,
+        "1.0": 340.3329994441603
       },
-      "inner_invalid_proxy_scores": {
-        "baseline:0": 3185.616736033331,
-        "global:0": 1989.9870652213106,
-        "airport:0": 2091.7398395839905,
-        "airport:20": 2095.8749425869996,
-        "airport:50": 1990.8260757998216,
-        "airport:200": 1989.6754513668782,
-        "airport:1000": 1989.9870652213106
-      }
+      "test_rmse_sec": 281.49522222410656
     },
     {
       "outer_fold": 3,
-      "selected": "convex_mix",
-      "strength": 0,
-      "valid_weights": [
-        0.0,
-        0.16254278101579323,
-        0.0,
-        0.3982884041896442,
-        0.43916881479456266
-      ],
-      "global_grouped_weight": null,
-      "missing_selected": "airport",
-      "missing_strength": 0,
-      "missing_global_choice": "lirf_ratio_high_schedule",
-      "outer_rmse_sec": 356.4464401287695,
-      "inner_valid_proxy_scores": {
-        "convex_mix:0": 232.12438647984703,
-        "global:250": 236.41071712365527,
-        "airport:250": 236.4824022330668,
-        "airport_gap:1000": 236.45225871488975,
-        "airport_disagreement:1000": 236.4873363282411
+      "selected_valid_weight": 1.0,
+      "training_scores": {
+        "0.25": 323.2551001146763,
+        "0.5": 323.0223250886223,
+        "1.0": 322.9526708621002
       },
-      "inner_invalid_proxy_scores": {
-        "baseline:0": 3086.4160897802976,
-        "global:0": 1820.568846605039,
-        "airport:0": 1816.5790207213256,
-        "airport:20": 1822.415001970289,
-        "airport:50": 1822.0485885351716,
-        "airport:200": 1820.568846605039,
-        "airport:1000": 1820.568846605039
-      }
+      "test_rmse_sec": 354.11323955160447
     },
     {
       "outer_fold": 4,
-      "selected": "convex_mix",
-      "strength": 0,
-      "valid_weights": [
-        0.0,
-        0.17603165957444164,
-        5.058261489058875e-18,
-        0.4102682852503977,
-        0.4137000551751606
-      ],
-      "global_grouped_weight": null,
-      "missing_selected": "global",
-      "missing_strength": 0,
-      "missing_global_choice": "lirf_ratio_high_schedule",
-      "outer_rmse_sec": 429.84980391048697,
-      "inner_valid_proxy_scores": {
-        "convex_mix:0": 232.71520648715554,
-        "global:250": 237.25145149743983,
-        "airport:250": 237.3170625035428,
-        "airport_gap:1000": 237.28068956036452,
-        "airport_disagreement:1000": 237.28877610415418
+      "selected_valid_weight": 1.0,
+      "training_scores": {
+        "0.25": 299.6195440001382,
+        "0.5": 299.38907115737646,
+        "1.0": 299.3356624472655
       },
-      "inner_invalid_proxy_scores": {
-        "baseline:0": 2897.7454941071,
-        "global:0": 1523.2079503926814,
-        "airport:0": 1593.511720747463,
-        "airport:20": 1598.5281902826368,
-        "airport:50": 1598.1917828668845,
-        "airport:200": 1598.2307586998484,
-        "airport:1000": 1596.0160587798653
-      }
+      "test_rmse_sec": 429.2272441557954
     }
   ],
-  "n_by_month": {
-    "1": 153706,
-    "7": 190713,
-    "11": 162332,
-    "12": 165677
+  "counts": {
+    "all_finite_rows": 672428,
+    "lobt_eligible": 658307,
+    "invalid_aobt_lobt_fallback": 283,
+    "valid_aobt_high_disagreement": 1486,
+    "uncovered_kept_from_frozen_ensemble": 14121
+  },
+  "seasonal_nested": {
+    "baseline": {
+      "n": 344419,
+      "overall_rmse_sec": 330.4738066526067,
+      "valid_proxy_n": 338802,
+      "valid_proxy_rmse_sec": 232.44003965843078,
+      "invalid_proxy_n": 5617,
+      "invalid_proxy_rmse_sec": 1854.1289591665627
+    },
+    "selected": {
+      "n": 344419,
+      "overall_rmse_sec": 329.40321110510314,
+      "valid_proxy_n": 338802,
+      "valid_proxy_rmse_sec": 231.56992225405216,
+      "invalid_proxy_n": 5617,
+      "invalid_proxy_rmse_sec": 1849.0074642592742
+    },
+    "fixed_quarter": {
+      "n": 344419,
+      "overall_rmse_sec": 329.6739543081527,
+      "valid_proxy_n": 338802,
+      "valid_proxy_rmse_sec": 231.96126384416496,
+      "invalid_proxy_n": 5617,
+      "invalid_proxy_rmse_sec": 1849.0074642592742
+    }
+  },
+  "forward_transfer": {
+    "baseline": {
+      "n": 328009,
+      "overall_rmse_sec": 226.4701976782285,
+      "valid_proxy_n": 324862,
+      "valid_proxy_rmse_sec": 204.48397449475988,
+      "invalid_proxy_n": 3147,
+      "invalid_proxy_rmse_sec": 1014.5886740680291
+    },
+    "selected": {
+      "n": 328009,
+      "overall_rmse_sec": 225.62531276464227,
+      "valid_proxy_n": 324862,
+      "valid_proxy_rmse_sec": 204.32253184406028,
+      "invalid_proxy_n": 3147,
+      "invalid_proxy_rmse_sec": 998.1938295226564
+    },
+    "fixed_quarter": {
+      "n": 328009,
+      "overall_rmse_sec": 225.66115619450798,
+      "valid_proxy_n": 324862,
+      "valid_proxy_rmse_sec": 204.36249501978824,
+      "invalid_proxy_n": 3147,
+      "invalid_proxy_rmse_sec": 998.1938295226564
+    }
+  },
+  "combined_nested_and_forward": {
+    "baseline": {
+      "n": 672428,
+      "overall_rmse_sec": 284.5305563072427,
+      "valid_proxy_n": 663664,
+      "valid_proxy_rmse_sec": 219.20154231600145,
+      "invalid_proxy_n": 8764,
+      "invalid_proxy_rmse_sec": 1604.050558512286
+    },
+    "selected": {
+      "n": 672428,
+      "overall_rmse_sec": 283.56562372658954,
+      "valid_proxy_n": 663664,
+      "valid_proxy_rmse_sec": 218.65703301224988,
+      "invalid_proxy_n": 8764,
+      "invalid_proxy_rmse_sec": 1596.5504551913316
+    },
+    "fixed_quarter": {
+      "n": 672428,
+      "overall_rmse_sec": 283.740640522346,
+      "valid_proxy_n": 663664,
+      "valid_proxy_rmse_sec": 218.88695108981204,
+      "invalid_proxy_n": 8764,
+      "invalid_proxy_rmse_sec": 1596.5504551913316
+    }
+  },
+  "selected_segments": {
+    "invalid_aobt_lobt_valid": {
+      "seasonal_jan_jul": {
+        "n": 176,
+        "base_rmse_sec": 1180.6472305726454,
+        "selected_rmse_sec": 888.0570084545888,
+        "fixed_quarter_rmse_sec": 888.0570084545888
+      },
+      "forward_nov_dec": {
+        "n": 107,
+        "base_rmse_sec": 1142.1845192968344,
+        "selected_rmse_sec": 577.9595636842321,
+        "fixed_quarter_rmse_sec": 577.9595636842321
+      }
+    },
+    "valid_aobt_gap_over_3600": {
+      "seasonal_jan_jul": {
+        "n": 983,
+        "base_rmse_sec": 1005.3234922197842,
+        "selected_rmse_sec": 933.5527360724108,
+        "fixed_quarter_rmse_sec": 966.4584452197698
+      },
+      "forward_nov_dec": {
+        "n": 503,
+        "base_rmse_sec": 772.5642697369742,
+        "selected_rmse_sec": 744.4664493317076,
+        "fixed_quarter_rmse_sec": 751.5174818778867
+      }
+    }
+  },
+  "ranking_counts": {
+    "n": 344841,
+    "lobt_eligible": 337093,
+    "invalid_aobt_lobt_fallback": 141,
+    "valid_aobt_high_disagreement": 895
   }
 }

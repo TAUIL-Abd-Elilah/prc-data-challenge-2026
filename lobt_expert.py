@@ -154,6 +154,37 @@ def group_metrics(oof: pd.DataFrame) -> dict:
     return report
 
 
+def policy_metrics(oof: pd.DataFrame) -> dict:
+    """Evaluate a fixed, covariate-only switch against the existing ensemble."""
+    y = oof["target"].to_numpy(dtype=np.float64)
+    prior = oof["nested_ensemble"].to_numpy(dtype=np.float64)
+    lobt = oof["lobt_prediction"].to_numpy(dtype=np.float64)
+    valid_aobt = oof["aobt_valid"].to_numpy(dtype=bool)
+    gap = oof["aobt_lobt_abs_gap"].to_numpy(dtype=np.float64)
+    replace = ~valid_aobt
+    blend = valid_aobt & (gap > 3600)
+    candidate = np.where(replace, lobt,
+                         np.where(blend, 0.5 * prior + 0.5 * lobt, prior))
+    return {"n": int(len(oof)), "aobt_invalid_replacements": int(replace.sum()),
+            "aobt_valid_large_gap_blends": int(blend.sum()),
+            "prior_rmse": rmse(y, prior), "conditional_rmse": rmse(y, candidate),
+            "rule": "Use LOBT prediction if AOBT invalid; otherwise blend 50% where absolute AOBT-LOBT gap exceeds 3600 sec."}
+
+
+def report_saved_predictions(output_dir: Path) -> None:
+    report_path = output_dir / "validation.json"
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    parts = []
+    for fold in FOLDS:
+        oof = pd.read_parquet(output_dir / f"{fold}_oof.parquet")
+        report["folds"][fold]["conditional_policy"] = policy_metrics(oof)
+        parts.append(oof)
+    report["pooled"]["conditional_policy"] = policy_metrics(pd.concat(parts, ignore_index=True))
+    report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    print(json.dumps({fold: report["folds"][fold]["conditional_policy"]
+                      for fold in FOLDS}, indent=2))
+
+
 def train(args: argparse.Namespace) -> None:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     rows, x = load_features(args.data_dir, args.cache_dir, args.weather_file, False)
@@ -209,12 +240,12 @@ def train(args: argparse.Namespace) -> None:
     # inspectable and avoids selecting a weight on the same validation rows.
     segments = ("aobt_valid_gap_gt_3600", "aobt_valid_gap_gt_1800",
                 "aobt_invalid_target_gt_7200")
-    reports["final_fit_supported"] = bool(any(
+    reports["final_fit_supported"] = bool(any(all(
         reports["folds"][fold][segment].get("n", 0) >= 5 and
         reports["folds"][fold][segment].get("blend_25pct_lobt", math.inf) <
         reports["folds"][fold][segment].get("nested_ensemble", math.inf)
-        for fold in FOLDS for segment in segments
-    ))
+        for fold in FOLDS
+    ) for segment in segments))
     (args.output_dir / "validation.json").write_text(json.dumps(reports, indent=2), encoding="utf-8")
     if not reports["final_fit_supported"]:
         print("No held-out segment supported a fixed blend; skipping ranking fit.", flush=True)
@@ -258,10 +289,15 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts/lobt"))
     parser.add_argument("--threads", type=int, default=8)
     parser.add_argument("--rounds", type=int, default=900)
+    parser.add_argument("--report-only", action="store_true",
+                        help="Summarize already saved OOF predictions without retraining")
     args = parser.parse_args()
     if args.threads < 1 or args.rounds < 1:
         parser.error("--threads and --rounds must be positive")
-    train(args)
+    if args.report_only:
+        report_saved_predictions(args.output_dir)
+    else:
+        train(args)
 
 
 if __name__ == "__main__":
