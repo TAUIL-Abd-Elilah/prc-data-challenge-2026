@@ -1,0 +1,67 @@
+{
+  "candidate": "all-positive Huber ordinary + long-tail probability * conditional schedule ratio",
+  "ranking_safe_covariates": "Baseline, ARR traffic, weather, full flight, unclipped schedule clock",
+  "weights_predeclared": [
+    0.0,
+    0.1,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "selected_weight_from_jan_jul": 0.5,
+  "point_gain_both_folds": false,
+  "day_block_stability_both_folds": false,
+  "promoted": false,
+  "all_finite_n": 672428,
+  "expert_gate_n": 8378,
+  "expert_gate_by_fold": {
+    "seasonal_jan_jul": 5373,
+    "forward_nov_dec": 3005
+  },
+  "fold_scores_all_finite": {
+    "seasonal_jan_jul": {
+      "0.0": 325.8216062799188,
+      "0.1": 325.02669168841953,
+      "0.25": 324.2023127103402,
+      "0.5": 323.81687455807213,
+      "1.0": 326.75105250628167
+    },
+    "forward_nov_dec": {
+      "0.0": 221.1420023730262,
+      "0.1": 221.71426289044953,
+      "0.25": 223.00637174983925,
+      "0.5": 226.29223936661654,
+      "1.0": 236.86638954858705
+    }
+  },
+  "combined_scores_all_finite": {
+    "0.0": 279.6969644595868,
+    "0.1": 279.4441210438907,
+    "0.25": 279.45515355620176,
+    "0.5": 280.5127501980362,
+    "1.0": 286.45092272980173
+  },
+  "day_bootstrap_selected_vs_v5": {
+    "seasonal_jan_jul": {
+      "days": 62,
+      "repeats": 1000,
+      "observed_gain_sec": 2.0047317218466674,
+      "gain_ci95_sec": [
+        -0.5930427361576107,
+        4.883183853988584
+      ],
+      "fraction_positive": 0.934
+    },
+    "forward_nov_dec": {
+      "days": 61,
+      "repeats": 1000,
+      "observed_gain_sec": -5.15023699359034,
+      "gain_ci95_sec": [
+        -19.221384922356776,
+        3.2124894461569657
+      ],
+      "fraction_positive": 0.27
+    }
+  },
+  "validation_limit": "Both held-out periods have been used for local model comparison; no ranking outcomes were read."
+}

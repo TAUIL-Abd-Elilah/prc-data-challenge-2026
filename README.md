@@ -106,6 +106,24 @@ Arrival ground features use the ARR block/taxi fields retained in the supplied r
 
 Local folds have been used repeatedly for model comparison. Improvements and bootstrap intervals do not guarantee a 2026 score or a prize. The public aggregate reports and final submission receipt record the accepted policy and observed outcome.
 
+## Reproduce v6
+
+After reproducing v5, run the larger clock-and-arrival expert. Run GPU stages serially on the reference 32 GB machine.
+
+```powershell
+python deep_arrival_expert.py --mode fit
+python deep_arrival_expert.py --mode fresh-audit
+python deep_arrival_expert.py --mode final-predict
+python finalize_submission.py --predictions artifacts/v6-deep-arrival/predictions.parquet --team merry-mushroom --version 6
+python submission_quota.py --submission submissions/merry-mushroom_v6.parquet --report reports/submission_quota_v6.json
+```
+
+This expert uses the released timestamp features plus the 14 released ARR traffic features, with depth 10 and at most 10,000 CatBoost trees. January/July select a 0.5 blend with v5 on valid AOBT rows. The fixed blend changes all-finite January/July RMSE from 325.822 to 323.723 seconds and November/December from 221.142 to 217.903. Both paired day-bootstrap intervals are positive. Invalid AOBT rows retain the v5 prediction.
+
+The additional April/October audit retrains both the previous depth-9 timestamp architecture and the new architecture while excluding those months from fitting and early stopping. On all 357,813 eligible held-out flights, the same 0.5 blend changes RMSE from 204.521 to 200.307, with a 95% paired day interval for the gain of 3.872 to 4.599 seconds. This checks the architecture change; it is not an estimate of the complete ensemble's 2026 score. Complete ID coverage, finite predictions and input fingerprints are required before promotion.
+
+The read-only quota check counts uploads in the preceding 24 hours because the official five-per-day rule does not publish a reset timezone. It also checks a conservative 1,000,000,000-byte bucket limit, the team destination and a fresh higher version number. No submissions are deleted. Upload the frozen v6 file with the same MinIO command below, then download it and its result and run `python record_submission.py --version 6`. Only aggregate receipts are published. Ranking results never select model settings.
+
 ## Submit with MinIO Client
 
 The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized v5 file. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.

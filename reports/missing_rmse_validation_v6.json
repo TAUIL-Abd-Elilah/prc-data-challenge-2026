@@ -1,0 +1,62 @@
+{
+  "model": "Shared depth-6 RMSE CatBoost on all finite positive non-LIRF no-NM invalid-AOBT training labels",
+  "weights_predeclared": [
+    0.0,
+    0.1,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "selected_weight_from_jan_jul": 0.5,
+  "point_gain_both_folds": true,
+  "day_ci_lower_positive_both_folds": false,
+  "promoted_for_audit": false,
+  "all_finite_n": 672428,
+  "expert_gate_n": 7841,
+  "fold_scores_all_finite": {
+    "seasonal_jan_jul": {
+      "0.0": 325.8216062799188,
+      "0.1": 325.74998043577966,
+      "0.25": 325.6779453296626,
+      "0.5": 325.65235592809523,
+      "1.0": 325.9553746947372
+    },
+    "forward_nov_dec": {
+      "0.0": 221.1420023730262,
+      "0.1": 221.08606561800426,
+      "0.25": 221.03781352556595,
+      "0.5": 221.05252198818584,
+      "1.0": 221.43834455526425
+    }
+  },
+  "combined_scores_all_finite": {
+    "0.0": 279.6969644595868,
+    "0.1": 279.63265406902093,
+    "0.25": 279.57106324227374,
+    "0.5": 279.56146791681726,
+    "1.0": 279.8910977991843
+  },
+  "day_bootstrap_selected_vs_v5": {
+    "seasonal_jan_jul": {
+      "days": 62,
+      "repeats": 1000,
+      "observed_gain_sec": 0.16925035182356396,
+      "gain_ci95_sec": [
+        -0.022216161308156752,
+        0.37691024873235507
+      ],
+      "fraction_positive": 0.963
+    },
+    "forward_nov_dec": {
+      "days": 61,
+      "repeats": 1000,
+      "observed_gain_sec": 0.08948038484035692,
+      "gain_ci95_sec": [
+        -0.12475821550498409,
+        0.41862301287784115
+      ],
+      "fraction_positive": 0.732
+    }
+  },
+  "validation_limit": "Both periods were used for local model comparison; no ranking outcomes were read."
+}

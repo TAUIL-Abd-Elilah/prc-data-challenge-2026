@@ -1,0 +1,144 @@
+{
+  "chosen_weight": 0.0,
+  "promote": false,
+  "seasonal_jan_jul": {
+    "fold": "seasonal_jan_jul",
+    "heldout_months": [
+      1,
+      7
+    ],
+    "train_fit_n": 1619296,
+    "internal_early_n": 103359,
+    "heldout_eligible_n": 338802,
+    "heldout_all_finite_n": 344419,
+    "best_iteration": 800,
+    "fit_sec": 281.4,
+    "scores_all_finite_clipped": {
+      "0.0": 325.8216062799188,
+      "0.1": 326.05700914345834,
+      "0.25": 326.60969057442344,
+      "0.5": 328.0597195483444,
+      "1.0": 332.9040781205711
+    },
+    "day_bootstrap": {
+      "point_gain_sec": 0.0,
+      "ci95_lower_sec": 0.0,
+      "ci95_upper_sec": 0.0,
+      "repetitions": 1000,
+      "utc_days": 62
+    }
+  },
+  "forward_nov_dec": {
+    "fold": "forward_nov_dec",
+    "heldout_months": [
+      11,
+      12
+    ],
+    "train_fit_n": 1632383,
+    "internal_early_n": 104194,
+    "heldout_eligible_n": 324862,
+    "heldout_all_finite_n": 328009,
+    "best_iteration": 799,
+    "fit_sec": 295.1,
+    "scores_all_finite_clipped": {
+      "0.0": 221.1420023730262,
+      "0.1": 221.42430895561742,
+      "0.25": 222.07783291327786,
+      "0.5": 223.77394068875583,
+      "1.0": 229.36790690284394
+    },
+    "day_bootstrap": {
+      "point_gain_sec": 0.0,
+      "ci95_lower_sec": 0.0,
+      "ci95_upper_sec": 0.0,
+      "repetitions": 1000,
+      "utc_days": 61
+    }
+  },
+  "protocol": {
+    "purpose": "2025 local model comparison; no ranking labels or public-score tuning",
+    "raw_predictor_columns": [
+      "MVT_ID_mvt",
+      "ADEP_mvt",
+      "RUNWAY_mvt",
+      "MVT_TIME_UTC_mvt",
+      "AOBT_3_flt"
+    ],
+    "raw_phase_filter": "PHASE_mvt == DEP",
+    "forbidden_predictor_columns": [
+      "BLOCK_TIME_UTC_mvt",
+      "TAXITIME_SEC_mvt"
+    ],
+    "source_proxy": "MVT_TIME_UTC_mvt - AOBT_3_flt in [0,7200] seconds",
+    "query_exclusion": "Past [t-window,t) and future (t,t+window] omit the query and all same-second peers",
+    "groupings": [
+      "ADEP_mvt",
+      "ADEP_mvt + RUNWAY_mvt"
+    ],
+    "windows_seconds": [
+      900,
+      3600
+    ],
+    "feature_names": [
+      "nbr_airport_past15m_count",
+      "nbr_airport_past15m_mean",
+      "nbr_airport_past15m_std",
+      "nbr_airport_past60m_count",
+      "nbr_airport_past60m_mean",
+      "nbr_airport_past60m_std",
+      "nbr_airport_future15m_count",
+      "nbr_airport_future15m_mean",
+      "nbr_airport_future15m_std",
+      "nbr_airport_future60m_count",
+      "nbr_airport_future60m_mean",
+      "nbr_airport_future60m_std",
+      "nbr_runway_past15m_count",
+      "nbr_runway_past15m_mean",
+      "nbr_runway_past15m_std",
+      "nbr_runway_past60m_count",
+      "nbr_runway_past60m_mean",
+      "nbr_runway_past60m_std",
+      "nbr_runway_future15m_count",
+      "nbr_runway_future15m_mean",
+      "nbr_runway_future15m_std",
+      "nbr_runway_future60m_count",
+      "nbr_runway_future60m_mean",
+      "nbr_runway_future60m_std"
+    ],
+    "model": {
+      "objective": "direct residual target-minus-own-AOBT-proxy",
+      "algorithm": "LightGBM regression",
+      "max_rounds": 800,
+      "num_leaves": 31,
+      "num_threads": 2,
+      "learning_rate": 0.045,
+      "min_data_in_leaf": 150,
+      "internal_early_stop_rounds": 80,
+      "eligible_training_target": "finite, 0..86400 seconds; own proxy 0..7200",
+      "heldout_scoring_target": "all finite labels, including negative and extreme"
+    },
+    "validation": {
+      "selection_months": [
+        1,
+        7
+      ],
+      "forward_months": [
+        11,
+        12
+      ],
+      "comparison": "frozen v5 selected, clipped >=0",
+      "blend_weights": [
+        0.0,
+        0.1,
+        0.25,
+        0.5,
+        1.0
+      ],
+      "choose": "lowest all-finite seasonal RMSE; ties select lower weight",
+      "forward": "apply unchanged selected weight",
+      "bootstrap": "1000 paired UTC-day resamples within each held-out month; seed 20261002",
+      "promotion_gate": "selected weight >0, RMSE gain and 95% day-block lower bound >0 in both folds"
+    },
+    "limitations": "Repeatedly examined 2025 folds and inherited v5 base-model limitations make this a comparison estimate, not untouched 2026 performance."
+  }
+}

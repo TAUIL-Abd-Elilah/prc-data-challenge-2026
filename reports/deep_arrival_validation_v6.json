@@ -1,0 +1,109 @@
+{
+  "protocol": {
+    "reference_sha256": "036da1502f4ae68238927e31a0479b9cb82a6fb31b7acdbab26aa0657b7a67f8",
+    "selection_months": [
+      1,
+      7
+    ],
+    "corroboration_months": [
+      11,
+      12
+    ],
+    "fresh_architecture_audit_months": [
+      4,
+      10
+    ],
+    "weights": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "iterations": 10000,
+    "depth": 10,
+    "seed": 2026,
+    "features": "Prior deep timestamp features plus the fixed 14 ARR traffic predictors",
+    "training": "Residual to AOBT, labels 0..86400 seconds, valid proxy 0..7200",
+    "promotion": "Seasonal selected nonzero blend; both existing folds have positive day CI lower bound; fresh paired architecture audit improves at same weight",
+    "leaderboard_use": "Progress only; no ranking values enter training, selection or promotion"
+  },
+  "folds": {
+    "seasonal_jan_jul": {
+      "scores": {
+        "0.0": 325.8216062799188,
+        "0.1": 325.19573689278013,
+        "0.25": 324.4495443383023,
+        "0.5": 323.7231616861707,
+        "1.0": 324.220414547655
+      },
+      "n": 344419,
+      "n_changed_gate": 338802,
+      "trees": 9998,
+      "fit_seconds": 379.4369999999981,
+      "bootstrap": {
+        "days": 62,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          1.6553625101608176,
+          2.6814674968924734
+        ],
+        "fraction_positive": 1.0,
+        "observed_gain_sec": 2.09844459374807
+      }
+    },
+    "forward_nov_dec": {
+      "scores": {
+        "0.0": 221.1420023730262,
+        "0.1": 220.26509787352165,
+        "0.25": 219.16284309992744,
+        "0.5": 217.90305012559384,
+        "1.0": 217.5844130440634
+      },
+      "n": 328009,
+      "n_changed_gate": 324862,
+      "trees": 10000,
+      "fit_seconds": 494.75,
+      "bootstrap": {
+        "days": 61,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          2.8977402265327656,
+          3.622471974597711
+        ],
+        "fraction_positive": 1.0,
+        "observed_gain_sec": 3.2389522474323655
+      }
+    }
+  },
+  "selected_weight": 0.5,
+  "promoted": true,
+  "existing_folds_passed": true,
+  "fresh_audit": {
+    "months": [
+      4,
+      10
+    ],
+    "weight": 0.5,
+    "n_valid_aobt": 357813,
+    "prior_architecture_rmse": 204.52133471240387,
+    "blended_new_architecture_rmse": 200.30654119795787,
+    "bootstrap": {
+      "days": 61,
+      "repeats": 1000,
+      "gain_ci95_sec": [
+        3.871545602275185,
+        4.598566746010743
+      ],
+      "fraction_positive": 1.0,
+      "observed_gain_sec": 4.214793514446001
+    },
+    "scope": "Independent architecture comparison; not a complete v5 ensemble forecast",
+    "passed": true,
+    "coverage_verified": true,
+    "training_rows_sha256": "b19e760a11b15e77996203ee84431fbcc225e0e2a325b15cd43bc38a00c47fcc",
+    "prior_oof_sha256": "7cb2a1d081214cef400c8909410acff4fc92c6ccdda5adcb606e7cc5767c6492",
+    "new_oof_sha256": "7d252edb4b3abf158830367633b56d5e68d03d0a387b98edae18d79fa50f225d",
+    "paired_predictions_sha256": "65f9929ac955f6fc771d66f2bd152ad0da5371f9c326fdc4b09b76dc47b32f92"
+  }
+}

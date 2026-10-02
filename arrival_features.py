@@ -172,7 +172,12 @@ def _seconds(values: pd.Series) -> np.ndarray:
 
 
 def build_arrival_traffic(deps: pd.DataFrame, arr: pd.DataFrame) -> pd.DataFrame:
-    """Past observed ARR taxi-in/stand occupancy at each DEP takeoff time."""
+    """Retrospective ARR taxi-in/stand occupancy from released ranking covariates.
+
+    An ARR taxi-in interval can end after the queried DEP takeoff. Its complete
+    in-block timestamp and taxi time are supplied in the challenge input; these
+    features are not a claim of availability in a real-time departure forecast.
+    """
     n = len(deps)
     out = pd.DataFrame(index=deps.index)
     windows = (900, 3600, 10800)
@@ -227,7 +232,7 @@ def build_arrival_traffic(deps: pd.DataFrame, arr: pd.DataFrame) -> pd.DataFrame
         inblock_end = np.searchsorted(block, d_time[q], side="left")
         inblock_start = np.searchsorted(block, d_time[q] - 3600, side="left")
         out.iloc[q, out.columns.get_loc("arr_block_prev_60m")] = (inblock_end - inblock_start)
-        # Number of arrivals whose observed taxi-in overlaps the query time.
+        # Released complete ARR taxi-in intervals overlapping the query time.
         taxiing = (np.searchsorted(landings_with_block, d_time[q], side="left")
                    - np.searchsorted(block, d_time[q], side="right"))
         out.iloc[q, out.columns.get_loc("arr_taxiing_now")] = np.maximum(taxiing, 0)

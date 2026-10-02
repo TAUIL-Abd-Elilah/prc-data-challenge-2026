@@ -1,0 +1,52 @@
+{
+  "reference": "Frozen clipped v5 all-finite OOF",
+  "reference_sha256": "036da1502f4ae68238927e31a0479b9cb82a6fb31b7acdbab26aa0657b7a67f8",
+  "purpose": "Transfer learned movement behavior from ordinary departures to invalid-AOBT no-NM non-LIRF rows",
+  "selection_months": [
+    1,
+    7
+  ],
+  "corroboration_months": [
+    11,
+    12
+  ],
+  "required_fresh_architecture_audit_months": [
+    4,
+    10
+  ],
+  "training": "All complementary-month 2025 departures with finite taxi-out target from 0 to 7200 seconds",
+  "internal_early_stop": "Calendar day number modulo 11 equals zero within complementary months; no held-out labels",
+  "gate": "Invalid AOBT, AOBT_3_flt and LOBT_flt missing, airport != LIRF; gate metadata never enters model",
+  "feature_sources": [
+    "movement and schedule",
+    "MVT-time airport/runway traffic",
+    "NOAA GHCNh weather",
+    "released arrival cache"
+  ],
+  "feature_exclusions": [
+    "all *_flt/NM fields",
+    "NM or movement IDs",
+    "callsign",
+    "off-block proxies",
+    "AOBT-time backlog",
+    "departure BLOCK/TAXITIME"
+  ],
+  "model": {
+    "family": "LightGBM direct regression",
+    "leaves": 63,
+    "max_rounds": 1200,
+    "early_stop_rounds": 100,
+    "threads": 3,
+    "seed": 20261002
+  },
+  "candidate_weights": [
+    0.0,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "selection": "Minimum all-finite Jan/Jul RMSE; ties favor smaller weight",
+  "promotion": "Selected positive weight improves all-finite RMSE and UTC-day bootstrap 95% lower gain bound >0 on both folds; independent Apr/Oct paired architecture audit also required",
+  "leaderboard_use": "No leaderboard feedback enters model or selection",
+  "status": "Predeclared protocol; fit and validation artifacts track completion"
+}

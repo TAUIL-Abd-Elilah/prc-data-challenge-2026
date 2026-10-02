@@ -1,0 +1,32 @@
+{
+  "n": 338802,
+  "baseline_rmse_sec": 239.0531211109831,
+  "neighbour_rmse_sec": 237.78157240232292,
+  "paired_day_gain": {
+    "point_gain_sec": 1.271548708660191,
+    "ci95_lower_sec": 0.9266235440393871,
+    "ci95_upper_sec": 1.6610634877827208,
+    "repetitions": 1000,
+    "utc_days": 62
+  },
+  "baseline_best_iteration": 800,
+  "neighbour_best_iteration": 800,
+  "baseline_fit_sec": 256.6,
+  "fit_rows": 1619296,
+  "internal_early_rows": 103359,
+  "protocol": {
+    "question": "Do neighbour AOBT covariates improve this fixed 31-leaf direct residual model?",
+    "comparison": "No-neighbour versus saved with-neighbour seasonal experts on identical valid-AOBT OOF rows",
+    "train_months_excluded": [
+      1,
+      7
+    ],
+    "max_rounds": 800,
+    "early_stop_rounds": 80,
+    "seed": 20261002,
+    "training_split": "Identical np.random.default_rng(seed) permutation and first max(30000,6%) internal early set",
+    "score": "Both full expert taxi-time predictions clipped >=0, on all finite valid-proxy seasonal labels",
+    "bootstrap": "1000 paired UTC-day resamples within Jan and Jul; lower 95% gain >0 is positive evidence",
+    "ranking_fit": false
+  }
+}
