@@ -1,0 +1,6 @@
+data/
+artifacts/
+submissions/
+*.parquet
+__pycache__/
+.venv/

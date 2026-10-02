@@ -1,0 +1,229 @@
+{
+  "dataset": "NOAA NCEI Global Historical Climatology Network-hourly (GHCNh)",
+  "dataset_doi": "https://doi.org/10.25921/jp3d-3v19",
+  "license": "CC0-1.0",
+  "retrieved_utc": "2026-10-02T12:16:25.062095+00:00",
+  "output_rows": 102480,
+  "sources": [
+    {
+      "airport": "EDDF",
+      "station_id": "GMI0000EDDF",
+      "station_name": "Frankfurt Main",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/parquet/GHCNh_GMI0000EDDF_2025.parquet",
+      "sha256": "3e219e03831a2c954f8ef1f507c407663e4daded23ea23c894fd32dc156ee0c5",
+      "source_records": 24094,
+      "observed_hours": 8758,
+      "expected_hours": 8760
+    },
+    {
+      "airport": "EDDF",
+      "station_id": "GMI0000EDDF",
+      "station_name": "Frankfurt Main",
+      "year": 2026,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/parquet/GHCNh_GMI0000EDDF_2026.parquet",
+      "sha256": "b4d3732f7a6df1f5be8f5a48ce2098341bb15b7ef7e6e384fb1e93585fd4b99c",
+      "source_records": 17309,
+      "observed_hours": 1484,
+      "expected_hours": 1488
+    },
+    {
+      "airport": "EDDM",
+      "station_id": "GMI0000EDDM",
+      "station_name": "Munich",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/parquet/GHCNh_GMI0000EDDM_2025.parquet",
+      "sha256": "fad0057f6d612c7d0b0bbb067ac43a54e1a178e783ccef3057d41997f2b1d292",
+      "source_records": 24037,
+      "observed_hours": 8758,
+      "expected_hours": 8760
+    },
+    {
+      "airport": "EDDM",
+      "station_id": "GMI0000EDDM",
+      "station_name": "Munich",
+      "year": 2026,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/parquet/GHCNh_GMI0000EDDM_2026.parquet",
+      "sha256": "9cf1a239216908173330d454fa8fbfe4b4d0f54e6ebc95477eab4a3fbe59830a",
+      "source_records": 13035,
+      "observed_hours": 1484,
+      "expected_hours": 1488
+    },
+    {
+      "airport": "EGLL",
+      "station_id": "UKI0000EGLL",
+      "station_name": "London Heathrow",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/parquet/GHCNh_UKI0000EGLL_2025.parquet",
+      "sha256": "b9de69b0681373f89f2e8e995d5faaeb9f454b9e878298f216b15e5645eaa76e",
+      "source_records": 50298,
+      "observed_hours": 8663,
+      "expected_hours": 8760
+    },
+    {
+      "airport": "EGLL",
+      "station_id": "UKI0000EGLL",
+      "station_name": "London Heathrow",
+      "year": 2026,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/parquet/GHCNh_UKI0000EGLL_2026.parquet",
+      "sha256": "7b7453ddb806ebbfb6cfdbbb79d6db6e432b2960987948e80fb02623da3b1e34",
+      "source_records": 36348,
+      "observed_hours": 1487,
+      "expected_hours": 1488
+    },
+    {
+      "airport": "EHAM",
+      "station_id": "NLMU0029295",
+      "station_name": "Amsterdam Schiphol",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/parquet/GHCNh_NLMU0029295_2025.parquet",
+      "sha256": "18a38f00b90a0a96e11d4846a654fd9413446fef2c0aa82658fa85ecb1bef041",
+      "source_records": 25769,
+      "observed_hours": 8643,
+      "expected_hours": 8760
+    },
+    {
+      "airport": "EHAM",
+      "station_id": "NLMU0029295",
+      "station_name": "Amsterdam Schiphol",
+      "year": 2026,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/parquet/GHCNh_NLMU0029295_2026.parquet",
+      "sha256": "7e048b99444fd24f12bbbb3e392915461125d3ca7371e6b1c8095d20b34fee76",
+      "source_records": 19201,
+      "observed_hours": 1486,
+      "expected_hours": 1488
+    },
+    {
+      "airport": "LEBL",
+      "station_id": "SPUP00000Y9",
+      "station_name": "Port de Barcelona - ZAL Prat (4.6 km from LEBL)",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/parquet/GHCNh_SPUP00000Y9_2025.parquet",
+      "sha256": "d5cfa9ef0c01be8117f12df66ad7aba872cc20f58c1c309f07ffa3b818360161",
+      "source_records": 17533,
+      "observed_hours": 8646,
+      "expected_hours": 8760
+    },
+    {
+      "airport": "LEBL",
+      "station_id": "SPUP00000Y9",
+      "station_name": "Port de Barcelona - ZAL Prat (4.6 km from LEBL)",
+      "year": 2026,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/parquet/GHCNh_SPUP00000Y9_2026.parquet",
+      "sha256": "db1b3c49a1d4e6486bde4b71dbb36f30937640d5e4e20b5d5d0d3e8c7fa69bc2",
+      "source_records": 13130,
+      "observed_hours": 1480,
+      "expected_hours": 1488
+    },
+    {
+      "airport": "LEMD",
+      "station_id": "SPMU0098221",
+      "station_name": "Madrid Barajas",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/parquet/GHCNh_SPMU0098221_2025.parquet",
+      "sha256": "895a7a013d84fccdd6f3f57f90b8b0959a612f1395f59c747a55fc4d52a356bf",
+      "source_records": 17501,
+      "observed_hours": 8640,
+      "expected_hours": 8760
+    },
+    {
+      "airport": "LEMD",
+      "station_id": "SPMU0098221",
+      "station_name": "Madrid Barajas",
+      "year": 2026,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/parquet/GHCNh_SPMU0098221_2026.parquet",
+      "sha256": "aafa12f92e10d9e1eb1e8cb4bd32245130515f07b4ace9f96189e7870303933e",
+      "source_records": 13204,
+      "observed_hours": 1480,
+      "expected_hours": 1488
+    },
+    {
+      "airport": "LFPG",
+      "station_id": "FRI0000LFPG",
+      "station_name": "Paris Charles de Gaulle",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/parquet/GHCNh_FRI0000LFPG_2025.parquet",
+      "sha256": "a7472c20e5665a94998a2c2ff87ae8eaf89151676ea6e8ee0dc2b840a65c7684",
+      "source_records": 17236,
+      "observed_hours": 8633,
+      "expected_hours": 8760
+    },
+    {
+      "airport": "LFPG",
+      "station_id": "FRI0000LFPG",
+      "station_name": "Paris Charles de Gaulle",
+      "year": 2026,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/parquet/GHCNh_FRI0000LFPG_2026.parquet",
+      "sha256": "768a92e90fa7f98d3666da838efb1765f032d5c84d4a915b2911873bed97f78c",
+      "source_records": 13044,
+      "observed_hours": 1479,
+      "expected_hours": 1488
+    },
+    {
+      "airport": "LIRF",
+      "station_id": "ITMU0016242",
+      "station_name": "Rome Fiumicino",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/parquet/GHCNh_ITMU0016242_2025.parquet",
+      "sha256": "f90f01de27c5d98ee044a2a6f1e6f044d313326a8fac285064fcd78cec279c0c",
+      "source_records": 20001,
+      "observed_hours": 8627,
+      "expected_hours": 8760
+    },
+    {
+      "airport": "LIRF",
+      "station_id": "ITMU0016242",
+      "station_name": "Rome Fiumicino",
+      "year": 2026,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/parquet/GHCNh_ITMU0016242_2026.parquet",
+      "sha256": "2d9f5c52d471c591df704b6b66db665ee69a9e63685706abfce0a4e7b12f82cf",
+      "source_records": 17862,
+      "observed_hours": 1486,
+      "expected_hours": 1488
+    },
+    {
+      "airport": "LTFM",
+      "station_id": "TUI0000LTFM",
+      "station_name": "Istanbul New Airport",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/parquet/GHCNh_TUI0000LTFM_2025.parquet",
+      "sha256": "64aa8a7d48c83239462eea316ba2bf1d274cb59ad28d8b54e4f1224459c0ba45",
+      "source_records": 17708,
+      "observed_hours": 8634,
+      "expected_hours": 8760
+    },
+    {
+      "airport": "LTFM",
+      "station_id": "TUI0000LTFM",
+      "station_name": "Istanbul New Airport",
+      "year": 2026,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/parquet/GHCNh_TUI0000LTFM_2026.parquet",
+      "sha256": "ae0cd52bab68ac922b12a876677b43710cc1e696e209caf2d07554d9ddb2a52e",
+      "source_records": 13398,
+      "observed_hours": 1486,
+      "expected_hours": 1488
+    },
+    {
+      "airport": "LSZH",
+      "station_id": "SZM00006664",
+      "station_name": "Zuerich-Affoltern (4.3 km from LSZH)",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/parquet/GHCNh_SZM00006664_2025.parquet",
+      "sha256": "be79874ea45a0d997d723ec02409ed405b2bf014bf89bdd7c0cf2b8bf45be60d",
+      "source_records": 8375,
+      "observed_hours": 8375,
+      "expected_hours": 8760
+    },
+    {
+      "airport": "LSZH",
+      "station_id": "SZM00006664",
+      "station_name": "Zuerich-Affoltern (4.3 km from LSZH)",
+      "year": 2026,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2026/parquet/GHCNh_SZM00006664_2026.parquet",
+      "sha256": "fec8dc54e7447658b6e311a70b018e5a9a5fb92e8d015edc18031d5abaf30d4d",
+      "source_records": 5919,
+      "observed_hours": 1359,
+      "expected_hours": 1488
+    }
+  ]
+}
