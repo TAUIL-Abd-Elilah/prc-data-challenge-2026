@@ -1,0 +1,353 @@
+{
+  "policy": "clipped v4 -> .5 deep blend on valid AOBT -> .5 ordinary missing direct blend on its disjoint gate -> .5 legacy ARR diagnostic on valid AOBT",
+  "reference_file": "artifacts\\v4\\validation_predictions.parquet",
+  "validation_rows": 672428,
+  "all_finite_scores": {
+    "n": 672428,
+    "v4": 282.40873391965357,
+    "deep": 281.4232615818423,
+    "deep_missing": 280.31699174922073,
+    "deep_missing_arrival_diagnostic": 279.7583135751758
+  },
+  "folds": {
+    "seasonal_jan_jul": {
+      "scores_all_finite": {
+        "n": 344419,
+        "v4": 328.216132742099,
+        "deep": 327.3660655955422,
+        "deep_missing": 326.53109397934446,
+        "deep_missing_arrival_diagnostic": 326.19001381851876
+      },
+      "valid_aobt_n": 338802,
+      "invalid_aobt_n": 5617,
+      "missing_changed_n": 4976,
+      "day_bootstrap": {
+        "days": 62,
+        "repeats": 1000,
+        "comparisons": {
+          "v4_to_deep": {
+            "observed_gain_sec": 0.8500671465567962,
+            "gain_ci95_sec": [
+              0.4981698710123112,
+              1.302207969797601
+            ],
+            "fraction_positive": 1.0
+          },
+          "deep_to_deep_missing": {
+            "observed_gain_sec": 0.8349716161977199,
+            "gain_ci95_sec": [
+              0.2543510729637816,
+              1.7279747172225426
+            ],
+            "fraction_positive": 1.0
+          },
+          "deep_missing_to_deep_missing_arrival_diagnostic": {
+            "observed_gain_sec": 0.3410801608256975,
+            "gain_ci95_sec": [
+              0.19511205902098255,
+              0.49874017590337155
+            ],
+            "fraction_positive": 1.0
+          },
+          "v4_to_deep_missing": {
+            "observed_gain_sec": 1.685038762754516,
+            "gain_ci95_sec": [
+              0.9622204200168014,
+              2.749928680033879
+            ],
+            "fraction_positive": 1.0
+          }
+        }
+      }
+    },
+    "forward_nov_dec": {
+      "scores_all_finite": {
+        "n": 328009,
+        "v4": 224.4642175825371,
+        "deep": 223.22695770183205,
+        "deep_missing": 221.65200853538047,
+        "deep_missing_arrival_diagnostic": 220.73043107077513
+      },
+      "valid_aobt_n": 324862,
+      "invalid_aobt_n": 3147,
+      "missing_changed_n": 2865,
+      "day_bootstrap": {
+        "days": 61,
+        "repeats": 1000,
+        "comparisons": {
+          "v4_to_deep": {
+            "observed_gain_sec": 1.2372598807050394,
+            "gain_ci95_sec": [
+              0.9485240171733373,
+              1.5316207208951311
+            ],
+            "fraction_positive": 1.0
+          },
+          "deep_to_deep_missing": {
+            "observed_gain_sec": 1.5749491664515745,
+            "gain_ci95_sec": [
+              0.6563139620530031,
+              2.8842549147994965
+            ],
+            "fraction_positive": 1.0
+          },
+          "deep_missing_to_deep_missing_arrival_diagnostic": {
+            "observed_gain_sec": 0.921577464605349,
+            "gain_ci95_sec": [
+              0.7130264360761828,
+              1.1758729858118455
+            ],
+            "fraction_positive": 1.0
+          },
+          "v4_to_deep_missing": {
+            "observed_gain_sec": 2.812209047156614,
+            "gain_ci95_sec": [
+              1.8830392611582354,
+              4.086126038471557
+            ],
+            "fraction_positive": 1.0
+          }
+        }
+      }
+    }
+  },
+  "monthly": [
+    {
+      "fold": "forward_nov_dec",
+      "month": 11,
+      "n": 162332,
+      "v4_rmse_sec": 222.79213319769235,
+      "deep_rmse_sec": 221.68608297993316,
+      "deep_missing_rmse_sec": 220.52660934800969,
+      "deep_missing_arrival_diagnostic_rmse_sec": 219.59545302221466
+    },
+    {
+      "fold": "forward_nov_dec",
+      "month": 12,
+      "n": 165677,
+      "v4_rmse_sec": 226.09054894096124,
+      "deep_rmse_sec": 224.7264751182618,
+      "deep_missing_rmse_sec": 222.74917127253806,
+      "deep_missing_arrival_diagnostic_rmse_sec": 221.8368619297795
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "month": 1,
+      "n": 153706,
+      "v4_rmse_sec": 348.50839315044016,
+      "deep_rmse_sec": 347.3803750102632,
+      "deep_missing_rmse_sec": 345.9090328110814,
+      "deep_missing_arrival_diagnostic_rmse_sec": 345.7566847915901
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "month": 7,
+      "n": 190713,
+      "v4_rmse_sec": 310.8990910015175,
+      "deep_rmse_sec": 310.29737457216896,
+      "deep_missing_rmse_sec": 310.03316326417894,
+      "deep_missing_arrival_diagnostic_rmse_sec": 309.52128981091346
+    }
+  ],
+  "airport": [
+    {
+      "fold": "forward_nov_dec",
+      "airport": "EDDF",
+      "n": 35446,
+      "v4_rmse_sec": 181.31995818839277,
+      "deep_rmse_sec": 181.77376422858046,
+      "deep_missing_rmse_sec": 181.40314237930048,
+      "deep_missing_arrival_diagnostic_rmse_sec": 179.94559674105642
+    },
+    {
+      "fold": "forward_nov_dec",
+      "airport": "EDDM",
+      "n": 24597,
+      "v4_rmse_sec": 200.36763139764076,
+      "deep_rmse_sec": 198.73157679550775,
+      "deep_missing_rmse_sec": 199.0768034296708,
+      "deep_missing_arrival_diagnostic_rmse_sec": 198.29173878210966
+    },
+    {
+      "fold": "forward_nov_dec",
+      "airport": "EGLL",
+      "n": 39423,
+      "v4_rmse_sec": 218.08011001399504,
+      "deep_rmse_sec": 216.9711595664969,
+      "deep_missing_rmse_sec": 216.6192167632889,
+      "deep_missing_arrival_diagnostic_rmse_sec": 213.66627922934367
+    },
+    {
+      "fold": "forward_nov_dec",
+      "airport": "EHAM",
+      "n": 38690,
+      "v4_rmse_sec": 161.63848489635924,
+      "deep_rmse_sec": 161.61334062584993,
+      "deep_missing_rmse_sec": 160.3926794261529,
+      "deep_missing_arrival_diagnostic_rmse_sec": 160.40422193815448
+    },
+    {
+      "fold": "forward_nov_dec",
+      "airport": "LEBL",
+      "n": 27167,
+      "v4_rmse_sec": 176.73567218934025,
+      "deep_rmse_sec": 175.20322497032538,
+      "deep_missing_rmse_sec": 174.97657012023427,
+      "deep_missing_arrival_diagnostic_rmse_sec": 174.9782733891335
+    },
+    {
+      "fold": "forward_nov_dec",
+      "airport": "LEMD",
+      "n": 35404,
+      "v4_rmse_sec": 171.14548503375389,
+      "deep_rmse_sec": 170.05885125496079,
+      "deep_missing_rmse_sec": 169.7723686669888,
+      "deep_missing_arrival_diagnostic_rmse_sec": 169.2497024109764
+    },
+    {
+      "fold": "forward_nov_dec",
+      "airport": "LFPG",
+      "n": 38424,
+      "v4_rmse_sec": 273.6117178881987,
+      "deep_rmse_sec": 272.10075252185555,
+      "deep_missing_rmse_sec": 264.0243548157286,
+      "deep_missing_arrival_diagnostic_rmse_sec": 263.2712364450694
+    },
+    {
+      "fold": "forward_nov_dec",
+      "airport": "LIRF",
+      "n": 23396,
+      "v4_rmse_sec": 410.8595462288256,
+      "deep_rmse_sec": 409.61539788584633,
+      "deep_missing_rmse_sec": 409.61539788584633,
+      "deep_missing_arrival_diagnostic_rmse_sec": 409.4434483883669
+    },
+    {
+      "fold": "forward_nov_dec",
+      "airport": "LSZH",
+      "n": 20663,
+      "v4_rmse_sec": 163.00257586300154,
+      "deep_rmse_sec": 162.70478693134257,
+      "deep_missing_rmse_sec": 161.87245926614827,
+      "deep_missing_arrival_diagnostic_rmse_sec": 161.42524999119829
+    },
+    {
+      "fold": "forward_nov_dec",
+      "airport": "LTFM",
+      "n": 44799,
+      "v4_rmse_sec": 222.9753713109891,
+      "deep_rmse_sec": 219.6069857254707,
+      "deep_missing_rmse_sec": 218.09503376783087,
+      "deep_missing_arrival_diagnostic_rmse_sec": 216.57303315001838
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "airport": "EDDF",
+      "n": 36830,
+      "v4_rmse_sec": 188.90184920446683,
+      "deep_rmse_sec": 187.13603015689176,
+      "deep_missing_rmse_sec": 187.50508029294926,
+      "deep_missing_arrival_diagnostic_rmse_sec": 187.0364668829242
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "airport": "EDDM",
+      "n": 27091,
+      "v4_rmse_sec": 181.6336510940569,
+      "deep_rmse_sec": 180.51762026191577,
+      "deep_missing_rmse_sec": 179.31207071301702,
+      "deep_missing_arrival_diagnostic_rmse_sec": 179.6160344539096
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "airport": "EGLL",
+      "n": 40210,
+      "v4_rmse_sec": 273.93358571903536,
+      "deep_rmse_sec": 271.88107591406754,
+      "deep_missing_rmse_sec": 272.215534320422,
+      "deep_missing_arrival_diagnostic_rmse_sec": 269.7566388141628
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "airport": "EHAM",
+      "n": 40949,
+      "v4_rmse_sec": 187.1418454899843,
+      "deep_rmse_sec": 185.7026056913844,
+      "deep_missing_rmse_sec": 183.59740128023006,
+      "deep_missing_arrival_diagnostic_rmse_sec": 183.79871715343404
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "airport": "LEBL",
+      "n": 28986,
+      "v4_rmse_sec": 225.94141251538133,
+      "deep_rmse_sec": 224.529127621062,
+      "deep_missing_rmse_sec": 223.6572120225027,
+      "deep_missing_arrival_diagnostic_rmse_sec": 223.50263243647302
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "airport": "LEMD",
+      "n": 35328,
+      "v4_rmse_sec": 179.77532952970816,
+      "deep_rmse_sec": 178.39889833669497,
+      "deep_missing_rmse_sec": 177.89159891640074,
+      "deep_missing_arrival_diagnostic_rmse_sec": 177.816146218803
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "airport": "LFPG",
+      "n": 39612,
+      "v4_rmse_sec": 570.7573082751585,
+      "deep_rmse_sec": 570.1394087895707,
+      "deep_missing_rmse_sec": 569.6814390267456,
+      "deep_missing_arrival_diagnostic_rmse_sec": 569.3434780471475
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "airport": "LIRF",
+      "n": 26528,
+      "v4_rmse_sec": 630.830270721877,
+      "deep_rmse_sec": 631.0961194669974,
+      "deep_missing_rmse_sec": 631.0961194669974,
+      "deep_missing_arrival_diagnostic_rmse_sec": 630.8989883800622
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "airport": "LSZH",
+      "n": 22346,
+      "v4_rmse_sec": 213.07747460271133,
+      "deep_rmse_sec": 213.92326411045778,
+      "deep_missing_rmse_sec": 204.6959684655994,
+      "deep_missing_arrival_diagnostic_rmse_sec": 204.17222583318207
+    },
+    {
+      "fold": "seasonal_jan_jul",
+      "airport": "LTFM",
+      "n": 46539,
+      "v4_rmse_sec": 268.1527985735811,
+      "deep_rmse_sec": 266.4363945334133,
+      "deep_missing_rmse_sec": 265.1362960892963,
+      "deep_missing_arrival_diagnostic_rmse_sec": 265.4186923585013
+    }
+  ],
+  "gates": {
+    "deep_valid_aobt_rows": 663664,
+    "missing_delta_nonzero_rows": 7841,
+    "arrival_valid_aobt_rows": 663664
+  },
+  "selection": {
+    "deep_improves_both_folds": true,
+    "missing_improves_both_folds_after_deep": true,
+    "legacy_arrival_improves_both_folds_diagnostic": true,
+    "legacy_arrival_promoted": false,
+    "selected_stage": "deep_missing",
+    "reason_arrival_excluded": "The forward ARR stack was trained on Jan/Jul v4 OOF residuals; the Jan/Jul v4 base models include Nov/Dec training labels, so the ARR forward comparison is indirectly contaminated."
+  },
+  "validation_limit": "Both month pairs have been used for local model comparison. These are not untouched final estimates and no ranking outcomes were read.",
+  "bootstrap": {
+    "unit": "UTC calendar day within each fold",
+    "seed": 20261002,
+    "repeats": 1000
+  }
+}

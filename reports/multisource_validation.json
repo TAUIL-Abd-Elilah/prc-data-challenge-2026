@@ -1,0 +1,217 @@
+{
+  "rule": "valid AOBT; plausible alternate in [0,7200] separated by >600 s; distinct IOBT >120 s from LOBT; posterior mean correction clipped to +/-3600 s",
+  "source_label": "nearest plausible LOBT/IOBT/schedule within 60 s of 2025 taxi-time label, else none",
+  "selection": "January/July scale; nested five-way seasonal estimate; unchanged November/December forward check",
+  "scale_scores_seasonal_all_finite": {
+    "0.0": 328.216132742099,
+    "0.25": 328.2883091501516,
+    "0.5": 328.48278981363177,
+    "1.0": 329.23766066732554
+  },
+  "selected_scale": 0.0,
+  "nested_outer_choices": [
+    {
+      "outer_fold": 0,
+      "selected_scale": 0.0,
+      "test_n": 69270
+    },
+    {
+      "outer_fold": 1,
+      "selected_scale": 0.0,
+      "test_n": 68741
+    },
+    {
+      "outer_fold": 2,
+      "selected_scale": 0.0,
+      "test_n": 68909
+    },
+    {
+      "outer_fold": 3,
+      "selected_scale": 0.0,
+      "test_n": 68696
+    },
+    {
+      "outer_fold": 4,
+      "selected_scale": 0.0,
+      "test_n": 68803
+    }
+  ],
+  "fold_models": {
+    "seasonal_jan_jul": {
+      "fold": "seasonal_jan_jul",
+      "training_candidates": 751232,
+      "sampled_rows": 300000,
+      "heldout_candidate_rows": 162773,
+      "sampled_class_counts": {
+        "0": 284134,
+        "1": 12531,
+        "2": 513,
+        "3": 2822
+      },
+      "best_iteration": 71,
+      "fit_seconds": 14.235,
+      "internal_validation_logloss": 0.06902329899689753
+    },
+    "forward_nov_dec": {
+      "fold": "forward_nov_dec",
+      "training_candidates": 778897,
+      "sampled_rows": 300000,
+      "heldout_candidate_rows": 135099,
+      "sampled_class_counts": {
+        "0": 283499,
+        "1": 13067,
+        "2": 550,
+        "3": 2884
+      },
+      "best_iteration": 77,
+      "fit_seconds": 15.718,
+      "internal_validation_logloss": 0.06919955255696973
+    }
+  },
+  "folds": {
+    "seasonal_jan_jul": {
+      "all_finite_n": 344419,
+      "candidate_n": 162773,
+      "baseline_rmse_sec": 328.216132742099,
+      "corrected_rmse_sec": 328.216132742099,
+      "rmse_gain_sec": 0.0,
+      "date_stability": {
+        "repetitions": 1000,
+        "calendar_days": 62,
+        "rmse_gain_ci95_sec": [
+          0.0,
+          0.0
+        ],
+        "positive_fraction": 0.0,
+        "days_with_positive_sse_gain": 0
+      },
+      "by_airport": {
+        "EDDF": {
+          "n": 36830,
+          "baseline_rmse_sec": 188.90184920446683,
+          "corrected_rmse_sec": 188.90184920446683
+        },
+        "EDDM": {
+          "n": 27091,
+          "baseline_rmse_sec": 181.6336510940569,
+          "corrected_rmse_sec": 181.6336510940569
+        },
+        "EGLL": {
+          "n": 40210,
+          "baseline_rmse_sec": 273.93358571903536,
+          "corrected_rmse_sec": 273.93358571903536
+        },
+        "EHAM": {
+          "n": 40949,
+          "baseline_rmse_sec": 187.1418454899843,
+          "corrected_rmse_sec": 187.1418454899843
+        },
+        "LEBL": {
+          "n": 28986,
+          "baseline_rmse_sec": 225.94141251538133,
+          "corrected_rmse_sec": 225.94141251538133
+        },
+        "LEMD": {
+          "n": 35328,
+          "baseline_rmse_sec": 179.77532952970816,
+          "corrected_rmse_sec": 179.77532952970816
+        },
+        "LFPG": {
+          "n": 39612,
+          "baseline_rmse_sec": 570.7573082751585,
+          "corrected_rmse_sec": 570.7573082751585
+        },
+        "LIRF": {
+          "n": 26528,
+          "baseline_rmse_sec": 630.830270721877,
+          "corrected_rmse_sec": 630.830270721877
+        },
+        "LSZH": {
+          "n": 22346,
+          "baseline_rmse_sec": 213.07747460271133,
+          "corrected_rmse_sec": 213.07747460271133
+        },
+        "LTFM": {
+          "n": 46539,
+          "baseline_rmse_sec": 268.1527985735811,
+          "corrected_rmse_sec": 268.1527985735811
+        }
+      }
+    },
+    "forward_nov_dec": {
+      "all_finite_n": 328009,
+      "candidate_n": 135099,
+      "baseline_rmse_sec": 224.4642175825371,
+      "corrected_rmse_sec": 224.4642175825371,
+      "rmse_gain_sec": 0.0,
+      "date_stability": {
+        "repetitions": 1000,
+        "calendar_days": 61,
+        "rmse_gain_ci95_sec": [
+          0.0,
+          0.0
+        ],
+        "positive_fraction": 0.0,
+        "days_with_positive_sse_gain": 0
+      },
+      "by_airport": {
+        "EDDF": {
+          "n": 35446,
+          "baseline_rmse_sec": 181.31995818839277,
+          "corrected_rmse_sec": 181.31995818839277
+        },
+        "EDDM": {
+          "n": 24597,
+          "baseline_rmse_sec": 200.36763139764076,
+          "corrected_rmse_sec": 200.36763139764076
+        },
+        "EGLL": {
+          "n": 39423,
+          "baseline_rmse_sec": 218.08011001399504,
+          "corrected_rmse_sec": 218.08011001399504
+        },
+        "EHAM": {
+          "n": 38690,
+          "baseline_rmse_sec": 161.63848489635924,
+          "corrected_rmse_sec": 161.63848489635924
+        },
+        "LEBL": {
+          "n": 27167,
+          "baseline_rmse_sec": 176.73567218934025,
+          "corrected_rmse_sec": 176.73567218934025
+        },
+        "LEMD": {
+          "n": 35404,
+          "baseline_rmse_sec": 171.14548503375389,
+          "corrected_rmse_sec": 171.14548503375389
+        },
+        "LFPG": {
+          "n": 38424,
+          "baseline_rmse_sec": 273.6117178881987,
+          "corrected_rmse_sec": 273.6117178881987
+        },
+        "LIRF": {
+          "n": 23396,
+          "baseline_rmse_sec": 410.8595462288256,
+          "corrected_rmse_sec": 410.8595462288256
+        },
+        "LSZH": {
+          "n": 20663,
+          "baseline_rmse_sec": 163.00257586300154,
+          "corrected_rmse_sec": 163.00257586300154
+        },
+        "LTFM": {
+          "n": 44799,
+          "baseline_rmse_sec": 222.9753713109891,
+          "corrected_rmse_sec": 222.9753713109891
+        }
+      }
+    }
+  },
+  "pooled": {
+    "all_finite_n": 672428,
+    "baseline_rmse_sec": 282.40873391965357,
+    "corrected_rmse_sec": 282.40873391965357
+  },
+  "validation_note": "Repeatedly examined 2025 labels; descriptive, not an untouched 2026 estimate. No leaderboard feedback used."
+}

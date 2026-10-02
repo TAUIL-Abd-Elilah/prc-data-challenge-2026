@@ -77,6 +77,37 @@ The additional residual CatBoost model uses all eligible 2025 labels, recurring 
 
 The fixed sequential policy reduced local all-finite RMSE from 329.403 to 328.221 seconds on January/July and from 225.625 to 224.465 on November/December, over 672,428 rows in total. Combined RMSE was 283.566 to 282.412. These periods have been examined across multiple experiments, so this is a model comparison rather than an untouched forecast. The aggregate report is [reports/validation_v4.json](reports/validation_v4.json). [RESEARCH.md](RESEARCH.md) records rejected experiments and validation limitations.
 
+## Reproduce v5 research and candidate
+
+After the v4 pipeline, run the following commands. The larger timestamp model uses CUDA; the missing-record specialist uses at most four CPU threads.
+
+```powershell
+python v4_reference.py
+python deep_timestamp_expert.py --mode fit --iterations 4500 --depth 9 --threads 2
+python deep_timestamp_expert.py --mode evaluate
+python deep_timestamp_expert.py --mode final-predict --iterations 4500 --depth 9 --threads 2
+python missing_catboost.py --fold both --threads 4
+python missing_catboost.py --evaluate-only
+python missing_catboost.py --fit-final-direct
+python arrival_features.py --mode traffic-eval
+python v5_ensemble.py --mode evaluate
+python v5_ensemble.py --mode ranking
+python finalize_submission.py --predictions artifacts/v5-ensemble/predictions.parquet --team merry-mushroom --version 5
+```
+
+The timestamp expert adds second/minute precision, flight duration, planning revisions and NM callsign features from released fields. It uses internal training splits for early stopping and a fixed 50% blend on valid AOBT rows. Its final model trains on 2,061,428 eligible 2025 departures. The second 50% blend applies a direct CatBoost expert only to departures with missing NM off-block records outside Rome. The two gates are disjoint. Every prediction is clipped at zero.
+
+The fixed combination improves local all-finite RMSE from 328.216 to 326.531 seconds on January/July and from 224.464 to 221.652 on November/December; pooled RMSE improves from 282.409 to 280.317 over 672,428 rows. The v4 comparator now uses the same nonnegative policy as the actual submission; older saved diagnostics included 57 negative predictions. GPU fits can vary slightly by hardware, so historical score equality is an optional `v4_reference.py --verify-snapshot` audit.
+
+Arrival ground features use the ARR block/taxi fields retained in the supplied ranking file. The initial correction stack is diagnostic only: its seasonal base models included November/December labels, which creates an indirect dependence in its forward check. `v5_ensemble.py` excludes that stack from submissions. A separate `arrival_residual_expert.py` trains directly on complementary months to assess arrival features without that dependence:
+
+```powershell
+python arrival_residual_expert.py --mode build-features --threads 4
+python arrival_residual_expert.py --mode validate --threads 4
+```
+
+Local folds have been used repeatedly for model comparison. Improvements and bootstrap intervals do not guarantee a 2026 score or a prize. The public aggregate reports and final submission receipt record the accepted policy and observed outcome.
+
 ## Submit with MinIO Client
 
 The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized v4 file. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.

@@ -1,0 +1,257 @@
+{
+  "reference": "Clipped frozen v4 all-finite OOF",
+  "policy_selection": "Nonoverlapping direct and LIRF long gates selected on Jan/Jul; require each gate to improve Nov/Dec before promotion",
+  "policies": {
+    "v4": {
+      "seasonal_jan_jul": {
+        "all_finite_rmse_sec": 328.216132742099,
+        "invalid_aobt_rmse_sec": 1848.9533254853368,
+        "all_finite_n": 344419,
+        "invalid_aobt_n": 5617,
+        "day_bootstrap": {
+          "days": 62,
+          "observed_rmse_gain_sec": 0.0,
+          "bootstrap_gain_95pct_interval_sec": [
+            0.0,
+            0.0
+          ],
+          "bootstrap_probability_improvement": 0.0,
+          "days_with_positive_sse_gain_fraction": 0.0
+        }
+      },
+      "forward_nov_dec": {
+        "all_finite_rmse_sec": 224.4642175825371,
+        "invalid_aobt_rmse_sec": 998.1716350566395,
+        "all_finite_n": 328009,
+        "invalid_aobt_n": 3147,
+        "day_bootstrap": {
+          "days": 61,
+          "observed_rmse_gain_sec": 0.0,
+          "bootstrap_gain_95pct_interval_sec": [
+            0.0,
+            0.0
+          ],
+          "bootstrap_probability_improvement": 0.0,
+          "days_with_positive_sse_gain_fraction": 0.0
+        }
+      }
+    },
+    "direct_half": {
+      "seasonal_jan_jul": {
+        "all_finite_rmse_sec": 327.3833291785362,
+        "invalid_aobt_rmse_sec": 1839.8777311517397,
+        "all_finite_n": 344419,
+        "invalid_aobt_n": 5617,
+        "day_bootstrap": {
+          "days": 62,
+          "observed_rmse_gain_sec": 0.8328035635627771,
+          "bootstrap_gain_95pct_interval_sec": [
+            0.2613998969673048,
+            1.7042538191920853
+          ],
+          "bootstrap_probability_improvement": 0.999,
+          "days_with_positive_sse_gain_fraction": 0.8064516129032258
+        }
+      },
+      "forward_nov_dec": {
+        "all_finite_rmse_sec": 222.8980107984219,
+        "invalid_aobt_rmse_sec": 960.8939919289925,
+        "all_finite_n": 328009,
+        "invalid_aobt_n": 3147,
+        "day_bootstrap": {
+          "days": 61,
+          "observed_rmse_gain_sec": 1.5662067841151952,
+          "bootstrap_gain_95pct_interval_sec": [
+            0.6713119553701745,
+            2.8970697811652175
+          ],
+          "bootstrap_probability_improvement": 1.0,
+          "days_with_positive_sse_gain_fraction": 0.9016393442622951
+        }
+      }
+    },
+    "direct_full": {
+      "seasonal_jan_jul": {
+        "all_finite_rmse_sec": 327.81347816803327,
+        "invalid_aobt_rmse_sec": 1844.5680372724305,
+        "all_finite_n": 344419,
+        "invalid_aobt_n": 5617,
+        "day_bootstrap": {
+          "days": 62,
+          "observed_rmse_gain_sec": 0.40265457406570704,
+          "bootstrap_gain_95pct_interval_sec": [
+            -0.4545080774462932,
+            1.5538460721214504
+          ],
+          "bootstrap_probability_improvement": 0.808,
+          "days_with_positive_sse_gain_fraction": 0.6451612903225806
+        }
+      },
+      "forward_nov_dec": {
+        "all_finite_rmse_sec": 222.61528156889503,
+        "invalid_aobt_rmse_sec": 954.0380516375549,
+        "all_finite_n": 328009,
+        "invalid_aobt_n": 3147,
+        "day_bootstrap": {
+          "days": 61,
+          "observed_rmse_gain_sec": 1.84893601364206,
+          "bootstrap_gain_95pct_interval_sec": [
+            0.5504816780056601,
+            3.73225329565605
+          ],
+          "bootstrap_probability_improvement": 1.0,
+          "days_with_positive_sse_gain_fraction": 0.7540983606557377
+        }
+      }
+    },
+    "ratio_half": {
+      "seasonal_jan_jul": {
+        "all_finite_rmse_sec": 326.10320973578825,
+        "invalid_aobt_rmse_sec": 1825.8849037494215,
+        "all_finite_n": 344419,
+        "invalid_aobt_n": 5617,
+        "day_bootstrap": {
+          "days": 62,
+          "observed_rmse_gain_sec": 2.112923006310723,
+          "bootstrap_gain_95pct_interval_sec": [
+            0.046407601490055586,
+            4.928938501794569
+          ],
+          "bootstrap_probability_improvement": 0.979,
+          "days_with_positive_sse_gain_fraction": 0.3225806451612903
+        }
+      },
+      "forward_nov_dec": {
+        "all_finite_rmse_sec": 228.28870330758636,
+        "invalid_aobt_rmse_sec": 1084.815292739654,
+        "all_finite_n": 328009,
+        "invalid_aobt_n": 3147,
+        "day_bootstrap": {
+          "days": 61,
+          "observed_rmse_gain_sec": -3.8244857250492714,
+          "bootstrap_gain_95pct_interval_sec": [
+            -11.062894579159149,
+            1.326176898547858
+          ],
+          "bootstrap_probability_improvement": 0.111,
+          "days_with_positive_sse_gain_fraction": 0.2459016393442623
+        }
+      }
+    },
+    "mixture_half": {
+      "seasonal_jan_jul": {
+        "all_finite_rmse_sec": 328.28782865854777,
+        "invalid_aobt_rmse_sec": 1849.733634946698,
+        "all_finite_n": 344419,
+        "invalid_aobt_n": 5617,
+        "day_bootstrap": {
+          "days": 62,
+          "observed_rmse_gain_sec": -0.07169591644878892,
+          "bootstrap_gain_95pct_interval_sec": [
+            -2.334782088223858,
+            2.141372405213556
+          ],
+          "bootstrap_probability_improvement": 0.4975,
+          "days_with_positive_sse_gain_fraction": 0.3548387096774194
+        }
+      },
+      "forward_nov_dec": {
+        "all_finite_rmse_sec": 227.19215202908336,
+        "invalid_aobt_rmse_sec": 1060.549926258217,
+        "all_finite_n": 328009,
+        "invalid_aobt_n": 3147,
+        "day_bootstrap": {
+          "days": 61,
+          "observed_rmse_gain_sec": -2.7279344465462714,
+          "bootstrap_gain_95pct_interval_sec": [
+            -9.507340221360247,
+            2.112090984028317
+          ],
+          "bootstrap_probability_improvement": 0.177,
+          "days_with_positive_sse_gain_fraction": 0.4426229508196721
+        }
+      }
+    },
+    "direct_half_ratio_half": {
+      "seasonal_jan_jul": {
+        "all_finite_rmse_sec": 325.2649963211937,
+        "invalid_aobt_rmse_sec": 1816.6940709720009,
+        "all_finite_n": 344419,
+        "invalid_aobt_n": 5617,
+        "day_bootstrap": {
+          "days": 62,
+          "observed_rmse_gain_sec": 2.9511364209053,
+          "bootstrap_gain_95pct_interval_sec": [
+            0.7561923866225044,
+            5.999041533181891
+          ],
+          "bootstrap_probability_improvement": 0.998,
+          "days_with_positive_sse_gain_fraction": 0.6935483870967742
+        }
+      },
+      "forward_nov_dec": {
+        "all_finite_rmse_sec": 226.74891466291976,
+        "invalid_aobt_rmse_sec": 1050.6164238462156,
+        "all_finite_n": 328009,
+        "invalid_aobt_n": 3147,
+        "day_bootstrap": {
+          "days": 61,
+          "observed_rmse_gain_sec": -2.2846970803826707,
+          "bootstrap_gain_95pct_interval_sec": [
+            -9.658384564709001,
+            3.189331133816899
+          ],
+          "bootstrap_probability_improvement": 0.2825,
+          "days_with_positive_sse_gain_fraction": 0.7540983606557377
+        }
+      }
+    },
+    "direct_half_mixture_half": {
+      "seasonal_jan_jul": {
+        "all_finite_rmse_sec": 327.4552074363556,
+        "invalid_aobt_rmse_sec": 1840.661888022325,
+        "all_finite_n": 344419,
+        "invalid_aobt_n": 5617,
+        "day_bootstrap": {
+          "days": 62,
+          "observed_rmse_gain_sec": 0.7609253057433989,
+          "bootstrap_gain_95pct_interval_sec": [
+            -1.5217841423633474,
+            3.157336004753149
+          ],
+          "bootstrap_probability_improvement": 0.7605,
+          "days_with_positive_sse_gain_fraction": 0.6935483870967742
+        }
+      },
+      "forward_nov_dec": {
+        "all_finite_rmse_sec": 225.6448807009789,
+        "invalid_aobt_rmse_sec": 1025.5421964892032,
+        "all_finite_n": 328009,
+        "invalid_aobt_n": 3147,
+        "day_bootstrap": {
+          "days": 61,
+          "observed_rmse_gain_sec": -1.1806631184417995,
+          "bootstrap_gain_95pct_interval_sec": [
+            -8.064272210883338,
+            3.9489810535616496
+          ],
+          "bootstrap_probability_improvement": 0.405,
+          "days_with_positive_sse_gain_fraction": 0.8688524590163934
+        }
+      }
+    }
+  },
+  "counts": {
+    "all_finite": 672428,
+    "invalid_aobt": 8764,
+    "direct_gate": 7841,
+    "lirf_long_gate": 239
+  },
+  "seasonal_gate_choices": {
+    "direct": "direct_half",
+    "lirf_long": "ratio_half"
+  },
+  "promoted_after_forward_check": [
+    "direct_half"
+  ]
+}

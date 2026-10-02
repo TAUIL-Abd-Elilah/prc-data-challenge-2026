@@ -64,3 +64,23 @@ python source_stability.py --candidate gpu_then_source --repetitions 1000 --seed
 | Sequential over GPU | 0.443 [0.095, 0.791] | 0.371 [0.065, 0.718] | 0.408 [0.178, 0.668] |
 
 The sequential-over-GPU gain is positive in 99.6% of the seasonal day resamples and 99.2% of the forward resamples. These intervals describe day-to-day variation in the repeatedly examined 2025 folds, not an untouched estimate of 2026 accuracy. Source gains are concentrated on several dates, and its standalone forward Rome/Istanbul result includes a slight Istanbul regression. The GPU expert improves pooled forward error but worsens Frankfurt and Amsterdam airport-specific forward error. The selected sequential rule has not been validated by a new, untouched year.
+
+## v5 research
+
+The comparator was corrected to match the submission's nonnegative output policy. Clipping 57 legacy negative v4 OOF values changes pooled RMSE from 282.412062 to 282.408734; it does not change the already submitted v4 file. New experts use internal training splits for early stopping. January/July select coarse blend weights, which are then fixed for November/December assessment.
+
+| Fixed rule | January/July RMSE | November/December RMSE | Pooled RMSE |
+|---|---:|---:|---:|
+| Clipped frozen v4 | 328.216 | 224.464 | 282.409 |
+| 50% larger timestamp residual expert on valid AOBT | 327.366 | 223.227 | 281.423 |
+| Then 50% missing-NM direct expert outside Rome | **326.531** | **221.652** | **280.317** |
+
+Paired UTC-day bootstrap intervals for the combination's RMSE gain over v4 are +0.962 to +2.750 seconds on January/July and +1.883 to +4.086 seconds on November/December (1,000 resamples, seed 20261002). The missing expert improves each held-out month separately; some airport subsets still regress. These repeatedly examined periods remain model comparisons, not untouched estimates.
+
+Additional candidates were rejected or withheld:
+
+- A Rome long-schedule ratio expert improves seasonal error but worsens forward error, so it is excluded. The related classifier mixture also fails the forward check.
+- A four-class alternate-timestamp classifier (`multisource_expert.py`) compares LOBT, IOBT and schedule candidates. Its best seasonal correction scale is zero; no ranking model is fit.
+- An arrival correction stack (`arrival_features.py`) improves both apparent periods, including when added to deep/missing predictions. Its seasonal v4 base experts were trained using November/December labels, however, so fitting the forward correction on seasonal residuals creates an indirect dependence on forward labels. This stack is excluded from submission. The separate direct residual expert in `arrival_residual_expert.py` uses complementary-month training to check arrival features without this path.
+
+All arrival ground-truth inputs are restricted to PHASE=ARR. Departure block and taxi labels are never predictors. Arrival taxi/in-block fields are available in the complete supplied ranking batch. No new choice uses official ranking scores or ranking labels.
