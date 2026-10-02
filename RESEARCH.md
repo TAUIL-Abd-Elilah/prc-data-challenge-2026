@@ -169,4 +169,6 @@ A source/protocol audit found no scored held-out model comparison on February/Au
 
 This additional check evaluates fixed component changes. It does not estimate the complete legacy ensemble independently, and it cannot guarantee a ranking result.
 
+The current candidate portfolio is also fixed before any v8/v9b scored OOF outcome. The valid-AOBT route compares unchanged v7 with the already specified v8 combo and v9b blend using only common-universe January/July RMSE among candidates passing their existing gates. That choice is locked before the reserved guard; failure retains v7 without retuning. The missing-clock movement route is disjoint and requires its own complete gates. Any composition must pass exact-coverage and paired-day checks on both original folds, with every other prediction unchanged. Details are in `reports/current_candidate_policy_protocol.json`.
+
 OpenStreetMap geometry was considered only for a read-only extraction audit. No maps were obtained, matching coverage is unknown, and no OSM data enter a model or submission. ODbL is an open-data license; the challenge's external-data wording says open-source license without naming accepted data licenses. Geometry is excluded while that interpretation remains unresolved. No OurAirports or OpenAP data are used.

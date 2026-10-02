@@ -1,0 +1,22 @@
+{
+  "status": "Frozen before any v8 or v9b scored OOF outcome",
+  "baseline": "Accepted v7 fixed policy; ranking SHA256 314e5dcc537b46954744ddc02018c7e2a65cd1dfe10be8e13da313c69eb0b0eb",
+  "purpose": "Choose and combine the current locally validated candidate routes without leaderboard tuning",
+  "valid_aobt_gate": "Own released AOBT proxy finite and within 0..7200 seconds",
+  "valid_aobt_alternatives": [
+    "Unchanged v7",
+    "The predeclared v8 combo toward the LightGBM residual expert from v7, using v8's fixed seasonally selected weight",
+    "The predeclared v9b movement-only expert blend from v7 on valid-AOBT rows, using v9b's fixed seasonally selected weight"
+  ],
+  "valid_aobt_selection": "Among alternatives passing their already published Jan/Jul, unchanged Nov/Dec and Apr/Oct gates, choose the smallest all-finite January/July RMSE on the exact common 2025 OOF universe. Ties favor unchanged v7, then v8 combo, then v9b. Freeze that choice before the February/August reserved guard.",
+  "valid_aobt_reserved_guard": "The chosen replacement must pass reports/reserved_guard_protocol.json with its fixed formula. If it fails, retain v7 on valid-AOBT rows; do not tune the formula or select an alternative using guard outcomes.",
+  "excluded_valid_route": "The older standalone v8 policy based on v6 is not a portfolio alternative. The fixed v7 combo has its own required gates.",
+  "missing_clock_gate": "Invalid AOBT proxy, both released AOBT_3_flt and LOBT_flt missing, airport != LIRF",
+  "missing_clock_alternative": "Use the movement-only expert at its already selected Jan/Jul weight only if its original two folds, April/October paired audit and February/August reserved guard all pass. Otherwise retain v7 on that gate.",
+  "combination": "The valid-AOBT and missing-clock masks are disjoint. Apply each selected correction once to v7. All rows outside both gates must equal v7 exactly. No further weight selection or airport exceptions.",
+  "combined_oof_gate": "Before any ranking assembly, require exact common unique 2025 OOF IDs, targets, months, timestamps and gates; verify v5 and v7 reference predictions agree exactly on the missing-clock gate. Require combined all-finite RMSE improvement and positive paired UTC-day 95% gain lower bound separately on Jan/Jul and Nov/Dec. A failed composition is rejected without retuning.",
+  "ranking_gate": "Only selected and fully guarded component models may generate ranking predictions. Exact template ID/order, two-column schema, finite nonnegative predictions, model/input/validation hashes, and unchanged predictions outside the gates are mandatory.",
+  "publication": "Publish the final source, selected policy, aggregate validation and file manifest before CLI upload; fresh quota checks enforce official naming, five submissions/day and 1 GB bucket limits.",
+  "leaderboard_use": "Ranking scores are recorded only after policy and file freezing. They never choose these models, weights, routes or checks.",
+  "limitations": "Repeated 2025 OOF comparisons and inherited legacy base limitations remain. Reserved checks verify fixed component changes rather than independently estimating the whole ensemble."
+}
