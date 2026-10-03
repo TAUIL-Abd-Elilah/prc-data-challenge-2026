@@ -1,0 +1,16 @@
+{
+  "prepublished_policy_sha256": "9dca07f04ae0cf4f9da4484fce42fc962bbec54fc4ee80cfc7e41f4882488c7c",
+  "reference": "Accepted v7 all-finite OOF and exact 344841-row ranking output",
+  "valid_route": "Frozen selected v7, v8_combo or v9b; use replacement only after its terminal February/August guard passes",
+  "missing_route": "Use original movement correction only after both original folds, April/October and February/August guards pass",
+  "masks": "valid own proxy [0,7200] and invalid no-NM non-LIRF are disjoint",
+  "composition": "Apply each fixed component exactly once to v7; every other row equals v7 bitwise",
+  "selection": "No weight, airport or alternative route tuning in this assembler",
+  "OOF_gate": "all-finite RMSE improves and paired UTC-day 95% gain lower bound >0 separately in Jan/Jul and Nov/Dec",
+  "bootstrap": {
+    "repeats": 1000,
+    "seed": 20261003
+  },
+  "ranking": "Only hash-bound terminal model, source, cache and ranking-input manifests; exact template order; no overwrite",
+  "submission": "This script writes an internal candidate artifact only; no upload or leaderboard calls"
+}

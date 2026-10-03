@@ -179,6 +179,18 @@ The missing-clock movement branch independently runs `movement_only_expert.py --
 
 The older v6-based standalone v8 ranking path is excluded from this portfolio. Its `--mode final-predict` now refuses that path. Only the selected and guarded v7 combination can use `reserved_valid_guard.py --mode final-v8-combo`; v9b's final modes likewise require its selected-route guard. No reserved guard result or new ranking prediction is available yet.
 
+`compose_current_candidate.py` implements the final fixed policy after those routes are terminal. Its prospective specification is `reports/current_composition_spec.json`. `validate` checks the exact common 672,428-row finite-label universe, labels, fold/month/time metadata and routing masks. It verifies that v5 and v7 agree on the missing-clock gate, applies each permitted correction once, and requires positive RMSE gains and paired UTC-day confidence bounds in both original folds. A failed composition is rejected without retuning; an unchanged v7 composition cannot pass a positive-gain gate.
+
+Only after that check passes, `assemble` reads fully guarded component outputs and verifies their model, source, input and validation manifests. It snapshots hashes before ranking reads and rechecks the same hashes before output and the final manifest. It requires all 344,841 template IDs in exact order, finite nonnegative values, and unchanged predictions outside the disjoint gates. Existing outputs are never overwritten. These modes create internal candidate artifacts; finalization, publication and a fresh CLI quota check still precede any upload. Static compilation and peer review passed. Calls with the current pending prerequisites correctly refused without creating artifacts; no candidate OOF evaluation or ranking assembly has run.
+
+```powershell
+python compose_current_candidate.py --mode contract
+python compose_current_candidate.py --mode validate
+python compose_current_candidate.py --mode assemble
+```
+
+The latter modes refuse pending prerequisites and exclude failed routes according to the fixed policy. They must not be used to bypass the selected-route or reserved-audit sequence.
+
 ## Prospective same-runway ARR taxi context
 
 `runway_arrival_taxi_features.py` defines ten fixed fields from released ARR covariates: counts, means and population standard deviations of completed taxi-in intervals in prior 15/60/180-minute windows, plus the number still taxiing on the same airport/runway. Completion windows are anchored to ARR in-block time, with strict upper bounds. Both summaries require finite taxi times in 0..7200 seconds and agreement with in-block minus landing time within one second. Zero taxi intervals can enter completed summaries but cannot count as active. Missing runway queries remain missing.
