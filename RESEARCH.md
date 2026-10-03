@@ -527,3 +527,32 @@ python v13_long_budget_expert.py --mode fresh-audit
 ```
 
 Run all full feature loading and training stages serially with the unlowerable 10 GiB floor. The longer budget may approach twice the training time and increase model memory/storage. Reproduction uses a separate clean artifact namespace and preserves original published seals; GPU fits may produce different model bytes, as documented earlier. Source publication and local gates alone do not establish a first-place score or prize.
+
+The prospective extension is implemented in `v13_capacity_final.py`, SHA-256 `3569a44426cac42a4a05066fecf9187682e61ea03920f2ad9b47170cbec095b1`. Independent static review, compilation and no-data synthetic missing-terminal, fixed-formula, ID, month/prefix and tamper checks passed before real execution. It strictly resolves v12's terminal status: missing required evidence refuses; verified failure retains v9 as the comparator; all v12 gates passing makes geometry the mandatory comparator. Only exact aligned original/fresh compatibility gains at the unchanged capacity formula authorize the separate matched February/August 10,000/20,000-budget models and own-prefix guard. Every stage has a prospective source/input seal and immutable replayable receipts. Failure retains the previously validated policy.
+
+After v13 original/fresh gates pass and v12 is resolved, run serially from the published source:
+
+```powershell
+$v13ExtensionSha = '3569a44426cac42a4a05066fecf9187682e61ea03920f2ad9b47170cbec095b1'
+python v13_capacity_final.py --mode prepare --published-source-sha256 $v13ExtensionSha
+# Publish the prepared compatibility seal before scoring.
+python v13_capacity_final.py --mode compat-eval --published-source-sha256 $v13ExtensionSha
+# Only after compatibility passes, prepare and publish the component seal.
+python v13_capacity_final.py --mode guard-prepare --published-source-sha256 $v13ExtensionSha
+python v13_capacity_final.py --mode guardfit-comparator --published-source-sha256 $v13ExtensionSha
+python v13_capacity_final.py --mode guardfit-replacement --published-source-sha256 $v13ExtensionSha
+python v13_capacity_final.py --mode guard-eval --published-source-sha256 $v13ExtensionSha
+```
+
+Only after all fixed gates pass and their receipts are published:
+
+```powershell
+python v13_capacity_final.py --mode finalprepare --published-source-sha256 $v13ExtensionSha
+# Publish the prepared full-fit seal before fitting.
+python v13_capacity_final.py --mode finalfit --published-source-sha256 $v13ExtensionSha
+python v13_capacity_final.py --mode rankingseal --published-source-sha256 $v13ExtensionSha
+# Publish the full-model receipt and ranking source seal before inference.
+python v13_capacity_final.py --mode predict --published-source-sha256 $v13ExtensionSha
+```
+
+The final 184-field architecture uses only the median original v13 fold tree counts. Ranking uses the unchanged sealed v9 plus 0.5 times the new/old raw expert difference on exact valid-proxy rows and preserves all other rows. The extension has no finalizer, upload or leaderboard choice. No real compatibility, capacity guard, final fit or inference has run at publication. Finalization, source publication, increasing version, fresh quota check, MinIO CLI upload and remote acceptance verification remain separate requirements.
