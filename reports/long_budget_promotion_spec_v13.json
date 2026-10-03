@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "status": "prospective_before_v12_terminal_and_before_v13_fit",
+  "purpose": "Test whether a longer training budget for the existing 184-field v11 residual expert gives a reproducible capacity gain without changing inputs, weight, route, or the sealed local v9 missing-clock policy.",
+  "scope": {
+    "source_family": "v11 184-field CatBoost GPU residual to own valid AOBT proxy",
+    "predictor_count": 184,
+    "categorical_count": 24,
+    "new_predictors": 0,
+    "external_data_change": false,
+    "training_labels": "Finite 2025 taxi targets in [0,86400] with finite own AOBT proxy in [0,7200].",
+    "heldout_scoring_labels": "All finite targets on the exact heldout valid-AOBT IDs; original all-finite fold policy also preserves every invalid-proxy v9 prediction.",
+    "forbidden_predictors": [
+      "own departure BLOCK timestamp",
+      "own departure TAXITIME target",
+      "opaque movement ID",
+      "heldout target or ranking label"
+    ],
+    "catboost_core": {
+      "task_type": "GPU",
+      "devices": "0",
+      "gpu_ram_part": 0.45,
+      "loss_function": "RMSE",
+      "eval_metric": "RMSE",
+      "iterations_max": 20000,
+      "depth": 10,
+      "learning_rate": 0.04,
+      "l2_leaf_reg": 12,
+      "random_strength": 0.5,
+      "bagging_temperature": 0.5,
+      "max_ctr_complexity": 1,
+      "one_hot_max_size": 20,
+      "border_count": 128,
+      "thread_count": 2,
+      "random_seed": 2026,
+      "allow_writing_files": false,
+      "verbose": 500
+    },
+    "internal_early_stop": "Complementary months only; RNG seed 2026 permutation, first max(20000, floor(0.06 * eligible_count)) eligible rows for early stopping, remaining eligible rows for fit, patience 200, use_best_model true.",
+    "memory_floor_gib": 10,
+    "saved_model_prefix": "Exactly the first 10000 trees of the same saved 20000-budget model, predicted with ntree_end=10000. A saved model with tree_count <= 10000 is terminally ineligible; no separately trained prefix or replacement variant is tried."
+  },
+  "frozen_reference": {
+    "local_v9_submission_path": "submissions/merry-mushroom_v9.parquet",
+    "local_v9_submission_sha256": "bc465ae7ff48deac5f93cd449a3799fee1a361a8021ec2ca03ff70baccc0f417",
+    "local_v9_status": "sealed locally, not uploaded",
+    "v9_all_finite_oof": "artifacts/later-feature-portfolio/evaluation_predictions.parquet selected values, exactly 672428 IDs",
+    "v11_10000_budget_original_oof": "artifacts/v11-taxi-flow-expert/<fold>_oof.parquet expert values, exact original-fold valid-AOBT IDs",
+    "v11_10000_budget_fresh_oof": "artifacts/v11-taxi-flow-expert/fresh_new/fresh_apr_oct_oof.parquet expert values, exact fresh valid-AOBT IDs",
+    "v11_saved_ranking_raw": "artifacts/later-feature-final/ranking_expert.parquet raw_expert on the same exact 339377 valid-AOBT ranking IDs",
+    "fixed_component_weight": 0.5,
+    "bootstrap": {
+      "unit": "UTC calendar day",
+      "repeats": 1000,
+      "seed": 20261016,
+      "gain_direction": "RMSE of comparator minus RMSE of candidate",
+      "confidence_interval": "empirical 2.5 and 97.5 percentiles of paired day resamples",
+      "pass": "strictly positive lower bound"
+    }
+  },
+  "original_folds": {
+    "selection_months": [1, 7],
+    "forward_months": [11, 12],
+    "fit_and_early_stop": "Exclude both heldout months from both fit and early stop for each fold.",
+    "old_raw": "Sealed original v11 10000-tree expert prediction aligned by exact movement ID.",
+    "full_raw": "Saved v13 model prediction from its complete best-model tree count.",
+    "prefix_raw": "Prediction from the same saved v13 model with ntree_end=10000.",
+    "fixed_formula_on_valid_aobt": "clip(v9_selected + 0.5 * (full_raw - old_raw), lower=0)",
+    "prefix_diagnostic_formula_on_valid_aobt": "clip(v9_selected + 0.5 * (prefix_raw - old_raw), lower=0)",
+    "outside_valid_aobt": "Copy sealed v9 selected predictions exactly.",
+    "coverage": "Exact 672428 all-finite original heldout movement IDs, with exact target, UTC time, fold, and valid-proxy flags. Full and prefix experts cover every valid-proxy heldout ID only; no row exceptions or ID-based predictors.",
+    "gate": "On each original fold, fixed full candidate improves all-finite RMSE over v9 and its paired UTC-day lower gain bound is >0. The full candidate also improves RMSE over its own 10000-tree prefix candidate with positive paired UTC-day lower gain bound. Saved full model tree_count must exceed 10000. Failure is terminal for this capacity route; no weight or budget is reselected."
+  },
+  "fresh_april_october": {
+    "months": [4, 10],
+    "expected_valid_aobt_finite_ids": 357813,
+    "fit_and_early_stop": "Both April and October excluded from both fit and early stop.",
+    "matched_baseline": "Sealed v11 fresh_audit_predictions.v11_blend, aligned by exact movement ID, target, and UTC time.",
+    "matched_old_raw": "Sealed v11 fresh_new/fresh_apr_oct_oof.expert on the same IDs.",
+    "fixed_formula": "clip(v11_blend + 0.5 * (full_raw - old_v11_fresh_raw), lower=0)",
+    "prefix_diagnostic_formula": "clip(v11_blend + 0.5 * (prefix_raw - old_v11_fresh_raw), lower=0)",
+    "gate": "For both months separately, full candidate RMSE improves over matched v11_blend; pooled paired UTC-day 95 percent lower gain bound is >0. Full candidate also improves over its own 10000-tree prefix candidate by both-month RMSE and positive pooled paired UTC-day lower bound; saved model tree_count must exceed 10000. No further fresh variants follow failure."
+  },
+  "promotion_branch_after_v12_terminal": {
+    "decision_order": "Resolve all v12 original, fresh April/October, and separate February/August gates before choosing the v13 compatibility comparator. Do not use v12 intermediate scores to change the v13 formula, weight, budget, or validation dates.",
+    "if_v12_fails_any_required_gate": {
+      "retained_policy_before_v13": "local v9",
+      "compatibility_comparator": "sealed local v9 original-fold and matched April/October policies",
+      "promotion": "v13 must pass its own original, fresh, and February/August gates; otherwise retain local v9"
+    },
+    "if_v12_passes_all_required_gates": {
+      "retained_policy_before_v13": "validated v12 geometry route",
+      "geometry_original_comparator": "artifacts/v12-runway-geometry-expert/validation_predictions.parquet candidate values on exact all-finite original-fold IDs",
+      "geometry_fresh_comparator": "artifacts/v12-runway-geometry-expert/fresh_audit_predictions.parquet v12_blend values on exact 357813 fresh valid-AOBT IDs",
+      "comparison_formula_stays_fixed": "v13 remains clip(v9_selected + 0.5 * (long184 - old_v11_raw), lower=0) on original valid-AOBT rows and the corresponding matched v11_blend/old_v11_fresh_raw formula on April/October; it never merges geometry features or changes weight based on v12 results.",
+      "compatibility_gate": "v13 candidate improves all-finite RMSE over validated geometry policy with positive paired UTC-day lower gain bound on each original fold; on matched April/October IDs it improves RMSE over geometry in each month and has positive pooled paired UTC-day lower gain bound. Exact movement ID, target, UTC time, and scoring masks must agree before scores are computed.",
+      "promotion": "Only v13 passing original, fresh, geometry compatibility, and February/August gates can replace geometry; otherwise retain validated geometry."
+    },
+    "failure_policy": "One terminal choice only. No alternate weight, budget, feature merge, selected airport, or row exception after observing a failed gate."
+  },
+  "separate_february_august_component_guard": {
+    "months": [2, 8],
+    "execution": "Only after original/fresh gates and conditional geometry compatibility pass, freeze source/input/model/report hashes before either v13 February/August guard refit or v13 guard scoring. This 2025 window was already inspected by the separate v12 guard and is not untouched test data.",
+    "comparator": "New 10000-budget pure v11 184-field residual model excluding February/August from fit and early stop.",
+    "replacement": "New 20000-budget v13 184-field residual model excluding February/August from fit and early stop.",
+    "matched_requirements": "Identical fit IDs, early-stop IDs, all-finite valid-AOBT heldout IDs, targets, UTC times, 184 feature names/order/dtypes, and all 24 ordered categorical vocabularies. Only maximum iteration budget differs.",
+    "fixed_component_formula": "clip(old_10000_raw + 0.5 * (full_20000_raw - old_10000_raw), lower=0)",
+    "own_prefix_formula": "clip(old_10000_raw + 0.5 * (same_20000_model_ntree_end_10000_raw - old_10000_raw), lower=0)",
+    "gate": "Saved 20000-budget model tree_count >10000; fixed full component improves over clipped pure old_10000 in each month and pooled paired UTC-day lower gain bound >0; fixed full component also improves over its own prefix formula in each month with positive pooled paired UTC-day lower bound. Otherwise retain the policy selected before v13; no refit, alternate weight, or ranking output."
+  },
+  "planned_artifact_contract": {
+    "v13_directory": "artifacts/v13-long-budget",
+    "pre_fit_seals": [
+      "protocol.json",
+      "frozen_v9_oof_reference.parquet"
+    ],
+    "each_original_fold": [
+      "<fold>.cbm",
+      "<fold>_oof.parquet: MVT_ID_mvt,full_expert,prefix_10000_expert",
+      "<fold>_fit.json",
+      "<fold>_provenance.json"
+    ],
+    "original_terminal": [
+      "validation_predictions.parquet: frozen reference metadata,old_v11_raw,full_expert,prefix_10000_expert,candidate,prefix_candidate",
+      "validation.json: frozen fixed-weight gates, original model/OOF/receipt hashes, exact coverage and bootstrap results"
+    ],
+    "fresh_terminal": [
+      "fresh_new/fresh_apr_oct.cbm",
+      "fresh_new/fresh_apr_oct_oof.parquet: MVT_ID_mvt,full_expert,prefix_10000_expert",
+      "fresh_new/fresh_apr_oct_fit.json",
+      "fresh_new/fresh_apr_oct_provenance.json",
+      "fresh_audit_predictions.parquet: ID,target,month,time,old_v11_blend,old_v11_raw,full_expert,prefix_10000_expert,candidate,prefix_candidate",
+      "fresh_audit.json: fixed-weight gate, exact coverage, source/model/OOF/receipt hashes and bootstrap results"
+    ],
+    "compatibility": "A separate immutable compatibility protocol must seal the resolved v12 terminal status, selected comparator artifacts and exact source/report hashes before reading geometry comparison labels or scoring. Its output must bind aligned original/fresh paired predictions, metric replay, and terminal route.",
+    "february_august": "A separate immutable matched guard protocol must seal the promoted route, source/input hashes and fixed weight before v13 guard refits or v13 guard scoring. Both model receipts must bind exact fit/early/held IDs, 184-field schema, ordered category vocabularies, model/OOF/report hashes and prefix tree count; this window was previously inspected for v12 and cannot be claimed as untouched.",
+    "final": "A separate guarded final extension may fit and predict only after all terminal reports and source hashes are verified; the original v13 source final modes must refuse until then."
+  },
+  "final_if_all_gates_pass": {
+    "training": "Fit the exact 184-field model on all eligible 2025 labels. Use only the integer median of the two ORIGINAL v13 Jan/July and November/December saved tree counts; never use fresh, compatibility, or February/August tree counts to set final iterations.",
+    "ranking_reference": "Sealed local v9 submission and matching saved v11 raw ranking expert; exact template ID/order of 344841 rows.",
+    "ranking_valid_aobt_rows": 339377,
+    "ranking_formula_on_valid": "clip(v9_prediction + 0.5 * (v13_full_raw - v11_saved_raw), lower=0)",
+    "outside_valid_aobt_rows": 5464,
+    "preserved_missing_clock_rows_within_outside_valid": 4907,
+    "outside_valid_formula": "Copy sealed local v9 values exactly, including all missing-clock corrections.",
+    "output": "Local complete finite nonnegative Parquet in template ID order, with exclusive model/ranking artifacts and aggregate receipts only. No upload or finalizer in the comparison source."
+  },
+  "provenance_and_interpretation": {
+    "freeze_before_each_phase": "Exact source/helper/spec SHA256, raw training and 2026 ranking source SHA256, feature cache and builder receipts, reference OOF/report/model SHA256, fixed policy/guard receipts, target-free ranking template, 184 feature schema and 24 categorical vocabularies. Rehash before and after each feature load, fit, evaluation, and artifact write; exclusive outputs and readback checks.",
+    "required_artifact_identity": "Every paired evaluation uses exact unique movement ID sets and aligned target/UTC time; reports seal model, OOF, fit report, source and protocol hashes, fit/early/held ID hashes, original tree counts, candidate formula, bootstrap seed and result.",
+    "statistical_limit": "All 2025 windows have been inspected repeatedly. These paired date-block checks support a constrained model-change decision, not an untouched estimate of future performance or a guarantee of first place.",
+    "leaderboard_feedback_for_choice": false,
+    "external_private_labels": false,
+    "upload_or_publication_by_this_spec": false
+  }
+}
