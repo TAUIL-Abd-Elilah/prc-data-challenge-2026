@@ -564,3 +564,35 @@ The separate v13 preparation also completed without fitting. Its exact prospecti
 Independent v12 terminal readback then passed: both saved models, ordered fit/early/held IDs, exact heldout labels/times, 24 category vocabularies, the unchanged formula and all month/bootstrap statistics matched; all 105 source/input hashes matched before and after replay. Full fitting is authorized at the original-fold-only 9,998-tree median.
 
 Independent readback of the actual prepared v13 protocol also passed all 108 input and 12 raw seals, the exact 672,428 reference rows and their 663,664 valid-proxy/8,764 outside masks, and original split exclusions. It found one pre-execution extension integration bug: the namespace adapter omitted `submission_v9`, now required by the unchanged comparison API. Before any extension preparation, scoring or fitting, a one-line adapter repair adds the already frozen `V9_SUBMISSION` path. The original published extension SHA was `3569a44426cac42a4a05066fecf9187682e61ea03920f2ad9b47170cbec095b1`; the repaired and reviewed source SHA is `4be95f5cf4d2c769b40ceab532b1a2500cc60ba4692b2b5bb33be03ff982550f`. Compilation, synthetic tests and namespace/API integration passed. No scientific setting, v13 main source, prepared protocol, reference, fit or outcome changed.
+
+### Prospective missing-clock event sequence
+
+The single new v14 hypothesis is fixed in `reports/event_sequence_missing_spec_v14.json`, SHA-256 `26782bcd1c46662bb705525fa5a72c4d9eb1d57616bbca1ee42edcff1a50aabb`. It adds ordered neighboring airport movements to the existing 79 movement-only fields. Each sequence has 16 strictly earlier and 16 strictly later events within one hour, partitioned by airport/UTC month, six label-free channels and a separate presence mask. Own and same-flight NM records are excluded; opaque IDs never determine channels or tie order. This uses organizer-released covariates and introduces no external dataset or copied paper implementation.
+
+`event_sequence_features_v14.py` (SHA-256 `3719fd5b0048e0590f77f094bf1bc3829982e9fe3db4115688dc196cec4405e2`) and `v14_event_sequence_expert.py` (SHA-256 `7d16c08ef1af2fdb77b6b66a1ab835e37fe3bea56986f88778aa6c708ee11343`) passed independent static review, compilation and CPU-only synthetic checks before publication. The fixed shared-weight CNN handles the two sequence halves separately and masks every convolution. Numerical scalers and categorical vocabularies use fit rows only. Tabular transformation occurs per minibatch; there are no per-fold full normalized matrices on disk. Event arrays are streamed from immutable float16 memmaps. The observed reference environment has CUDA-enabled PyTorch 2.13.0+cu126; every actual fit must record its package/runtime/device settings.
+
+Direct ordinary taxi labels in [0,7200] train the model, with all query NM fields hidden. Maximum epochs are 30, internal early-stop patience is four, and seed is 20261017. The exact accepted v8 no-NM/non-LIRF gate and fixed weight **1** remain unchanged. Original January/July and November/December require monthly gate improvements, full-policy improvements and positive paired UTC-day lower bounds. Matched April/October and February/August require the same monthly and pooled uncertainty checks against their actual saved movement-only comparators. Every finite gate target is scored, including negative or extreme values excluded from ordinary training. Failure is terminal. These previously inspected 2025 periods are stability checks and cannot establish a 2026 ranking result.
+
+Run real stages serially only after source publication, with the unlowerable 10 GiB memory floor:
+
+```powershell
+$v14BuilderSha = '3719fd5b0048e0590f77f094bf1bc3829982e9fe3db4115688dc196cec4405e2'
+python event_sequence_features_v14.py --mode prepare --published-source-sha256 $v14BuilderSha
+# Publish the exact training input protocol before building.
+python event_sequence_features_v14.py --mode build --published-source-sha256 $v14BuilderSha
+# Publish the build receipt and verify cache/ID/source seals before trainer preparation.
+python v14_event_sequence_expert.py --mode prepare
+# Publish the prepared trainer protocol before fitting.
+python v14_event_sequence_expert.py --mode fit-fold --fold seasonal_jan_jul
+python v14_event_sequence_expert.py --mode fit-fold --fold forward_nov_dec
+python v14_event_sequence_expert.py --mode evaluate-original
+# Only after the unchanged original gate passes:
+python v14_event_sequence_expert.py --mode fit-fold --fold fresh_april_october
+python v14_event_sequence_expert.py --mode evaluate-fresh
+# Only after the unchanged fresh gate passes:
+python v14_event_sequence_expert.py --mode fit-fold --fold reserved_february_august
+python v14_event_sequence_expert.py --mode evaluate-reserved
+python v14_event_sequence_expert.py --mode terminal
+```
+
+Fit receipts bind ordered fit/early/held IDs and labels, fit-only preprocessing, actual optimizer/model settings and model-to-OOF checkpoint replay. Cache builders seal raw inputs before feature-value reads and reject changed movement-cache rebuild proofs. Ranking cache values require the independently verified terminal and a prior ranking input seal. Trainer final/ranking modes refuse until a separate reviewed final extension exists. No real v14 preparation, feature build, fit, scoring, ranking inference or upload has run at publication. The clean reproduction integration described in README remains separate pending work.
