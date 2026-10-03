@@ -153,6 +153,30 @@ The selected valid-AOBT route is unchanged v7. V8 adds only the fixed movement-o
 
 The public aggregate provenance bundle includes `reports/movement_only_final_model.json`, `reports/movement_only_ranking_manifest.json`, `reports/current_candidate_ranking_manifest.json`, `reports/current_candidate_ranking_sources.json`, and `reports/submission_v8_finalized_manifest.json`. The alternative v8 LightGBM expert passed standalone validation but its fixed combination with v7 failed the November/December confidence gate; it is excluded. The separate valid-AOBT movement route also failed. No validation result guarantees a 2026 score or prize.
 
+## Reproduce the guarded later candidate
+
+After the v8 pipeline, build the two prospective feature families and run their original and matched April/October comparisons serially, using the commands and frozen specifications in [RESEARCH.md](RESEARCH.md). The published portfolio contract checks the fixed blends against the complete current policy, preserves the missing-clock route, and chooses only after both families have terminal evidence. It selected **v11 at weight 0.5**; exact records are [evaluation](reports/later_feature_portfolio_evaluation.json) and [selection](reports/later_feature_portfolio_selection.json). January/July RMSE is 320.993962 seconds and November/December 212.698229. These are repeatedly used component comparisons, not an untouched estimate of the full ensemble.
+
+```powershell
+python later_feature_portfolio.py --mode evaluate-select --expected-source-sha256 f0dde94e95479b0e0dae00d9d4b37b3437bcc7c8804f4dfd912cba2f78568a0d
+python later_reserved_guard.py --mode freeze
+python later_reserved_guard.py --mode fit-comparator
+python later_reserved_guard.py --mode fit-replacement
+python later_reserved_guard.py --mode evaluate
+```
+
+Publish the immutable selection and guard protocol before the May/September fits. Both reserved months are excluded from fitting and internal early stopping for the matched v7 comparator and selected replacement. The single fixed blend must improve each month and have a positive pooled paired UTC-day interval. Failure retains v8 without switching candidates. Only a passing selected replacement may proceed:
+
+```powershell
+python later_feature_final.py --mode prepare
+python later_feature_final.py --mode fit-final
+python later_feature_final.py --mode freeze-ranking-inputs
+python later_feature_final.py --mode final-predict
+python finalize_submission.py --predictions artifacts/later-feature-final/predictions.parquet --team merry-mushroom --version 9
+```
+
+The final tree count is the integer median of the two original selected-family folds, and ranking inputs are sealed before feature reads. V8 remains immutable; a distinct v9 is finalized only if the selected reserved guard passes. Finalization, public aggregate provenance, a fresh quota check, MinIO CLI upload and remote readback/acceptance verification are required before reporting a new official result. May/September and later final execution are still pending.
+
 ## Submit with MinIO Client
 
 The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized file for the selected version. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.

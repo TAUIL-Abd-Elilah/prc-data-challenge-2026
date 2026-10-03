@@ -1,0 +1,329 @@
+{
+  "protocol_sha256": "c05422b1d010cb235d73c16d556613ca88c545cb6e6a81646da8dd6802160913",
+  "implementation_sha256": "f0dde94e95479b0e0dae00d9d4b37b3437bcc7c8804f4dfd912cba2f78568a0d",
+  "frozen_input_sha256": {
+    "reports/current_selected_policy.json": "671d84a53b0d04c708f8b16e60a46af32819390e3e1ddcfd7b4b8b9edba70112",
+    "reports/current_composition_validation.json": "7215a66936b92bf65f70f07d05c0cbec88867c5adb71981a6536a445f7b38d36",
+    "artifacts/current-candidate/protocol.json": "bdd0ddb07a2ba1108c9162d642699408a4e071f60b36c81caf2071141ce62f3c",
+    "artifacts/current-candidate/validation_predictions.parquet": "575f1b5e8046135b92c5d051c0272045416d01078da0f4372c379c86d79a7f92",
+    "artifacts/current-candidate/predictions.parquet": "8fc6519610a573dd77a4b5ca18f49ab816a564754db13d26d91f26b53d04b9e5",
+    "artifacts/v7-runway-traffic/validation_predictions.parquet": "a5e1e8911f30d1c346be17b6b2d666c2571cfa7eb8727a85c082d9b0bab8d095",
+    "artifacts/v7-runway-traffic/validation.json": "a382b46fa064b811e1a83d5c4eda93f3b783db1f2b2e652ed10fd69e2e0694e8",
+    "reports/runway_taxi_model_spec_v10.json": "32514d6a4b5816d3858663f171f04bea2d1332f92f267ca1cdf18bd5f8683beb",
+    "reports/taxi_flow_model_spec_v11.json": "404f315d23eebe995535f2d58dc17f170d48ced41607d38dfdb7af7db11e3709",
+    "reports/runway_arrival_taxi_protocol_v10.json": "2ebfe35cb4d159597fb08556d8e0df0414e6cb879a91a7aa921b575dbca56572",
+    "reports/taxi_interval_flow_spec_v11.json": "4fb40aad744050007649f0698e52ffb6b739542acdded3201acd9506f02a99ab",
+    "v10_runway_taxi_expert.py": "bd25c47d81021d38e7e9c1ea464dcc0699bc10a447130a5752eee60b60b2e9de",
+    "v11_taxi_interval_flow_expert.py": "8d2027973780495bb7f4715aa4a665889020f6250903211ee80f2e4e73258298",
+    "runway_arrival_taxi_features.py": "8c8527d63eaf28fa1cefabf4a6b3bdd21e7c1d2f2ceac5e04977de703aac96a0",
+    "taxi_interval_flow_features.py": "99c0e0c3ae6f1a73b01fd39517a7524f6deb40fc455bf79ef993487277d1e3ef",
+    "reports/submission_v8_finalized_manifest.json": "264d494e406ec8e4afd327b370aa21ba4bd1a787b61f7ce86b797552f921b366",
+    "artifacts/current-candidate/ranking_manifest.json": "8acc90526363ba2aa7f12efd3ee774a889e179efb898c8d5a975df65eaa31458",
+    "artifacts/current-candidate/ranking_sources.json": "6dac1dc0ef78672e6c552bbe9725d3ca864a8937b22420ffeab144bc66719218",
+    "artifacts/v7-runway-traffic/predictions.parquet": "314e5dcc537b46954744ddc02018c7e2a65cd1dfe10be8e13da313c69eb0b0eb",
+    "artifacts/v7-runway-traffic/fresh_audit_predictions.parquet": "d1b204ceaec7693d0e6a916dc2e9e721d504d7d7f0c5026dbeaf79fdafcb35e1",
+    "artifacts/v7-runway-traffic/fresh_audit.json": "47389aa4e34dfd40e0fcde9b4368be1667f863aebda9735abb9d18b0d3dec79e",
+    "artifacts/v6-movement-only/validation_predictions.parquet": "98493a0c46c3e4e5bacf609d6014c61f2b361a46720cd41a78139d152d40fc26",
+    "reports/movement_only_validation_v6.json": "a378ff065ed140ab3f01ef8867db81227d1db0ec02f18ed32bcc8567e28023f3",
+    "reports/movement_only_fresh_audit.json": "083fbc90551c46ec7084c9767b7710bb5764a0b478cf3743f9977d8d36ec0be0",
+    "reports/movement_only_reserved_audit.json": "5839fbdbd11f19e9d4d4c5ce349052caa1eb0289568eab1575c07d141d384132"
+  },
+  "dynamic_input_sha256": {
+    "reports/current_selected_policy.json": "671d84a53b0d04c708f8b16e60a46af32819390e3e1ddcfd7b4b8b9edba70112",
+    "reports/current_composition_validation.json": "7215a66936b92bf65f70f07d05c0cbec88867c5adb71981a6536a445f7b38d36",
+    "artifacts/current-candidate/protocol.json": "bdd0ddb07a2ba1108c9162d642699408a4e071f60b36c81caf2071141ce62f3c",
+    "artifacts/v7-runway-traffic/validation.json": "a382b46fa064b811e1a83d5c4eda93f3b783db1f2b2e652ed10fd69e2e0694e8",
+    "artifacts/current-candidate/validation_predictions.parquet": "575f1b5e8046135b92c5d051c0272045416d01078da0f4372c379c86d79a7f92",
+    "artifacts/v7-runway-traffic/validation_predictions.parquet": "a5e1e8911f30d1c346be17b6b2d666c2571cfa7eb8727a85c082d9b0bab8d095",
+    "artifacts/baseline/training_rows.parquet": "b19e760a11b15e77996203ee84431fbcc225e0e2a325b15cd43bc38a00c47fcc",
+    "artifacts/baseline/features.parquet": "62b35f2ebb012cf85853c41c2aae55d72b2bd8cd7fb68243b23a9868afca0253",
+    "artifacts/v10-runway-taxi/protocol.json": "b83783bf2c58403403de9c7edc65ab91d47d68874a08fbda796212c2abf34cfd",
+    "v10_runway_taxi_expert.py": "bd25c47d81021d38e7e9c1ea464dcc0699bc10a447130a5752eee60b60b2e9de",
+    "traffic_deep_expert.py": "98cdd405aec2ba6cdc4ead2197a2b20d238aa6a53d5b1d2361b463f92578f425",
+    "deep_timestamp_expert.py": "8edf1eb0b00b065c2d6b5fbb1d7b85b013ba861b12c55a574d53dc8ead14ad82",
+    "deep_arrival_expert.py": "8ac598480948f6d67deb181391f274606542e968d73106cbc8d4e98e492e5ad6",
+    "catboost_expert.py": "1e1ecfec5acfe41524f028339984ae56fdb1b8c6e360fde704acdd64258345f2",
+    "airport_models.py": "68f1e7b6f45ef0cfec11049760f5d87e7609ac9c9cd4fad3bd5c28b5e12563f0",
+    "solution.py": "13848cd8483737c1e5db0ac4e1e90c0b64eead8ce289cc17870944f58715aa11",
+    "weather_model.py": "6dbfe4f41550b97da604e698c00c3fbbafc0ef6489ea6b47e4099e5658b7c1ec",
+    "proxy_neighbour_expert.py": "6f447bb5aba8356a1cb9df8e16274d05aba1f087789c8c2b17696e3b0d9a2fa1",
+    "runway_arrival_features.py": "314673d1cd21479e0657368b0ec45c08784a70e6b604db5d43aea02088440f30",
+    "runway_arrival_taxi_features.py": "8c8527d63eaf28fa1cefabf4a6b3bdd21e7c1d2f2ceac5e04977de703aac96a0",
+    "v4_reference.py": "5bf163d64863cc695f0a3fdfab379e2d76b6c056332622f9ffa9d9ee5eeddaa0",
+    "artifacts/v7-runway-traffic/protocol.json": "27de40f395a76c98fb2fda5d2de4b677d0a2a7ddf43538234e3ca2d6b83a0680",
+    "artifacts/v7-runway-traffic/fresh_audit.json": "47389aa4e34dfd40e0fcde9b4368be1667f863aebda9735abb9d18b0d3dec79e",
+    "artifacts/v7-runway-traffic/fresh_audit_predictions.parquet": "d1b204ceaec7693d0e6a916dc2e9e721d504d7d7f0c5026dbeaf79fdafcb35e1",
+    "artifacts/v7-runway-traffic/fresh_new/fresh_apr_oct.cbm": "f98b5f2883d463680be3fd66d721cbdadf244692add1bc3b0fb1ba3e96cf78fc",
+    "artifacts/v6-deep-arrival/fresh_new/fresh_apr_oct.cbm": "25ceb7192ff7fd9447d67269d63b77f947f8ef853d60d2babca23bfedc2efbc1",
+    "artifacts/v7-runway-traffic/seasonal_jan_jul.cbm": "c4b6c14fbe9f9ad0f0aa7eb9b46f96df793fa4fe02488527bf63c618d1c8ef6e",
+    "artifacts/v7-runway-traffic/forward_nov_dec.cbm": "dc04b0449d3f3c74fa4887d57def5d116fca4a51cbc5eb030f6e2a91976ce217",
+    "artifacts/v6-deep-arrival/seasonal_jan_jul.cbm": "6fcb919d07687a8535d956871bb8b97d6d3d8971564456e190d9196e46c9aa35",
+    "artifacts/v6-deep-arrival/forward_nov_dec.cbm": "a11109e38cbadcced4ac348c5042576b579e4955263c9ef7beeb6b2813a3aca3",
+    "artifacts/baseline/ranking_rows.parquet": "da1a018792fba6531616fd32e5bcb4021dac0690676ea28a5eefdbb021c28235",
+    "artifacts/v5-arrival-clean/training_arrival_features.parquet": "c4cad12b3a7d0bcf600f775fe12178bb2132fbfc9e0741c8fa35fd71257d76b5",
+    "artifacts/v6-neighbour/training_neighbour_features.parquet": "2c46c58db6cf2b89a1d53034c215cf1f24618f2a097b00fd0e4faf20063fe26e",
+    "artifacts/v6-runway-arrival/training_runway_arrival_features.parquet": "1dbe8beaa5550f3974e628f3aa220ae6c32c4ff883ccc6655030c262089942bf",
+    "artifacts/v10-runway-arrival-taxi/training_runway_arrival_taxi_features.parquet": "7a205a67989874b1496020cc30942854dca44b01b7f16110466dc1a8958eca98",
+    "artifacts/v10-runway-arrival-taxi/protocol.json": "2ebfe35cb4d159597fb08556d8e0df0414e6cb879a91a7aa921b575dbca56572",
+    "artifacts/v10-runway-arrival-taxi/feature_build.json": "f7dc71b1cc379be818c84bb1a6cde8599a32a6aea0f02c24fe891f4e6fa73b3b",
+    "data/ranking.parquet": "9db75e3a56fa09b87aab72e191a53da3fe763d9887ad2b23aea9cde6a6325f86",
+    "data/external/weather.parquet": "cf8b9d15f38a9f516cf47d18974caae87b1c9aba48cc3bf112853d49ab8cb925",
+    "data/training_2025-01-01_2025-02-01.parquet": "a4dc8f152c082c650cd7eb745fe9c641089f34f74df127e6944a188990a0ed94",
+    "data/training_2025-02-01_2025-03-01.parquet": "b6f9ff2cdb1cfe07c5442f4e1f11bbcdbeafe52852dcb0b8175f62ab84c6a066",
+    "data/training_2025-03-01_2025-04-01.parquet": "58fde7e5f8b539546af63b41d7f6ec0f2884fdc3d3dd9b6bfca7c59a420dcdd3",
+    "data/training_2025-04-01_2025-05-01.parquet": "9ffe0cf5741c4863799c41be81475dfaecedabe0ba687b8f8e4eacba992f9390",
+    "data/training_2025-05-01_2025-06-01.parquet": "5481c0642a8fbb4dc395f93bc713c57f4cc16854fb361d404967077e1fce2ff9",
+    "data/training_2025-06-01_2025-07-01.parquet": "c3ef5080f2cc636c3416baf1555f7d0ee3519f9046e8043c1c0c8f017a244025",
+    "data/training_2025-07-01_2025-08-01.parquet": "34d1c5bba7c8596a1c20c09edd3cb2f63277b5a684fa801911660fe0eaf63c9d",
+    "data/training_2025-08-01_2025-09-01.parquet": "6c8d2aa7a1b6c9dff9a0305a37eb02de1e87a68d07557264f41b77738272c540",
+    "data/training_2025-09-01_2025-10-01.parquet": "955308a4000947e32a00586d3ee13928949d2231b67f84f6dfb0631893f3754a",
+    "data/training_2025-10-01_2025-11-01.parquet": "4a31a35601c1bdcd74b8cd6379231ba516a48324e4c2478bf1c9360cd23e687f",
+    "data/training_2025-11-01_2025-12-01.parquet": "ac36b17db7a537e3baeb682fa4763dacaa1fcc5d9bfa6bf32b3ee5d9f91300b0",
+    "data/training_2025-12-01_2026-01-01.parquet": "2d357f2f403a86778a69e93f72d8754effe77f1ac0942399b3d1b7728241f724",
+    "artifacts/v10-runway-taxi/validation.json": "238f34ad69690ddd4173545ced474ae196568d6b1f6d0669e5c1d7b41315aa78",
+    "artifacts/v10-runway-taxi/validation_predictions.parquet": "0dabd753e04ac5ec2b8f4dd236c45123afb5e1fa465220b8efdb059438b2c5ac",
+    "artifacts/v10-runway-taxi/frozen_v7_oof_reference.parquet": "372443f5a09b576031dc6192f4855ce54f09c93a88a559e14b1325e5e7db144d",
+    "artifacts/v10-runway-taxi/seasonal_jan_jul_oof.parquet": "55ffe26a5620b92eff8124c2864b833b54258d16fee35b9075e31ecc9f7f8203",
+    "artifacts/v10-runway-taxi/seasonal_jan_jul.cbm": "f330d18c7af5a3edc9092db501eba4aca2b301e5a864d11054f421a49925b72d",
+    "artifacts/v10-runway-taxi/seasonal_jan_jul_validation.json": "791be5942a92614c953141e3a1a0c81d3ed692af2369c72e9bb03427c640de38",
+    "artifacts/v10-runway-taxi/seasonal_jan_jul_provenance.json": "4778e1fc7fa914cff806f198b3a67a190b67d902a9373b0fbbb84581b95d4d1c",
+    "artifacts/v10-runway-taxi/forward_nov_dec_oof.parquet": "49e6fd21f69e3f81292dbee3c6bdd9482fc374553fdef1f6635728d9b63e76cb",
+    "artifacts/v10-runway-taxi/forward_nov_dec.cbm": "fdec517b65527cfaf6893a6282a0eb60112e5a4a2d6f0b1583ff141c93c205db",
+    "artifacts/v10-runway-taxi/forward_nov_dec_validation.json": "21b848e636e636dafad1ff2ce932a44764c6830b1e0512a1c6997081425077e2",
+    "artifacts/v10-runway-taxi/forward_nov_dec_provenance.json": "22792505864519dd4d909661de9eb4dbe0106d7da0d70e76b3deb103f13d1ff9",
+    "reports/runway_taxi_model_spec_v10.json": "32514d6a4b5816d3858663f171f04bea2d1332f92f267ca1cdf18bd5f8683beb",
+    "artifacts/v10-runway-taxi/fresh_audit.json": "bc10490b8ad7a7fda869f293c66643c60ca474f92433755be907f2eb646f4f99",
+    "artifacts/v10-runway-taxi/fresh_audit_predictions.parquet": "dd726cd32e43cbeb505ca9c331ebf9521c0d455f4294e14cfcd9004ae2707bd4",
+    "artifacts/v10-runway-taxi/fresh_new/fresh_apr_oct_oof.parquet": "c8a43e9f1afe263d7eda7b2fdf3b3e95528fbb3a2b513f6a0d5dee74a59a6d0a",
+    "artifacts/v10-runway-taxi/fresh_new/fresh_apr_oct_provenance.json": "20bd9592d6a0069a08dd1cf1101e89c78a9d93ccca65a22f9926f4ca807951dd",
+    "artifacts/v10-runway-taxi/fresh_new/fresh_apr_oct.cbm": "f58924890b841ee31ae9678ee808387f8e91ee484e2d28d15a9ec8fc272194e7",
+    "artifacts/v10-runway-taxi/fresh_new/fresh_apr_oct_validation.json": "80c4c6d8f311c24b9bbe3fe66a15aad5ce292c3ce808a0cc2a78d79588d55e94",
+    "artifacts/v11-taxi-flow-expert/protocol.json": "b359787a47fe0c3fe60294e954856b109b797e07dabaa060472055c50dda7e39",
+    "v11_taxi_interval_flow_expert.py": "8d2027973780495bb7f4715aa4a665889020f6250903211ee80f2e4e73258298",
+    "artifacts/v11-taxi-flow/training_taxi_interval_flow_features.parquet": "093cdd432177de02ce798e30bdc071536ed6c735dbd783c5638dc717c05d4ab4",
+    "artifacts/v11-taxi-flow/protocol.json": "722cc5367239a24363689b28ee24b462a3be46f1d1162a5f7e83b8c144fece53",
+    "artifacts/v11-taxi-flow/feature_build.json": "b14be666e965a64334577aa4d81356223f3703caeabf4a3b49a59bb31ffb7f9b",
+    "taxi_interval_flow_features.py": "99c0e0c3ae6f1a73b01fd39517a7524f6deb40fc455bf79ef993487277d1e3ef",
+    "artifacts/v11-taxi-flow-expert/validation.json": "cf006ccc67867406994bf6bf2978089640e36d22f9f1442d771e9a311add11b5",
+    "artifacts/v11-taxi-flow-expert/validation_predictions.parquet": "a91d47c4102bea2964968ba9610eb7f41868c76ed3db300c2b00123892933a26",
+    "artifacts/v11-taxi-flow-expert/frozen_v7_oof_reference.parquet": "372443f5a09b576031dc6192f4855ce54f09c93a88a559e14b1325e5e7db144d",
+    "artifacts/v11-taxi-flow-expert/seasonal_jan_jul_oof.parquet": "4d37a22f29e6877573553622402baaa5b0a1104677bdf121bdc051eafb85fab3",
+    "artifacts/v11-taxi-flow-expert/seasonal_jan_jul.cbm": "6aafaed4305921bf3403ff9ad711b571860201e2ce296d8b673ace577abad7ca",
+    "artifacts/v11-taxi-flow-expert/seasonal_jan_jul_validation.json": "593b9cf1544640d9915a998f1d1a8995e1a1f76640fe2fbc8d1de985bea31ab4",
+    "artifacts/v11-taxi-flow-expert/seasonal_jan_jul_provenance.json": "4a6beb41b794c18b4dbe3f6b9fe8e0d74fa000e7179c7594f9e5feb9b8b17b8c",
+    "artifacts/v11-taxi-flow-expert/forward_nov_dec_oof.parquet": "867739c63b8800bff1932d65a2b48b1b6db44016d6b0d7a067ba9fb04847cb61",
+    "artifacts/v11-taxi-flow-expert/forward_nov_dec.cbm": "56de61d43c55398f6c3be375c7f162580dabba17d4dbfce82d8bd81ba365ebff",
+    "artifacts/v11-taxi-flow-expert/forward_nov_dec_validation.json": "606c18f41ac1d911317c531d2fb13313111a7cd26af4030cca71955bd69566c1",
+    "artifacts/v11-taxi-flow-expert/forward_nov_dec_provenance.json": "b3ef5a41e489fb134d65ba37b1354536f9c817d243a8abdedb6f10433699f02e",
+    "reports/taxi_flow_model_spec_v11.json": "404f315d23eebe995535f2d58dc17f170d48ced41607d38dfdb7af7db11e3709",
+    "artifacts/v11-taxi-flow-expert/fresh_audit.json": "1d905eb770121da1d4ea4f848c3dcb919eea6321197258a843ccfb8e510220f4",
+    "artifacts/v11-taxi-flow-expert/fresh_audit_predictions.parquet": "d397d058db76d2546f9f6940da8184254372bfc79c3d8fadd3890ee24043d027",
+    "artifacts/v11-taxi-flow-expert/fresh_new/fresh_apr_oct_oof.parquet": "d01ab1b2b6fdb1caab5d4a4dc16d92d4de97ac174430c1d5b6c17c507d60b2d7",
+    "artifacts/v11-taxi-flow-expert/fresh_new/fresh_apr_oct_provenance.json": "480960683a37afd64b76119189ae4a79f6cb9b83278136c6167767c6f7d21c1b",
+    "artifacts/v11-taxi-flow-expert/fresh_new/fresh_apr_oct.cbm": "4738f622a40dc7d730ac914ceb46047d0a513a1420cda5f7d29689e1e2906d95",
+    "artifacts/v11-taxi-flow-expert/fresh_new/fresh_apr_oct_validation.json": "ab56ad2965bc49b6f44555a84dddcde62f266f1ec5b643f17dad159f863a6b97"
+  },
+  "rows_all_finite": 672428,
+  "valid_aobt_rows": 663664,
+  "missing_clock_rows": 7841,
+  "months_scored": [
+    1,
+    7,
+    11,
+    12
+  ],
+  "fresh_eligibility_months": [
+    4,
+    10
+  ],
+  "reserved_months_unscored": [
+    5,
+    9
+  ],
+  "february_august_not_used_for_selection": true,
+  "scores": {
+    "current": {
+      "eligible": true,
+      "seasonal_all_finite_rmse": 321.3892648508644,
+      "forward_all_finite_rmse": 213.44331763636305,
+      "selected_weight": 0.0
+    },
+    "v10": {
+      "eligible": true,
+      "selected_weight": 0.25,
+      "seasonal_all_finite_rmse": 321.20628919968334,
+      "forward_all_finite_rmse": 212.94104164067636,
+      "compatibility_scores": {
+        "seasonal_jan_jul": {
+          "rows": 344419,
+          "current_rmse": 321.3892648508644,
+          "candidate_rmse": 321.20628919968334,
+          "day_bootstrap": {
+            "days": 62,
+            "repeats": 1000,
+            "gain_ci95_sec": [
+              0.11987787588266059,
+              0.2619384256510045
+            ],
+            "fraction_positive": 1.0,
+            "observed_gain_sec": 0.18297565118103876
+          },
+          "passed": true
+        },
+        "forward_nov_dec": {
+          "rows": 328009,
+          "current_rmse": 213.44331763636305,
+          "candidate_rmse": 212.94104164067636,
+          "day_bootstrap": {
+            "days": 61,
+            "repeats": 1000,
+            "gain_ci95_sec": [
+              0.3936805265593236,
+              0.6272458360896366
+            ],
+            "fraction_positive": 1.0,
+            "observed_gain_sec": 0.5022759956866878
+          },
+          "passed": true
+        }
+      }
+    },
+    "v11": {
+      "eligible": true,
+      "selected_weight": 0.5,
+      "seasonal_all_finite_rmse": 320.99396221215926,
+      "forward_all_finite_rmse": 212.6982285550322,
+      "compatibility_scores": {
+        "seasonal_jan_jul": {
+          "rows": 344419,
+          "current_rmse": 321.3892648508644,
+          "candidate_rmse": 320.99396221215926,
+          "day_bootstrap": {
+            "days": 62,
+            "repeats": 1000,
+            "gain_ci95_sec": [
+              0.2416268973775658,
+              0.5867042984733429
+            ],
+            "fraction_positive": 1.0,
+            "observed_gain_sec": 0.39530263870511817
+          },
+          "passed": true
+        },
+        "forward_nov_dec": {
+          "rows": 328009,
+          "current_rmse": 213.44331763636305,
+          "candidate_rmse": 212.6982285550322,
+          "day_bootstrap": {
+            "days": 61,
+            "repeats": 1000,
+            "gain_ci95_sec": [
+              0.5505724953628104,
+              0.9681439920967106
+            ],
+            "fraction_positive": 1.0,
+            "observed_gain_sec": 0.7450890813308604
+          },
+          "passed": true
+        }
+      }
+    }
+  },
+  "terminal_routes": {
+    "v10": {
+      "route": "v10",
+      "original_passed": true,
+      "fresh_passed": true,
+      "compatibility_passed": true,
+      "selected_weight": 0.25,
+      "original_validation_sha256": "238f34ad69690ddd4173545ced474ae196568d6b1f6d0669e5c1d7b41315aa78",
+      "original_protocol_sha256": "b83783bf2c58403403de9c7edc65ab91d47d68874a08fbda796212c2abf34cfd",
+      "reason": null,
+      "fresh_audit_sha256": "bc10490b8ad7a7fda869f293c66643c60ca474f92433755be907f2eb646f4f99",
+      "compatibility_scores": {
+        "seasonal_jan_jul": {
+          "rows": 344419,
+          "current_rmse": 321.3892648508644,
+          "candidate_rmse": 321.20628919968334,
+          "day_bootstrap": {
+            "days": 62,
+            "repeats": 1000,
+            "gain_ci95_sec": [
+              0.11987787588266059,
+              0.2619384256510045
+            ],
+            "fraction_positive": 1.0,
+            "observed_gain_sec": 0.18297565118103876
+          },
+          "passed": true
+        },
+        "forward_nov_dec": {
+          "rows": 328009,
+          "current_rmse": 213.44331763636305,
+          "candidate_rmse": 212.94104164067636,
+          "day_bootstrap": {
+            "days": 61,
+            "repeats": 1000,
+            "gain_ci95_sec": [
+              0.3936805265593236,
+              0.6272458360896366
+            ],
+            "fraction_positive": 1.0,
+            "observed_gain_sec": 0.5022759956866878
+          },
+          "passed": true
+        }
+      }
+    },
+    "v11": {
+      "route": "v11",
+      "original_passed": true,
+      "fresh_passed": true,
+      "compatibility_passed": true,
+      "selected_weight": 0.5,
+      "original_validation_sha256": "cf006ccc67867406994bf6bf2978089640e36d22f9f1442d771e9a311add11b5",
+      "original_protocol_sha256": "b359787a47fe0c3fe60294e954856b109b797e07dabaa060472055c50dda7e39",
+      "reason": null,
+      "fresh_audit_sha256": "1d905eb770121da1d4ea4f848c3dcb919eea6321197258a843ccfb8e510220f4",
+      "compatibility_scores": {
+        "seasonal_jan_jul": {
+          "rows": 344419,
+          "current_rmse": 321.3892648508644,
+          "candidate_rmse": 320.99396221215926,
+          "day_bootstrap": {
+            "days": 62,
+            "repeats": 1000,
+            "gain_ci95_sec": [
+              0.2416268973775658,
+              0.5867042984733429
+            ],
+            "fraction_positive": 1.0,
+            "observed_gain_sec": 0.39530263870511817
+          },
+          "passed": true
+        },
+        "forward_nov_dec": {
+          "rows": 328009,
+          "current_rmse": 213.44331763636305,
+          "candidate_rmse": 212.6982285550322,
+          "day_bootstrap": {
+            "days": 61,
+            "repeats": 1000,
+            "gain_ci95_sec": [
+              0.5505724953628104,
+              0.9681439920967106
+            ],
+            "fraction_positive": 1.0,
+            "observed_gain_sec": 0.7450890813308604
+          },
+          "passed": true
+        }
+      }
+    }
+  },
+  "selected_route": "v11",
+  "selected_weight": 0.5,
+  "evaluation_predictions_sha256": "2626c43410bc6c03c8cc3a91855bd9c8dbe3b117bb181903bf4afd6378a466d6",
+  "decision": "sealed_for_separate_may_september_guard",
+  "ranking_authorized": false
+}
