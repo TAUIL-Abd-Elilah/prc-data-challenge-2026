@@ -294,3 +294,11 @@ The v8 April/October audit is running next with its original 0.25 weight. Its v7
 python movement_only_expert.py --mode fresh-audit
 python movement_only_expert.py --mode reserved-audit
 ```
+
+### Terminal v8 combination decision
+
+The original LightGBM April/October audit passed at fixed weight 0.25 on all 357,813 eligible rows: paired RMSE 198.491222 → 196.892042 seconds, with UTC-day gain interval [1.296352, 1.883122]. The original complementary-fold gates remain positive. Exact aggregate copies are `reports/lightgbm_fresh_audit_v8.json` and `reports/lightgbm_validation_v8_complete.json`.
+
+The separately frozen v7 combination was then evaluated without choosing another weight. January/July improves 322.310529 → 321.858278 seconds with gain interval [0.218506, 0.730483]. April/October improves 195.888222 → 195.264389 with interval [0.366230, 0.890854]. November/December improves only 215.198602 → 215.174044, and its interval [-0.152834, 0.211483] crosses zero. The mandatory combination gate therefore fails; the LightGBM replacement is excluded from this portfolio without retuning. The full aggregate is `reports/combination_validation_v8.json`. Together with v9b's failed original folds, this leaves v7 as the eligible valid-AOBT policy.
+
+The selector initially refused because its v7 master was aligned to chronological baseline order while the saved expert OOFs were concatenated by fold. All 672,428 unique IDs, targets, folds, months, gates and UTC timestamps were exactly equal after alignment by ID. Its operational fix now proves the complete unique ID set, aligns the expert to the master with a one-to-one join, and then performs every existing metadata and unchanged-row check. It does not rewrite OOF files or change scores, weights or eligibility. Independent synthetic checks reject duplicate, missing, extra and null IDs. The repair is published before the selection receipt is created.

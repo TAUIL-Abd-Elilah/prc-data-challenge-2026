@@ -1,0 +1,26 @@
+{
+  "months": [
+    4,
+    10
+  ],
+  "weight": 0.25,
+  "n_valid_aobt": 357813,
+  "coverage_verified": true,
+  "prior_rmse": 198.49122204044616,
+  "candidate_rmse": 196.89204192627673,
+  "bootstrap": {
+    "days": 61,
+    "repeats": 1000,
+    "gain_ci95_sec": [
+      1.2963519613052241,
+      1.883121793659015
+    ],
+    "fraction_positive": 1.0,
+    "observed_gain_sec": 1.5991801141694282
+  },
+  "passed": true,
+  "prior_oof_sha256": "7d252edb4b3abf158830367633b56d5e68d03d0a387b98edae18d79fa50f225d",
+  "new_oof_sha256": "7b707e61c1ce3e4fd5479fe42b8964d7479dd814735e9c917e10a3a6b36fb724",
+  "paired_sha256": "795fba02ced8aeb3d520f9b87b7786d68ee47f8e4adb5df23495cdaabb768bda",
+  "scope": "paired architecture comparison, not full v6 ensemble OOF"
+}

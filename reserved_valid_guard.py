@@ -156,6 +156,12 @@ def select_policy(args: argparse.Namespace) -> dict:
             frame = pd.read_parquet(path, columns=[*columns[:-1],
                                                    item["prediction_column"]])
             exact_ids(frame.MVT_ID_mvt, v7.MVT_ID_mvt, f"portfolio {name} OOF")
+            # The v7 master was aligned to chronological baseline row order;
+            # saved expert OOFs use fold-concatenated order. After exact unique
+            # ID-set proof, align by ID before comparing every metadata field.
+            frame = v7[["MVT_ID_mvt"]].merge(
+                frame, on="MVT_ID_mvt", how="left", sort=False,
+                validate="one_to_one")
             if (not frame.MVT_ID_mvt.equals(v7.MVT_ID_mvt)
                     or not np.allclose(frame.target, v7.target, rtol=0, atol=1e-6)
                     or not np.array_equal(frame.fold.to_numpy(), v7.fold.to_numpy())

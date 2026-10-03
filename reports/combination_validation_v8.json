@@ -1,0 +1,107 @@
+{
+  "protocol": {
+    "purpose": "Fixed v7+v8 local OOF comparison, no training or leaderboard feedback",
+    "prerequisite": "Both standalone v7 and v8 reports promoted under their own frozen gates",
+    "reference": "same frozen v6 all-finite 2025 OOF movement IDs and labels",
+    "source_protocol_sha256": {
+      "v7": "27de40f395a76c98fb2fda5d2de4b677d0a2a7ddf43538234e3ca2d6b83a0680",
+      "v8": "437f6615cee18732291cb627b9534fda127824be161c19dd7357a3dd6fe21f18"
+    },
+    "existing_fold_policy": {
+      "months": {
+        "seasonal_jan_jul": [
+          1,
+          7
+        ],
+        "forward_nov_dec": [
+          11,
+          12
+        ]
+      },
+      "base": "v7 clipped candidate on every finite row",
+      "expert": "v8 raw OOF expert on exact valid-AOBT IDs",
+      "weight": "v8 standalone January/July-selected weight, unchanged",
+      "formula": "clip(v7_candidate + weight*(v8_expert-v7_candidate), lower=0) only on valid AOBT",
+      "gate": "RMSE improvement and UTC-day bootstrap 95% lower gain >0 separately in both folds"
+    },
+    "fresh_audit_policy": {
+      "months": [
+        4,
+        10
+      ],
+      "base": "v7 saved fixed fresh blend: depth10 ARR prior + v7 selected weight*(v7 fresh expert-prior)",
+      "expert": "v8 separately refitted April/October raw fresh expert",
+      "weight": "same v8 standalone January/July-selected weight",
+      "formula": "clip(v7_fresh_base + weight*(v8_fresh_expert-v7_fresh_base), lower=0)",
+      "gate": "exact valid-AOBT IDs, aligned labels/time, positive paired UTC-day bootstrap 95% lower gain"
+    },
+    "decision": "accept fixed combination only if both existing folds and fresh paired audit pass; otherwise reject combination without retuning",
+    "limitations": "Repeated 2025 comparison decisions; no untouched 2026 accuracy estimate."
+  },
+  "weight": 0.25,
+  "folds": {
+    "seasonal_jan_jul": {
+      "n": 344419,
+      "v7_rmse": 322.3105287178819,
+      "combined_rmse": 321.8582781045662,
+      "bootstrap": {
+        "days": 62,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          0.21850594151498087,
+          0.7304825575940257
+        ],
+        "fraction_positive": 1.0,
+        "observed_gain_sec": 0.45225061331569805
+      },
+      "passed": true
+    },
+    "forward_nov_dec": {
+      "n": 328009,
+      "v7_rmse": 215.19860172054857,
+      "combined_rmse": 215.17404363142887,
+      "bootstrap": {
+        "days": 61,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          -0.152833692161429,
+          0.21148303991679568
+        ],
+        "fraction_positive": 0.612,
+        "observed_gain_sec": 0.024558089119693705
+      },
+      "passed": false
+    }
+  },
+  "fresh_audit": {
+    "n": 357813,
+    "v7_rmse": 195.88822176558412,
+    "combined_rmse": 195.2643893078722,
+    "bootstrap": {
+      "days": 61,
+      "repeats": 1000,
+      "gain_ci95_sec": [
+        0.36623007581125433,
+        0.8908537840591477
+      ],
+      "fraction_positive": 1.0,
+      "observed_gain_sec": 0.6238324577119272
+    },
+    "passed": true
+  },
+  "accepted": false,
+  "source_sha256": {
+    "v7_validation": "a382b46fa064b811e1a83d5c4eda93f3b783db1f2b2e652ed10fd69e2e0694e8",
+    "v8_validation": "7cb94d4b7c8f86637fc949834d44145406f78727f593a5178a9ec2ef12ae2413",
+    "v7_oof": "a5e1e8911f30d1c346be17b6b2d666c2571cfa7eb8727a85c082d9b0bab8d095",
+    "v8_oof": "359016dec9af817e797557bf43bf000a62e097f79539032899c89a6bc83c05c4",
+    "v7_fresh": "d1b204ceaec7693d0e6a916dc2e9e721d504d7d7f0c5026dbeaf79fdafcb35e1",
+    "v8_fresh": "795fba02ced8aeb3d520f9b87b7786d68ee47f8e4adb5df23495cdaabb768bda",
+    "prior_fresh": "7d252edb4b3abf158830367633b56d5e68d03d0a387b98edae18d79fa50f225d",
+    "v6_reference": "a249be9ff5a4d26a8f7c1afe415d09180328ee2a922839c3b9c77d4790e954ed"
+  },
+  "output_sha256": {
+    "existing_oof": "79c84dbacfe1019dd4f2d789f32bc9bfb077db3f6774032d04260e149b8fdfb4",
+    "fresh_oof": "77dbf9cfa5fc1e56dbebafe27210c66178d4601f7bd0ded105f115ed4540be55"
+  }
+}
