@@ -1,0 +1,19 @@
+{
+  "final_rounds": 931,
+  "fold_best_rounds": {
+    "seasonal_jan_jul": 876,
+    "forward_nov_dec": 987
+  },
+  "training_rows": 2084094,
+  "feature_count": 79,
+  "selected_weight": 1.0,
+  "model_sha256": "a05e1e062d2598953ef22404524cff482c76ab413536054861658ce81065bc32",
+  "features_manifest_sha256": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4f8d6084825",
+  "validation_sha256": "a378ff065ed140ab3f01ef8867db81227d1db0ec02f18ed32bcc8567e28023f3",
+  "fresh_audit_sha256": "083fbc90551c46ec7084c9767b7710bb5764a0b478cf3743f9977d8d36ec0be0",
+  "reserved_audit_sha256": "5839fbdbd11f19e9d4d4c5ce349052caa1eb0289568eab1575c07d141d384132",
+  "reference_sha256": "036da1502f4ae68238927e31a0479b9cb82a6fb31b7acdbab26aa0657b7a67f8",
+  "audit_passed": true,
+  "reserved_guard_passed": true,
+  "ranking_prediction_created": false
+}

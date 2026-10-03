@@ -312,3 +312,33 @@ python reserved_valid_guard.py --mode select-policy
 python compose_current_candidate.py --mode validate
 python movement_only_expert.py --mode fit-final
 ```
+
+### Prospective departure interval-flow experiment
+
+`taxi_interval_flow_features.py` defines ten original numeric features inspired by the [MIT taxi queue study](https://dspace.mit.edu/entities/publication/f0891972-627a-409e-9fbc-2e12fe4ba28b). For both airport and airport/runway scopes, it counts other takeoffs and quality-valid proxy starts strictly between the query's released NM AOBT and takeoff; valid proxy intervals active at takeoff; intervals starting later but finishing earlier; and intervals starting earlier but finishing later. These are retrospective proxy relationships, not measured runway queues. No paper code or data are reused.
+
+The DEP phase filter precedes the strict ID, airport, runway, MVT and AOBT projection. Departure block/taxi labels are never read. IDs only align rows and prove uniqueness. Each proxy interval must be nonnegative and at most 7,200 seconds. Strict inequalities exclude the query and define timestamp ties. Missing groups and invalid queries produce NaNs. The builder freezes all raw/baseline/source hashes, stages output, rechecks inputs and publishes exclusively. The full build has a 4 GiB launch floor and O(n log n) sweeps. Synthetic brute-force checks cover 18 hand-built cases, 160 random rows and six extreme timestamp cases; peer review found and repaired integer overflow and out-of-range date conversion before any data construction. The fixed specification is `reports/taxi_interval_flow_spec_v11.json`.
+
+`v11_taxi_interval_flow_expert.py` preserves the v7 residual trainer, adding exactly those ten fields. It uses the same coarse January/July weight choice, unchanged November/December check and independently refitted April/October gate as v10, with its own fixed bootstrap seed. Its prospective specification is `reports/taxi_flow_model_spec_v11.json`. Both v10 and v11 now verify fixed trainer parameters and all transitive feature sources, recheck source hashes around each fit, and require main/fresh fold provenance receipts covering exact feature schema, categories, model settings, tree counts and output hashes. Post-fit large frames are released before evaluation. The existing v10 scientific specification is unchanged. Neither new family has been fitted or scored; final and ranking modes still refuse.
+
+The later choice between v10, v11 and the unchanged current policy is frozen before their model comparisons in `reports/later_feature_portfolio_protocol.json`. Original and April/October gates plus exact fixed composition checks precede selection; the selected route is then locked before one May/September paired refit guard. Guard failure retains the current policy without alternative switching or retuning. These are component checks after repeated 2025 exploration, and no leaderboard outcome selects a model.
+
+```powershell
+python taxi_interval_flow_features.py synthetic
+python taxi_interval_flow_features.py prepare
+python taxi_interval_flow_features.py build
+python v11_taxi_interval_flow_expert.py --mode prepare
+python v11_taxi_interval_flow_expert.py --mode fit-folds
+python v11_taxi_interval_flow_expert.py --mode fresh-audit
+```
+
+Run full builds and fitting stages serially. The later portfolio's guard and final implementation remain required before a later candidate can be submitted.
+
+
+### Version 8 finalized, quota pending
+
+The 931-round movement-only final fit completed on 2,084,094 eligible ordinary 2025 rows. Its model SHA-256 is `a05e1e062d2598953ef22404524cff482c76ab413536054861658ce81065bc32`; `reports/movement_only_final_model.json` is the exact fit receipt. The historical `ranking_prediction_created: false` field describes the moment that fit receipt was written. Later ranking generation and assembly completed and are separately recorded in `reports/movement_only_ranking_manifest.json`, `reports/movement_only_ranking_inputs.json`, `reports/current_candidate_ranking_manifest.json` and `reports/current_candidate_ranking_sources.json`.
+
+`merry-mushroom_v8.parquet` contains all 344,841 template rows in original order, with finite nonnegative predictions. Exactly 4,907 missing-clock rows change from accepted v7; every other prediction is bitwise unchanged. The finalized SHA-256 is `8fc6519610a573dd77a4b5ca18f49ab816a564754db13d26d91f26b53d04b9e5` and size is 4,707,529 bytes; the exact seal is `reports/submission_v8_finalized_manifest.json`. The failed LightGBM combination is absent from this file.
+
+No version 8 upload or official score exists yet. At 2026-10-03 02:24 UTC the conservative preceding-24-hour check found five submissions and refused upload (`reports/submission_quota_v8.json`). Its next count slot is after 13:46:52.428 UTC; a fresh quota and bucket check is required before upload. Best accepted v7 remains RMSE 278.7888 seconds, last verified at rank 69 on October 2 at 23:01 UTC. Ranking feedback has not selected any model or weight.

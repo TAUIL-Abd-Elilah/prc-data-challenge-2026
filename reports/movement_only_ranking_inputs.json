@@ -1,0 +1,29 @@
+{
+  "purpose": "Immutable source inventory before movement-only ranking feature reads",
+  "inputs": {
+    "raw_ranking": {
+      "path": "data\\ranking.parquet",
+      "sha256": "9db75e3a56fa09b87aab72e191a53da3fe763d9887ad2b23aea9cde6a6325f86"
+    },
+    "baseline_ranking_rows": {
+      "path": "artifacts\\baseline\\ranking_rows.parquet",
+      "sha256": "da1a018792fba6531616fd32e5bcb4021dac0690676ea28a5eefdbb021c28235"
+    },
+    "baseline_ranking_features": {
+      "path": "artifacts\\baseline\\ranking_features.parquet",
+      "sha256": "4761235dc63160998955d09de234e5a733aeb78b8d52a2a574ebbb7f40dee38a"
+    },
+    "released_arrival_ranking_cache": {
+      "path": "artifacts\\v5-arrival-clean\\ranking_arrival_features.parquet",
+      "sha256": "f7dad5ee2b62b38d41d4d7aef2fcb465a26150b9580f4cb6fee78ea8daec2bcc"
+    },
+    "noaa_weather": {
+      "path": "data\\external\\weather.parquet",
+      "sha256": "cf8b9d15f38a9f516cf47d18974caae87b1c9aba48cc3bf112853d49ab8cb925"
+    },
+    "submission_template": {
+      "path": "data\\submitting.parquet",
+      "sha256": "0d383408ed5ac27bfcfd12d6b961cee77c8a6364b10dad9fe3ec81115c79652b"
+    }
+  }
+}

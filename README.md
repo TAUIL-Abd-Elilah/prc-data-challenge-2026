@@ -135,6 +135,24 @@ python finalize_submission.py --predictions artifacts/v7-runway-traffic/predicti
 python submission_quota.py --submission submissions/merry-mushroom_v7.parquet --report reports/submission_quota_v7.json
 ```
 
+## Reproduce v8 local candidate
+
+After the v7 pipeline and the frozen v8 candidate audits in [RESEARCH.md](RESEARCH.md), run the selected missing-clock route and guarded composition:
+
+```powershell
+python reserved_valid_guard.py --mode select-policy
+python compose_current_candidate.py --mode validate
+python movement_only_expert.py --mode fit-final
+python movement_only_expert.py --mode freeze-ranking-inputs
+python movement_only_expert.py --mode final-predict --ranking-reference artifacts/v7-runway-traffic/predictions.parquet --reference-sha256 314e5dcc537b46954744ddc02018c7e2a65cd1dfe10be8e13da313c69eb0b0eb
+python compose_current_candidate.py --mode assemble
+python finalize_submission.py --predictions artifacts/current-candidate/predictions.parquet --team merry-mushroom --version 8
+```
+
+The selected valid-AOBT route is unchanged v7. V8 adds only the fixed movement-only direct predictor for invalid-AOBT records lacking NM off-block clocks outside Rome. It was trained on 2,084,094 ordinary 2025 departures for 931 rounds and changes 4,907 of 344,841 ranking rows. The composed 2025 comparison improves all-finite RMSE from 322.311 to 321.389 seconds on January/July and from 215.199 to 213.443 on November/December, with positive paired UTC-day intervals. The final local submission SHA-256 is `8fc6519610a573dd77a4b5ca18f49ab816a564754db13d26d91f26b53d04b9e5`. It has **not been uploaded or officially scored**.
+
+The public aggregate provenance bundle includes `reports/movement_only_final_model.json`, `reports/movement_only_ranking_manifest.json`, `reports/current_candidate_ranking_manifest.json`, `reports/current_candidate_ranking_sources.json`, and `reports/submission_v8_finalized_manifest.json`. The alternative v8 LightGBM expert passed standalone validation but its fixed combination with v7 failed the November/December confidence gate; it is excluded. The separate valid-AOBT movement route also failed. No validation result guarantees a 2026 score or prize.
+
 ## Submit with MinIO Client
 
 The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized file for the selected version. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.
@@ -144,7 +162,7 @@ $mc = Join-Path $env:TEMP 'mc-community.exe'
 Invoke-WebRequest 'https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe' -OutFile $mc
 if ((Get-FileHash $mc -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c8db13ebeda31497f354c0e950809db0ae9b2a2a69b8afee68c128c37300c157') { throw 'MinIO Client checksum mismatch' }
 & $mc alias set opensky 'https://s3.opensky-network.org/' '<ACCESS_KEY>' '<SECRET_KEY>'
-$version = 7
+$version = 8
 $filename = "merry-mushroom_v$version.parquet"
 python submission_quota.py --mc $mc --submission "submissions/$filename"
 if ($LASTEXITCODE -ne 0) { throw 'Submission quota check failed' }
@@ -175,13 +193,13 @@ The accepted v7 submission improved the team's official score by 1.6912 seconds 
 
 Ranks count distinct teams with a lower best score, plus one. They are leaderboard snapshots, and first place has not been achieved. The scores are available from the [official team results API](https://datacomp.opensky-network.org/api/competitions/bb3693e1-26bc-4a9e-8619-4fe78b4eab0c/leaderboard?teamName=merry-mushroom&limit=200).
 
-After v7, the conservative preceding-24-hour upload count is five. The next count slot opens at **2026-10-03 13:46:52.428 UTC**. Each future file still needs a fresh quota/version/size check before upload. The post-upload audit is [reports/submission_quota_after_v7.json](reports/submission_quota_after_v7.json); it intentionally rejects re-uploading the already stored v7 file. Local research continues while quota is closed.
+After v7, the conservative preceding-24-hour upload count is five. The next count slot opens after **2026-10-03 13:46:53 UTC**; rerun the quota check before any v8 upload. The local v8 file is finalized but remains unsubmitted. The post-upload audit is [reports/submission_quota_after_v7.json](reports/submission_quota_after_v7.json); it intentionally rejects re-uploading the already stored v7 file.
 
 The synthetic pipeline check is `python tests/smoke.py`. It tests execution and Parquet alignment; its generated RMSE has no competition meaning.
 
 ## Current local research
 
-The fixed missing-clock movement expert passed its original January/July and November/December comparisons, followed by independently refitted April/October and February/August component audits. Both months improved in each audit, with positive pooled UTC-day confidence intervals. The original weight remains 1.0 and final training remains 931 rounds. Exact aggregate results are [fresh audit](reports/movement_only_fresh_audit.json) and [reserved audit](reports/movement_only_reserved_audit.json). Final fitting, guarded composition and upload are still pending. The separate valid-AOBT movement route failed and is excluded. The LightGBM expert passed its standalone gates, but its fixed v7 combination failed the November/December confidence bound and is also excluded; see [combination evidence](reports/combination_validation_v8.json). See [RESEARCH.md](RESEARCH.md) for the frozen protocols and commands; accepted v7 remains the submitted solution.
+The missing-clock movement expert passed its original folds and independently refitted April/October and February/August component audits. Their aggregate results are the [fresh audit](reports/movement_only_fresh_audit.json) and [reserved audit](reports/movement_only_reserved_audit.json). The fixed v7 composition also passed both original folds. The rejected valid-AOBT alternatives and later research are documented in [RESEARCH.md](RESEARCH.md); the [combination evidence](reports/combination_validation_v8.json) records the LightGBM rejection. V7 remains the latest officially scored submission, at 278.7888 seconds RMSE and 69th at the last verified snapshot.
 
 ## Improving a submission
 

@@ -1,0 +1,62 @@
+{
+  "status": "Frozen before any v10 or v11 scored model comparison",
+  "baseline": "The current locally accepted policy: v7 on valid AOBT, guarded weight-1 movement correction on the disjoint missing-clock mask",
+  "alternatives": [
+    "Unchanged current policy",
+    "v10 same-runway ARR taxi expert",
+    "v11 released departure interval-flow expert"
+  ],
+  "model_specifications": [
+    "reports/runway_taxi_model_spec_v10.json",
+    "reports/taxi_flow_model_spec_v11.json"
+  ],
+  "weights": "Each alternative keeps its own already specified January/July-selected coarse weight; no additional weight search",
+  "prerequisites": "Each alternative must pass its fixed original January/July and November/December model gates and matched April/October audit",
+  "compatibility_formula": "On valid-AOBT rows, use clip(v7_candidate + fixed_weight*(new_raw_expert-v7_candidate),0); retain the current missing-clock correction and every other current prediction exactly",
+  "compatibility_gate": "Exact common 672428 unique finite-label OOF IDs, labels, folds, months, timestamps and masks; positive all-finite RMSE gain and paired UTC-day 95% gain lower bound separately on January/July and November/December against the current policy",
+  "compatibility_bootstrap": {
+    "repeats": 1000,
+    "seed": 20261014
+  },
+  "selection": "After both alternatives are terminal, choose the minimum common-universe January/July RMSE among passing compatible alternatives; ties favor unchanged current policy, then v10, then v11",
+  "freeze": "Publish and seal the selected route and unchanged weight before scoring May/September",
+  "reserved_guard": {
+    "months": [
+      5,
+      9
+    ],
+    "comparator": "Refit the unchanged v7 174-feature depth-10 residual architecture with May/September excluded from fitting and internal early stopping",
+    "replacement": "Refit only the selected 184-feature architecture with the same exclusions and its unchanged published CatBoost parameters",
+    "prediction": "Compare clipped raw v7 refit with clip(v7_raw + fixed_weight*(new_raw-v7_raw),0) on every finite-label valid-AOBT May/September row",
+    "gate": "Each month improves RMSE; pooled paired UTC-day 95% gain lower bound is positive; exact heldout coverage and model/source/prediction provenance are mandatory",
+    "bootstrap": {
+      "repeats": 1000,
+      "seed": 20261014
+    },
+    "failure": "Retain the current policy; do not retune the failed formula or select another alternative using the guard result",
+    "scope": "Fixed component architecture check; legacy training and prior data-quality checks mean this is not an untouched complete ensemble performance estimate"
+  },
+  "february_august": "No outcome on these labels selects the v10/v11 features, architecture, weights or routes",
+  "final_fit": "Only a selected guarded replacement may fit all eligible 2025 rows; use the integer median of its two original complementary-fold tree counts",
+  "ranking": "Preserve the fixed missing-clock correction and all rows outside valid AOBT exactly; exact template order, finite nonnegative values, source/model/input hashes and readback proof precede finalization",
+  "publication_and_submission": "Publish source, fixed selection and aggregate evidence before CLI submission; fresh official quota, increasing version and bucket size checks apply",
+  "leaderboard_use": "Receipts and ranks only report progress after policy and file freezing; no leaderboard feedback selects models, weights, routes or checks",
+  "frozen_input_sha256": {
+    "reports/current_selected_policy.json": "671d84a53b0d04c708f8b16e60a46af32819390e3e1ddcfd7b4b8b9edba70112",
+    "reports/current_composition_validation.json": "7215a66936b92bf65f70f07d05c0cbec88867c5adb71981a6536a445f7b38d36",
+    "artifacts/current-candidate/protocol.json": "bdd0ddb07a2ba1108c9162d642699408a4e071f60b36c81caf2071141ce62f3c",
+    "artifacts/current-candidate/validation_predictions.parquet": "575f1b5e8046135b92c5d051c0272045416d01078da0f4372c379c86d79a7f92",
+    "artifacts/current-candidate/predictions.parquet": "8fc6519610a573dd77a4b5ca18f49ab816a564754db13d26d91f26b53d04b9e5",
+    "artifacts/v7-runway-traffic/validation_predictions.parquet": "a5e1e8911f30d1c346be17b6b2d666c2571cfa7eb8727a85c082d9b0bab8d095",
+    "artifacts/v7-runway-traffic/validation.json": "a382b46fa064b811e1a83d5c4eda93f3b783db1f2b2e652ed10fd69e2e0694e8",
+    "reports/runway_taxi_model_spec_v10.json": "32514d6a4b5816d3858663f171f04bea2d1332f92f267ca1cdf18bd5f8683beb",
+    "reports/taxi_flow_model_spec_v11.json": "404f315d23eebe995535f2d58dc17f170d48ced41607d38dfdb7af7db11e3709",
+    "reports/runway_arrival_taxi_protocol_v10.json": "2ebfe35cb4d159597fb08556d8e0df0414e6cb879a91a7aa921b575dbca56572",
+    "reports/taxi_interval_flow_spec_v11.json": "4fb40aad744050007649f0698e52ffb6b739542acdded3201acd9506f02a99ab",
+    "v10_runway_taxi_expert.py": "bd25c47d81021d38e7e9c1ea464dcc0699bc10a447130a5752eee60b60b2e9de",
+    "v11_taxi_interval_flow_expert.py": "8d2027973780495bb7f4715aa4a665889020f6250903211ee80f2e4e73258298",
+    "runway_arrival_taxi_features.py": "8c8527d63eaf28fa1cefabf4a6b3bdd21e7c1d2f2ceac5e04977de703aac96a0",
+    "taxi_interval_flow_features.py": "99c0e0c3ae6f1a73b01fd39517a7524f6deb40fc455bf79ef993487277d1e3ef"
+  },
+  "input_integrity": "Require these exact baseline, spec and source hashes before and after all later compatibility comparisons and before sealing selection. Future implementation source is separately published and frozen before comparisons."
+}

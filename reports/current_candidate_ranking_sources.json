@@ -1,0 +1,63 @@
+{
+  "files_sha256": {
+    "composition_report": "7215a66936b92bf65f70f07d05c0cbec88867c5adb71981a6536a445f7b38d36",
+    "composition_oof": "575f1b5e8046135b92c5d051c0272045416d01078da0f4372c379c86d79a7f92",
+    "composition_protocol": "bdd0ddb07a2ba1108c9162d642699408a4e071f60b36c81caf2071141ce62f3c",
+    "current_policy": "9dca07f04ae0cf4f9da4484fce42fc962bbec54fc4ee80cfc7e41f4882488c7c",
+    "selected_policy": "671d84a53b0d04c708f8b16e60a46af32819390e3e1ddcfd7b4b8b9edba70112",
+    "template": "0d383408ed5ac27bfcfd12d6b961cee77c8a6364b10dad9fe3ec81115c79652b",
+    "raw_ranking": "9db75e3a56fa09b87aab72e191a53da3fe763d9887ad2b23aea9cde6a6325f86",
+    "baseline_ranking_rows": "da1a018792fba6531616fd32e5bcb4021dac0690676ea28a5eefdbb021c28235",
+    "baseline_ranking_features": "4761235dc63160998955d09de234e5a733aeb78b8d52a2a574ebbb7f40dee38a",
+    "weather": "cf8b9d15f38a9f516cf47d18974caae87b1c9aba48cc3bf112853d49ab8cb925",
+    "ranking_arrival_cache": "f7dad5ee2b62b38d41d4d7aef2fcb465a26150b9580f4cb6fee78ea8daec2bcc",
+    "ranking_neighbour_cache": "1931dec6be7b656ecf9980d2103677b33bd249106fa92a394525e2b4e1c3207a",
+    "ranking_runway_cache": "7f1c2bf4830dbe5526ed16c867a0552cface11d49a7f2175355f07ff190f10df",
+    "v6_ranking_reference": "3fa41955c243f2821626203b9c33f83b40f71271993f7204acdc6f0294dc161d",
+    "v7_ranking": "314e5dcc537b46954744ddc02018c7e2a65cd1dfe10be8e13da313c69eb0b0eb",
+    "v7_expert": "c87bf371fd36e5ce0609c0e95155041783e0937fa4f3666b562fc367d9738d1a",
+    "v7_model": "82393074ea395361ab4e70945ac9e7e857f6b68a77fb05c28b8d180c226183b8",
+    "v7_manifest": "d0b8e07de497f501a5ddda3d9e99c2ee8c0403401b1209b015323991b75e4a62",
+    "v7_protocol": "27de40f395a76c98fb2fda5d2de4b677d0a2a7ddf43538234e3ca2d6b83a0680",
+    "v7_validation": "a382b46fa064b811e1a83d5c4eda93f3b783db1f2b2e652ed10fd69e2e0694e8",
+    "v7_fresh_audit": "47389aa4e34dfd40e0fcde9b4368be1667f863aebda9735abb9d18b0d3dec79e",
+    "missing_predictions": "8fc6519610a573dd77a4b5ca18f49ab816a564754db13d26d91f26b53d04b9e5",
+    "missing_expert": "99ef73b2926e2ace25d45baf51387e333e0e685184f1ee71f62d77be2679e366",
+    "missing_manifest": "57d3dc7960a880905dec68e7e8440b9750469a93d9d2c26934bd477493ce83f0",
+    "missing_model": "a05e1e062d2598953ef22404524cff482c76ab413536054861658ce81065bc32",
+    "missing_fit": "04df64a00cfa55a258d6c1cd8d818ba0a33bbcac5fc8acbdfdab88d0b1c26b60",
+    "missing_ranking_inputs": "af76220f23e8ef7c5159a8a337b08d62cf60f759359e8cfff89ca46564670e9e",
+    "missing_features": "454c9c8c9220564bd9b208c666143056725541683e05da774a479f55e6083a5f",
+    "missing_features_manifest": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4f8d6084825",
+    "missing_validation": "a378ff065ed140ab3f01ef8867db81227d1db0ec02f18ed32bcc8567e28023f3",
+    "missing_fresh": "083fbc90551c46ec7084c9767b7710bb5764a0b478cf3743f9977d8d36ec0be0",
+    "missing_reserved": "5839fbdbd11f19e9d4d4c5ce349052caa1eb0289568eab1575c07d141d384132"
+  },
+  "valid_route": {
+    "chosen": "v7",
+    "active": "v7",
+    "terminal": "unchanged",
+    "selected_policy_sha256": "671d84a53b0d04c708f8b16e60a46af32819390e3e1ddcfd7b4b8b9edba70112"
+  },
+  "missing_route": {
+    "active": true,
+    "terminal": "passed",
+    "validation_sha256": "a378ff065ed140ab3f01ef8867db81227d1db0ec02f18ed32bcc8567e28023f3",
+    "fresh_audit_sha256": "083fbc90551c46ec7084c9767b7710bb5764a0b478cf3743f9977d8d36ec0be0",
+    "reserved_audit_sha256": "5839fbdbd11f19e9d4d4c5ce349052caa1eb0289568eab1575c07d141d384132",
+    "weight": 1.0
+  },
+  "valid_component": {
+    "active": "v7"
+  },
+  "missing_component": {
+    "predictions_sha256": "8fc6519610a573dd77a4b5ca18f49ab816a564754db13d26d91f26b53d04b9e5",
+    "expert_sha256": "99ef73b2926e2ace25d45baf51387e333e0e685184f1ee71f62d77be2679e366",
+    "rows_changed": 4907,
+    "gate_rows": 4907,
+    "active": true,
+    "manifest_sha256": "57d3dc7960a880905dec68e7e8440b9750469a93d9d2c26934bd477493ce83f0",
+    "model_sha256": "a05e1e062d2598953ef22404524cff482c76ab413536054861658ce81065bc32",
+    "weight": 1.0
+  }
+}

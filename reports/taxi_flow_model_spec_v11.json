@@ -1,0 +1,90 @@
+{
+  "purpose": "One 2025 local comparison of fixed released-DEP taxi interval-flow covariates",
+  "architecture": {
+    "base": "v7 depth-10 traffic CatBoost residual to own AOBT proxy",
+    "trainer": "deep_timestamp_expert.fit_fold, unchanged",
+    "depth": 10,
+    "max_iterations": 10000,
+    "random_seed": 2026,
+    "other_params": "deep_timestamp_expert.params, unchanged",
+    "effective_catboost_params": {
+      "task_type": "GPU",
+      "devices": "0",
+      "gpu_ram_part": 0.45,
+      "loss_function": "RMSE",
+      "eval_metric": "RMSE",
+      "iterations": 10000,
+      "depth": 10,
+      "learning_rate": 0.04,
+      "l2_leaf_reg": 12,
+      "random_strength": 0.5,
+      "bagging_temperature": 0.5,
+      "max_ctr_complexity": 1,
+      "one_hot_max_size": 20,
+      "border_count": 128,
+      "thread_count": 2,
+      "random_seed": 2026,
+      "allow_writing_files": false,
+      "verbose": 500
+    },
+    "additional_features": [
+      "taxi_flow_airport_takeoffs_between_count",
+      "taxi_flow_airport_proxy_starts_between_count",
+      "taxi_flow_airport_active_at_takeoff_count",
+      "taxi_flow_airport_overtakers_count",
+      "taxi_flow_airport_left_behind_count",
+      "taxi_flow_runway_takeoffs_between_count",
+      "taxi_flow_runway_proxy_starts_between_count",
+      "taxi_flow_runway_active_at_takeoff_count",
+      "taxi_flow_runway_overtakers_count",
+      "taxi_flow_runway_left_behind_count"
+    ],
+    "additional_feature_count": 10,
+    "training_labels": "finite 2025 labels in [0,86400], own AOBT proxy in [0,7200]",
+    "scoring_labels": "all finite, including negative/extreme",
+    "forbidden_prediction_sources": [
+      "own departure BLOCK",
+      "own departure TAXITIME",
+      "opaque movement IDs",
+      "ranking labels"
+    ],
+    "flow_source": "released retrospective DEP ADEP/RUNWAY/MVT/AOBT_3 only; no departure BLOCK/TAXI or ARR fields",
+    "flow_availability": "complete released DEP batch, not real-time forecasting"
+  },
+  "existing_folds": {
+    "selection_months": [
+      1,
+      7
+    ],
+    "forward_months": [
+      11,
+      12
+    ],
+    "weights": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "selection": "minimum clipped all-finite Jan/Jul RMSE; ties favor smaller weight",
+    "forward": "use the same Jan/Jul-selected weight without adjustment",
+    "gate": "nonzero selected weight, RMSE improvement and paired UTC-day CI lower >0 in both folds",
+    "reference": "frozen v7 candidate all-finite OOF, with invalid-AOBT rows unchanged"
+  },
+  "fresh_matched_audit": {
+    "months": [
+      4,
+      10
+    ],
+    "reference": "saved v7 fresh_audit_predictions candidate; both v7 component models excluded April/October labels",
+    "candidate": "new v11 depth-10 residual expert excluding April/October labels from fit and early stopping",
+    "weight": "unchanged selected Jan/Jul blend weight",
+    "gate": "exact all finite-label valid-AOBT ID/label/time coverage; each month improves RMSE and pooled paired-day CI lower >0"
+  },
+  "february_august_policy": "Their labels may occur in complementary training but do not select this feature family, architecture, blend or gates",
+  "may_september_policy": "Remain reserved; a separately frozen later guard is required before final fit or ranking prediction",
+  "ranking_status": "Final fit and ranking prediction modes refuse until the later May/September guard is separately frozen and implemented",
+  "limitations": "Architecture comparison after repeated 2025 exploration; not an unbiased complete ensemble estimate or guaranteed ranking performance",
+  "leaderboard_use": false
+}

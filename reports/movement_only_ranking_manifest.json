@@ -1,0 +1,24 @@
+{
+  "ranking_rows": 344841,
+  "gate_rows": 4907,
+  "changed_rows": 4907,
+  "selected_weight": 1.0,
+  "ranking_reference": "artifacts\\v7-runway-traffic\\predictions.parquet",
+  "ranking_reference_sha256": "314e5dcc537b46954744ddc02018c7e2a65cd1dfe10be8e13da313c69eb0b0eb",
+  "ranking_inputs_sha256": "af76220f23e8ef7c5159a8a337b08d62cf60f759359e8cfff89ca46564670e9e",
+  "ranking_input_sha256": {
+    "raw_ranking": "9db75e3a56fa09b87aab72e191a53da3fe763d9887ad2b23aea9cde6a6325f86",
+    "baseline_ranking_rows": "da1a018792fba6531616fd32e5bcb4021dac0690676ea28a5eefdbb021c28235",
+    "baseline_ranking_features": "4761235dc63160998955d09de234e5a733aeb78b8d52a2a574ebbb7f40dee38a",
+    "released_arrival_ranking_cache": "f7dad5ee2b62b38d41d4d7aef2fcb465a26150b9580f4cb6fee78ea8daec2bcc",
+    "noaa_weather": "cf8b9d15f38a9f516cf47d18974caae87b1c9aba48cc3bf112853d49ab8cb925",
+    "submission_template": "0d383408ed5ac27bfcfd12d6b961cee77c8a6364b10dad9fe3ec81115c79652b"
+  },
+  "model_sha256": "a05e1e062d2598953ef22404524cff482c76ab413536054861658ce81065bc32",
+  "prediction_sha256": "8fc6519610a573dd77a4b5ca18f49ab816a564754db13d26d91f26b53d04b9e5",
+  "prediction_bytes": 4707529,
+  "template_order_verified": true,
+  "non_gate_unchanged": true,
+  "finite_nonnegative": true,
+  "uploaded": false
+}

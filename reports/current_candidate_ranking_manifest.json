@@ -1,0 +1,28 @@
+{
+  "rows": 344841,
+  "valid_gate_rows": 339377,
+  "missing_gate_rows": 4907,
+  "valid_route": {
+    "chosen": "v7",
+    "active": "v7",
+    "terminal": "unchanged",
+    "selected_policy_sha256": "671d84a53b0d04c708f8b16e60a46af32819390e3e1ddcfd7b4b8b9edba70112"
+  },
+  "missing_route": {
+    "active": true,
+    "terminal": "passed",
+    "validation_sha256": "a378ff065ed140ab3f01ef8867db81227d1db0ec02f18ed32bcc8567e28023f3",
+    "fresh_audit_sha256": "083fbc90551c46ec7084c9767b7710bb5764a0b478cf3743f9977d8d36ec0be0",
+    "reserved_audit_sha256": "5839fbdbd11f19e9d4d4c5ce349052caa1eb0289568eab1575c07d141d384132",
+    "weight": 1.0
+  },
+  "component_oof_gate_passed": true,
+  "composition_report_sha256": "7215a66936b92bf65f70f07d05c0cbec88867c5adb71981a6536a445f7b38d36",
+  "ranking_sources_sha256": "6dac1dc0ef78672e6c552bbe9725d3ca864a8937b22420ffeab144bc66719218",
+  "template_order_verified": true,
+  "outside_masks_unchanged": true,
+  "finite_nonnegative": true,
+  "predictions_sha256": "8fc6519610a573dd77a4b5ca18f49ab816a564754db13d26d91f26b53d04b9e5",
+  "prediction_bytes": 4707529,
+  "uploaded": false
+}

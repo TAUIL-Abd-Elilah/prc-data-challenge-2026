@@ -1,9 +1,10 @@
-"""Prospective v10 comparison using released same-runway ARR taxi context.
+"""Prospective v11 comparison using released DEP taxi interval flow.
 
-This code is prepared before constructing the ten fixed ARR taxi features.
+This code is prepared before constructing the ten fixed interval-flow features.
 It reuses the accepted v7 depth-10 CatBoost feature loader and the existing
 complementary-month residual trainer. No ranking predictions or final model
-can be produced from this experiment without a separately frozen later guard.
+can be produced from this experiment without a separately frozen May/September
+guard.
 """
 from __future__ import annotations
 
@@ -17,20 +18,17 @@ import numpy as np
 import pandas as pd
 from catboost import CatBoostRegressor
 
-import airport_models as airport_source
-import catboost_expert as catboost_source
+import airport_models
+import catboost_expert
 import deep_arrival_expert as arrival
 import deep_timestamp_expert as deep
-import proxy_neighbour_expert as neighbour_source
-import runway_arrival_features as runway_source
-import runway_arrival_taxi_features as taxi_builder
-import solution as solution_source
+import proxy_neighbour_expert
+import runway_arrival_features
+import solution
+import taxi_interval_flow_features as flow
 import traffic_deep_expert as traffic
-import weather_model as weather_source
-import v4_reference as v4_source
-from runway_arrival_taxi_features import ARR_COLUMNS, DEP_COLUMNS
-from runway_arrival_taxi_features import FEATURES as TAXI_FEATURES
-from runway_arrival_taxi_features import require_memory
+import v4_reference
+import weather_model
 from solution import _training_files
 
 
@@ -40,15 +38,15 @@ FRESH_MONTHS = (4, 10)
 REFERENCE_COLUMNS = ("MVT_ID_mvt", "target", "fold", "airport", "month",
                      "MVT_TIME_UTC_mvt", "a_valid", "selected")
 EXPECTED_OOF_ROWS = 672428
-BOOTSTRAP_SEED = 20261012
-EXPECTED_DEP_COLUMNS = ("MVT_ID_mvt", "ADEP_mvt", "RUNWAY_mvt",
-                        "MVT_TIME_UTC_mvt")
-EXPECTED_ARR_COLUMNS = ("ADES_mvt", "RUNWAY_mvt", "MVT_TIME_UTC_mvt",
-                        "BLOCK_TIME_UTC_mvt", "TAXITIME_SEC_mvt")
+BOOTSTRAP_SEED = 20261013
+TAXI_FEATURES = flow.FEATURES
+EXPECTED_RAW_DEP = ("MVT_ID_mvt", "ADEP_mvt", "RUNWAY_mvt",
+                    "MVT_TIME_UTC_mvt", "AOBT_3_flt")
 EXPECTED_TAXI_FEATURES = tuple(
-    f"runway_arr_taxi_completed_{minutes}m_{stat}"
-    for minutes in (15, 60, 180) for stat in ("count", "mean", "std")
-) + ("runway_arr_taxiing_now_count",)
+    f"taxi_flow_{scope}_{kind}_count"
+    for scope in ("airport", "runway")
+    for kind in ("takeoffs_between", "proxy_starts_between",
+                 "active_at_takeoff", "overtakers", "left_behind"))
 EXPECTED_CATBOOST_PARAMS = {
     "task_type": "GPU", "devices": "0", "gpu_ram_part": .45,
     "loss_function": "RMSE", "eval_metric": "RMSE", "iterations": 10000,
@@ -58,18 +56,6 @@ EXPECTED_CATBOOST_PARAMS = {
     "border_count": 128, "thread_count": 2, "random_seed": 2026,
     "allow_writing_files": False, "verbose": 500,
 }
-
-
-def assert_fixed_args(args: argparse.Namespace) -> dict:
-    """Enforce the prospective architecture before any data or report read."""
-    if (not np.isfinite(args.min_free_gib) or args.min_free_gib < 0
-            or args.iterations != 10000 or args.depth != 10
-            or args.threads != 2):
-        raise ValueError("v10 requires finite RAM floor and depth10/10000/2-thread fit")
-    params = deep.params(args)
-    if params != EXPECTED_CATBOOST_PARAMS:
-        raise ValueError("v10 residual trainer parameters changed")
-    return params
 
 
 def sha256(path: Path) -> str:
@@ -95,22 +81,62 @@ def exact_ids(actual: pd.Series, expected: pd.Series, label: str) -> None:
         raise ValueError(f"{label}: exact unique ID coverage failed")
 
 
+def require_frozen_settings(args: argparse.Namespace) -> None:
+    """Reject direct calls that bypass the CLI's frozen fit arguments."""
+    if (type(getattr(args, "depth", None)) is not int or args.depth != 10
+            or type(getattr(args, "iterations", None)) is not int
+            or args.iterations != 10000
+            or type(getattr(args, "threads", None)) is not int
+            or args.threads != 2):
+        raise ValueError("V11 requires depth=10, iterations=10000, threads=2")
+    minimum = getattr(args, "min_free_gib", None)
+    if (isinstance(minimum, bool)
+            or not isinstance(minimum, (int, float, np.integer, np.floating))):
+        raise ValueError("V11 memory floor must be finite and nonnegative")
+    if not np.isfinite(minimum) or minimum < 0:
+        raise ValueError("V11 memory floor must be finite and nonnegative")
+    if deep.params(args) != EXPECTED_CATBOOST_PARAMS:
+        raise ValueError("V11 CatBoost trainer params or seed changed")
+
+
+def verify_saved_params(trained: dict) -> None:
+    """Check effective core training settings embedded in a saved CatBoost model."""
+    exact = ("task_type", "loss_function", "eval_metric", "depth",
+             "random_seed", "max_ctr_complexity", "one_hot_max_size",
+             "border_count")
+    numeric = ("learning_rate", "l2_leaf_reg", "random_strength",
+               "bagging_temperature")
+    if any(trained.get(key) != EXPECTED_CATBOOST_PARAMS[key] for key in exact):
+        raise ValueError("Saved CatBoost model has changed core settings")
+    for key in numeric:
+        try:
+            actual = float(trained[key])
+        except (KeyError, TypeError, ValueError) as error:
+            raise ValueError(f"Saved CatBoost model lacks {key}") from error
+        if (not np.isfinite(actual)
+                or not np.isclose(actual, EXPECTED_CATBOOST_PARAMS[key],
+                                  rtol=0, atol=1e-6)):
+            raise ValueError(f"Saved CatBoost model changed {key}")
+
+
 def protocol_spec() -> dict:
-    """Fixed before any v10 cache build or label-based model comparison."""
+    """Fixed before any v11 cache build or label-based model comparison."""
     return {
-        "purpose": "One 2025 local comparison of fixed released-ARR taxi covariates",
+        "purpose": "One 2025 local comparison of fixed released-DEP taxi interval-flow covariates",
         "architecture": {
             "base": "v7 depth-10 traffic CatBoost residual to own AOBT proxy",
             "trainer": "deep_timestamp_expert.fit_fold, unchanged",
             "depth": 10, "max_iterations": 10000, "random_seed": 2026,
             "other_params": "deep_timestamp_expert.params, unchanged",
+            "effective_catboost_params": EXPECTED_CATBOOST_PARAMS,
             "additional_features": list(TAXI_FEATURES),
             "additional_feature_count": 10,
             "training_labels": "finite 2025 labels in [0,86400], own AOBT proxy in [0,7200]",
             "scoring_labels": "all finite, including negative/extreme",
             "forbidden_prediction_sources": ["own departure BLOCK", "own departure TAXITIME",
                                              "opaque movement IDs", "ranking labels"],
-            "ARR_availability": "released retrospective batch ARR BLOCK/TAXITIME, not real-time forecasting",
+            "flow_source": "released retrospective DEP ADEP/RUNWAY/MVT/AOBT_3 only; no departure BLOCK/TAXI or ARR fields",
+            "flow_availability": "complete released DEP batch, not real-time forecasting",
         },
         "existing_folds": {
             "selection_months": [1, 7], "forward_months": [11, 12],
@@ -123,13 +149,13 @@ def protocol_spec() -> dict:
         "fresh_matched_audit": {
             "months": list(FRESH_MONTHS),
             "reference": "saved v7 fresh_audit_predictions candidate; both v7 component models excluded April/October labels",
-            "candidate": "new v10 depth-10 residual expert excluding April/October labels from fit and early stopping",
+            "candidate": "new v11 depth-10 residual expert excluding April/October labels from fit and early stopping",
             "weight": "unchanged selected Jan/Jul blend weight",
             "gate": "exact all finite-label valid-AOBT ID/label/time coverage; each month improves RMSE and pooled paired-day CI lower >0",
         },
         "february_august_policy": "Their labels may occur in complementary training but do not select this feature family, architecture, blend or gates",
-        "may_september_policy": "Remain reserved; no later guard is specified or run by this script",
-        "ranking_status": "No final fit, ranking predictions, upload or submission from this script",
+        "may_september_policy": "Remain reserved; a separately frozen later guard is required before final fit or ranking prediction",
+        "ranking_status": "Final fit and ranking prediction modes refuse until the later May/September guard is separately frozen and implemented",
         "limitations": "Architecture comparison after repeated 2025 exploration; not an unbiased complete ensemble estimate or guaranteed ranking performance",
         "leaderboard_use": False,
     }
@@ -188,20 +214,23 @@ def freeze_reference(args: argparse.Namespace) -> dict:
             "frozen_reference_sha256": sha256(frozen_path)}
 
 
-def input_paths(args: argparse.Namespace) -> dict[str, Path]:
-    return {
+def source_inventory(args: argparse.Namespace) -> tuple[list[Path], dict[str, Path]]:
+    """Paths whose exact bytes must stay fixed across every model fit."""
+    raw = _training_files(args.data_dir)
+    if len(raw) != 12 or len({path.name for path in raw}) != 12:
+        raise ValueError("Expected twelve canonical 2025 source files")
+    paths = {
         "own_script": Path(__file__).resolve(),
         "v7_loader": Path(traffic.__file__).resolve(),
         "residual_trainer": Path(deep.__file__).resolve(),
-        "arrival_loader": Path(arrival.__file__).resolve(),
-        "catboost_feature_source": Path(catboost_source.__file__).resolve(),
-        "airport_feature_source": Path(airport_source.__file__).resolve(),
-        "solution_feature_source": Path(solution_source.__file__).resolve(),
-        "weather_feature_source": Path(weather_source.__file__).resolve(),
-        "neighbour_feature_source": Path(neighbour_source.__file__).resolve(),
-        "runway_feature_source": Path(runway_source.__file__).resolve(),
-        "runway_taxi_builder_source": Path(taxi_builder.__file__).resolve(),
-        "v4_reference_source": Path(v4_source.__file__).resolve(),
+        "arrival_loader_bootstrap": Path(arrival.__file__).resolve(),
+        "flight_weather_loader": Path(catboost_expert.__file__).resolve(),
+        "flight_join": Path(airport_models.__file__).resolve(),
+        "baseline_loader": Path(solution.__file__).resolve(),
+        "weather_join": Path(weather_model.__file__).resolve(),
+        "neighbour_feature_names": Path(proxy_neighbour_expert.__file__).resolve(),
+        "runway_feature_names_normalizer": Path(runway_arrival_features.__file__).resolve(),
+        "trainer_import_reference": Path(v4_reference.__file__).resolve(),
         "v7_protocol": args.v7_dir / "protocol.json",
         "v7_validation": args.v7_dir / "validation.json",
         "v7_oof": args.v7_dir / "validation_predictions.parquet",
@@ -214,82 +243,72 @@ def input_paths(args: argparse.Namespace) -> dict[str, Path]:
         "v6_seasonal_model": args.v6_dir / "seasonal_jan_jul.cbm",
         "v6_forward_model": args.v6_dir / "forward_nov_dec.cbm",
         "baseline_rows": args.cache_dir / "training_rows.parquet",
-        "baseline_ranking_rows": args.cache_dir / "ranking_rows.parquet",
         "baseline_features": args.cache_dir / "features.parquet",
         "arrival_cache": args.arrival_dir / "training_arrival_features.parquet",
         "neighbour_cache": args.neighbour_dir / "training_neighbour_features.parquet",
         "runway_sequence_cache": args.runway_dir / "training_runway_arrival_features.parquet",
-        "runway_taxi_cache": args.taxi_dir / "training_runway_arrival_taxi_features.parquet",
-        "runway_taxi_build_protocol": args.taxi_dir / "protocol.json",
-        "runway_taxi_build_manifest": args.taxi_dir / "feature_build.json",
-        "ranking_raw": args.data_dir / "ranking.parquet",
+        "taxi_flow_cache": args.taxi_dir / "training_taxi_interval_flow_features.parquet",
+        "taxi_flow_build_protocol": args.taxi_dir / "protocol.json",
+        "taxi_flow_build_manifest": args.taxi_dir / "feature_build.json",
+        "taxi_flow_builder": Path(flow.__file__).resolve(),
+        "taxi_flow_normalizer": Path(flow.__file__).resolve().parent / "runway_arrival_features.py",
         "weather": args.weather_file,
     }
+    return raw, paths
 
 
-def assert_frozen_inputs(args: argparse.Namespace, frozen: dict,
-                         protocol_sha256: str) -> None:
-    """Rehash all frozen inputs without reloading labels or feature values."""
-    assert_fixed_args(args)
-    root_protocol = args.output_dir / "protocol.json"
-    if (sha256(root_protocol) != protocol_sha256
-            or json.loads(root_protocol.read_text(encoding="utf-8")) != frozen):
-        raise ValueError("Frozen v10 root protocol changed during fit")
-    current_inputs = {name: sha256(path) for name, path in input_paths(args).items()}
-    raw = _training_files(args.data_dir)
-    current_raw = {path.name: sha256(path) for path in raw}
-    if (current_inputs != frozen["input_sha256"]
-            or current_raw != frozen["raw_training_sha256"]
-            or sha256(args.output_dir / "frozen_v7_oof_reference.parquet") !=
-               frozen["references"]["frozen_reference_sha256"]):
-        raise ValueError("Frozen v10 sources, caches, or reference changed during fit")
+def verify_source_snapshot(args: argparse.Namespace, frozen: dict,
+                           protocol_sha256: str) -> None:
+    """Rehash the frozen inputs without loading dataframes or applying a RAM gate."""
+    raw, paths = source_inventory(args)
+    if (sha256(args.output_dir / "protocol.json") != protocol_sha256
+            or json.loads((args.output_dir / "protocol.json")
+                          .read_text(encoding="utf-8")) != frozen
+            or {name: sha256(path) for name, path in paths.items()}
+               != frozen["input_sha256"]
+            or {path.name: sha256(path) for path in raw}
+               != frozen["raw_training_sha256"]
+            or sha256(args.output_dir / "frozen_v7_oof_reference.parquet")
+               != frozen["references"]["frozen_reference_sha256"]):
+        raise ValueError("V11 source, cache, reference or protocol changed during fit")
 
 
 def protocol(args: argparse.Namespace) -> dict:
-    assert_fixed_args(args)
-    require_memory(max(10.0, args.min_free_gib))
-    if (tuple(DEP_COLUMNS) != EXPECTED_DEP_COLUMNS
-            or tuple(ARR_COLUMNS) != EXPECTED_ARR_COLUMNS
+    require_frozen_settings(args)
+    flow.require_memory(max(10.0, args.min_free_gib))
+    if (tuple(flow.RAW_DEP) != EXPECTED_RAW_DEP
             or tuple(TAXI_FEATURES) != EXPECTED_TAXI_FEATURES):
-        raise ValueError("Fixed runway ARR taxi feature list changed")
+        raise ValueError("Fixed taxi interval-flow feature list changed")
     references = freeze_reference(args)
-    raw = _training_files(args.data_dir)
-    if len(raw) != 12 or len({path.name for path in raw}) != 12:
-        raise ValueError("Expected twelve canonical 2025 source files")
-    paths = input_paths(args)
+    raw, paths = source_inventory(args)
     taxi_build = json.loads((args.taxi_dir / "feature_build.json")
                             .read_text(encoding="utf-8"))
     taxi_protocol = json.loads((args.taxi_dir / "protocol.json")
                                .read_text(encoding="utf-8"))
-    taxi_file = paths["runway_taxi_cache"]
+    taxi_file = paths["taxi_flow_cache"]
     builder_spec = taxi_protocol["spec"]
     builder_sources = taxi_protocol["source_sha256"]
     if (taxi_build.get("departure_labels_used") is not False
-            or taxi_build.get("released_arrival_taxi_used") is not True
-            or builder_spec != taxi_builder.protocol_spec()
-            or builder_spec["raw_query"]["phase"] != "DEP"
-            or builder_spec["raw_query"]["columns"] != list(DEP_COLUMNS)
-            or builder_spec["raw_query"]["forbidden"] !=
-               ["BLOCK_TIME_UTC_mvt", "TAXITIME_SEC_mvt"]
-            or builder_spec["raw_events"]["phase"] != "ARR"
-            or builder_spec["raw_events"]["columns"] != list(ARR_COLUMNS)
+            or taxi_build.get("source_sha256") != builder_sources
+            or builder_spec != flow.protocol_spec()
+            or builder_spec["raw_phase_filter"] != "PHASE_mvt == DEP before selecting any feature columns"
+            or builder_spec["raw_dep_allowlist"] != list(EXPECTED_RAW_DEP)
+            or builder_spec["raw_dep_forbidden"] != ["BLOCK_TIME_UTC_mvt", "TAXITIME_SEC_mvt"]
+            or builder_spec["departure_labels_used"] is not False
             or builder_spec["features"] != list(TAXI_FEATURES)
-            or builder_sources["script"] != sha256(paths["runway_taxi_builder_source"])
-            or builder_sources["normalization_script"] !=
-               sha256(paths["runway_feature_source"])
-            or builder_sources["raw_training"] !=
-               {path.name: sha256(path) for path in raw}
-            or builder_sources["raw_ranking"] !=
-               sha256(args.data_dir / "ranking.parquet")
-            or builder_sources["baseline_training_rows"] !=
-               sha256(paths["baseline_rows"])
-            or builder_sources["baseline_ranking_rows"] !=
-               sha256(args.cache_dir / "ranking_rows.parquet")):
-        raise ValueError("Runway taxi cache provenance or fixed field policy changed")
-    if taxi_build["training"]["output_sha256"] != sha256(taxi_file):
-        raise ValueError("Fixed runway taxi feature output differs from builder manifest")
-    if taxi_build["protocol_sha256"] != sha256(paths["runway_taxi_build_protocol"]):
-        raise ValueError("Runway taxi builder protocol changed")
+            or builder_sources["builder"] != sha256(paths["taxi_flow_builder"])
+            or builder_sources["normalization"] != sha256(paths["taxi_flow_normalizer"])
+            or builder_sources["raw_training"] != {path.name: sha256(path) for path in raw}
+            or builder_sources["raw_ranking"] != sha256(args.data_dir / "ranking.parquet")
+            or builder_sources["baseline_training_rows"] != sha256(paths["baseline_rows"])
+            or builder_sources["baseline_ranking_rows"] != sha256(args.cache_dir / "ranking_rows.parquet")):
+        raise ValueError("Taxi interval-flow cache provenance or DEP-only field policy changed")
+    if (taxi_build["training"]["sha256"] != sha256(taxi_file)
+            or taxi_build["training"]["feature_names"] != list(TAXI_FEATURES)
+            or taxi_build["training"]["feature_dtypes"] !=
+               {name: "float32" for name in TAXI_FEATURES}
+            or taxi_build["protocol_sha256"] != sha256(paths["taxi_flow_build_protocol"])):
+        raise ValueError("Fixed taxi interval-flow feature output or builder protocol changed")
     value = {
         "spec": protocol_spec(), "references": references,
         "input_sha256": {name: sha256(path) for name, path in paths.items()},
@@ -298,7 +317,7 @@ def protocol(args: argparse.Namespace) -> dict:
     target = args.output_dir / "protocol.json"
     if target.exists():
         if json.loads(target.read_text(encoding="utf-8")) != value:
-            raise ValueError("Frozen v10 protocol or source/input hashes changed")
+            raise ValueError("Frozen v11 protocol or source/input hashes changed")
     else:
         write_json(target, value)
     return value
@@ -306,22 +325,22 @@ def protocol(args: argparse.Namespace) -> dict:
 
 def load_features(args: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame]:
     rows, features = traffic.load_features(args)
-    taxi_path = args.taxi_dir / "training_runway_arrival_taxi_features.parquet"
+    taxi_path = args.taxi_dir / "training_taxi_interval_flow_features.parquet"
     taxi = pd.read_parquet(taxi_path)
     if (list(taxi) != ["MVT_ID_mvt", *TAXI_FEATURES]
             or len(taxi) != len(rows)
             or not np.array_equal(taxi.MVT_ID_mvt.to_numpy(),
                                   rows.MVT_ID_mvt.to_numpy())
             or any(name in features for name in TAXI_FEATURES)):
-        raise ValueError("Ten fixed runway taxi features lack exact ID/schema alignment")
+        raise ValueError("Ten fixed taxi interval-flow features lack exact ID/schema alignment")
     if np.isinf(taxi[list(TAXI_FEATURES)].to_numpy(dtype=float)).any():
-        raise ValueError("Runway taxi feature cache contains infinity")
+        raise ValueError("Taxi interval-flow feature cache contains infinity")
     features = pd.concat([features.reset_index(drop=True),
                           taxi[list(TAXI_FEATURES)].reset_index(drop=True)], axis=1)
     if (features.columns.duplicated().any() or "MVT_ID_mvt" in features
             or "target" in features or "BLOCK_TIME_UTC_mvt" in features
             or "TAXITIME_SEC_mvt" in features):
-        raise ValueError("v10 model predictor schema contains forbidden own fields")
+        raise ValueError("v11 model predictor schema contains forbidden own fields")
     return rows, features
 
 
@@ -343,88 +362,71 @@ def verify_expert(args: argparse.Namespace, name: str,
     expert = pd.read_parquet(path)
     if list(expert) != ["MVT_ID_mvt", "expert"]:
         raise ValueError(f"{name} expert OOF has unexpected schema")
-    exact_ids(expert.MVT_ID_mvt, expected, f"{name} v10 expert")
+    exact_ids(expert.MVT_ID_mvt, expected, f"{name} v11 expert")
     if not np.isfinite(expert.expert.to_numpy(dtype=float)).all():
-        raise ValueError(f"{name} v10 expert has nonfinite predictions")
+        raise ValueError(f"{name} v11 expert has nonfinite predictions")
     return expert
-
-
-def verify_saved_params(trained: dict) -> None:
-    """Check persisted CatBoost settings that affect the fitted predictor."""
-    for key in ("task_type", "loss_function", "eval_metric"):
-        if trained.get(key) != EXPECTED_CATBOOST_PARAMS[key]:
-            raise ValueError(f"Saved CatBoost {key} differs from frozen architecture")
-    for key in ("depth", "random_seed", "max_ctr_complexity",
-                "one_hot_max_size", "border_count"):
-        if trained.get(key) != EXPECTED_CATBOOST_PARAMS[key]:
-            raise ValueError(f"Saved CatBoost {key} differs from frozen architecture")
-    for key in ("learning_rate", "l2_leaf_reg", "random_strength",
-                "bagging_temperature"):
-        actual = trained.get(key)
-        if (not isinstance(actual, (int, float))
-                or not np.isfinite(actual)
-                or not np.isclose(actual, EXPECTED_CATBOOST_PARAMS[key],
-                                  rtol=0, atol=1e-6)):
-            raise ValueError(f"Saved CatBoost {key} differs from frozen architecture")
 
 
 def fold_provenance(args: argparse.Namespace, name: str,
                     held: pd.DataFrame, schema: list[dict]) -> dict:
-    """Check a saved fold's OOF, report and actual CatBoost metadata."""
-    if name in FOLDS:
-        months = FOLDS[name]
-        root_output = args.output_dir
-        expected_ids = held.loc[held.a_valid, "MVT_ID_mvt"]
-        heldout_scope = "all_finite"
-    elif name == "fresh_apr_oct":
+    """Bind each saved fold to its frozen source, feature schema and model."""
+    if name == "fresh_apr_oct":
         months = FRESH_MONTHS
-        root_output = args.output_dir.parent
-        expected_ids = held.MVT_ID_mvt
-        heldout_scope = "valid_aobt_finite"
+        protocol_path = args.output_dir.parent / "protocol.json"
+        if args.output_dir.name != "fresh_new" or "a_valid" in held:
+            raise ValueError("Fresh fold must use valid-only heldout rows and parent protocol")
+        expected = held.MVT_ID_mvt
+    elif name in FOLDS:
+        months = FOLDS[name]
+        protocol_path = args.output_dir / "protocol.json"
+        if "a_valid" not in held:
+            raise ValueError("Existing fold lacks valid-AOBT flags")
+        expected = held.loc[held.a_valid, "MVT_ID_mvt"]
     else:
-        raise ValueError("Fold provenance has an unexpected name")
+        raise ValueError("Unknown V11 fold")
     if (not held.fold.eq(name).all()
             or not held.month.isin(months).all()
-            or not np.isfinite(held.target.to_numpy(dtype=float)).all()):
+            or held.MVT_ID_mvt.isna().any()
+            or held.MVT_ID_mvt.duplicated().any()
+            or not np.isfinite(held.target.to_numpy(dtype=float)).all()
+            or not np.array_equal(
+                pd.to_datetime(held.MVT_TIME_UTC_mvt, utc=True)
+                .dt.month.to_numpy(), held.month.to_numpy())):
         raise ValueError("Fold provenance has an unexpected held-out universe")
-    if (not schema or any(not isinstance(item, dict)
-                          or set(item) != {"name", "dtype"}
-                          or not isinstance(item["name"], str)
-                          or not isinstance(item["dtype"], str)
-                          for item in schema)):
-        raise ValueError("Fold feature schema receipt is invalid")
-    names = [item["name"] for item in schema]
-    cat_indices = [index for index, item in enumerate(schema)
-                   if item["dtype"] == "category"]
-    expert = verify_expert(args, name, expected_ids)
+    expert = verify_expert(args, name, expected)
     report_path = args.output_dir / f"{name}_validation.json"
     model_path = args.output_dir / f"{name}.cbm"
     report = json.loads(report_path.read_text(encoding="utf-8"))
+    names = [item["name"] for item in schema]
     if (report.get("fold") != name or report.get("n_all_finite") != len(held)
             or report.get("n_eligible") != len(expert)
             or report.get("features") != names
             or names[-len(TAXI_FEATURES):] != list(TAXI_FEATURES)
             or len(names) != len(set(names))
-            or not isinstance(report.get("trees"), int)
-            or not 1 <= report["trees"] <= EXPECTED_CATBOOST_PARAMS["iterations"]):
+            or report.get("trees", 0) < 1
+            or report["trees"] > EXPECTED_CATBOOST_PARAMS["iterations"]):
         raise ValueError("Fold report differs from the frozen valid-AOBT feature universe")
     model = CatBoostRegressor()
     model.load_model(str(model_path))
     trained = model.get_all_params()
-    verify_saved_params(trained)
+    categorical_indices = [position for position, item in enumerate(schema)
+                           if item["dtype"] == "category"]
     if (int(model.tree_count_) != report["trees"]
             or list(model.feature_names_) != names
-            or list(model.get_cat_feature_indices()) != cat_indices):
+            or list(model.get_cat_feature_indices()) != categorical_indices):
         raise ValueError("Saved CatBoost model metadata differs from frozen architecture")
+    verify_saved_params(trained)
     return {
         "schema_version": 1,
         "fold": name,
         "heldout_months": list(months),
-        "heldout_scope": heldout_scope,
-        "protocol_sha256": sha256(root_output / "protocol.json"),
+        "heldout_scope": ("valid_aobt_finite" if name == "fresh_apr_oct"
+                          else "all_finite_targets"),
+        "protocol_sha256": sha256(protocol_path),
         "catboost_params": EXPECTED_CATBOOST_PARAMS,
         "feature_schema": schema,
-        "categorical_feature_indices": cat_indices,
+        "categorical_feature_indices": categorical_indices,
         "heldout_all_finite_rows": len(held),
         "heldout_valid_aobt_rows": len(expert),
         "trees": report["trees"],
@@ -450,25 +452,29 @@ def verify_fold_provenance(args: argparse.Namespace, name: str,
     path = args.output_dir / f"{name}_provenance.json"
     saved = json.loads(path.read_text(encoding="utf-8"))
     schema = saved.get("feature_schema")
+    if (not isinstance(schema, list)
+            or any(not isinstance(item, dict)
+                   or set(item) != {"name", "dtype"} for item in schema)):
+        raise ValueError("Fold feature schema receipt is invalid")
     if saved != fold_provenance(args, name, held, schema):
         raise ValueError("Fold OOF/model/report or frozen protocol provenance changed")
 
 
 def fit_folds(args: argparse.Namespace) -> None:
     frozen = protocol(args)
-    root_protocol_sha256 = sha256(args.output_dir / "protocol.json")
-    require_memory(max(10.0, args.min_free_gib))
+    protocol_sha = sha256(args.output_dir / "protocol.json")
+    flow.require_memory(max(10.0, args.min_free_gib))
     for name in FOLDS:
         if any((args.output_dir / f"{name}{suffix}").exists() for suffix in
                ("_oof.parquet", ".cbm", "_validation.json",
                 "_provenance.json")):
-            raise FileExistsError(f"v10 {name} artifacts already exist; verify before reuse")
+            raise FileExistsError(f"v11 {name} artifacts already exist; verify before reuse")
     rows, features = load_features(args)
     ref = load_reference(args)
     for name, months in FOLDS.items():
-        assert_frozen_inputs(args, frozen, root_protocol_sha256)
+        verify_source_snapshot(args, frozen, protocol_sha)
         deep.fit_fold(name, months, rows, features, ref, args)
-        assert_frozen_inputs(args, frozen, root_protocol_sha256)
+        verify_source_snapshot(args, frozen, protocol_sha)
         held = ref.loc[ref.fold.eq(name)]
         verify_expert(args, name, held.loc[held.a_valid, "MVT_ID_mvt"])
         seal_fold(args, name, held, features)
@@ -518,8 +524,8 @@ def evaluate(args: argparse.Namespace, include_fresh: bool = True) -> dict:
             "expert_oof_sha256": sha256(args.output_dir / f"{name}_oof.parquet"),
             "model_sha256": sha256(args.output_dir / f"{name}.cbm"),
             "fit_report_sha256": sha256(info_path),
-            "fold_provenance_sha256": sha256(args.output_dir /
-                                             f"{name}_provenance.json"),
+            "fold_provenance_sha256": sha256(
+                args.output_dir / f"{name}_provenance.json"),
             "trees": info["trees"],
         }
         part["candidate"] = candidate
@@ -539,74 +545,87 @@ def evaluate(args: argparse.Namespace, include_fresh: bool = True) -> dict:
         if (fresh["weight"] != weight or fresh["protocol_sha256"] !=
                 report["protocol_sha256"] or fresh.get("months") !=
                 list(FRESH_MONTHS) or not fresh.get("coverage_verified")
+                or fresh["v7_fresh_report_sha256"] != sha256(
+                    args.v7_dir / "fresh_audit.json")
                 or fresh["v7_paired_sha256"] !=
                    sha256(args.v7_dir / "fresh_audit_predictions.parquet")
-                or fresh["v10_expert_oof_sha256"] != sha256(
+                or fresh["v7_fresh_model_sha256"] != sha256(
+                    args.v7_dir / "fresh_new/fresh_apr_oct.cbm")
+                or fresh["v6_fresh_model_sha256"] != sha256(
+                    args.v6_dir / "fresh_new/fresh_apr_oct.cbm")
+                or fresh["v11_expert_oof_sha256"] != sha256(
                     args.output_dir / "fresh_new/fresh_apr_oct_oof.parquet")
-                or fresh["v10_model_sha256"] != sha256(
+                or fresh["v11_model_sha256"] != sha256(
                     args.output_dir / "fresh_new/fresh_apr_oct.cbm")
-                or fresh.get("fresh_fold_provenance_sha256") != sha256(
+                or fresh["fresh_fold_provenance_sha256"] != sha256(
                     args.output_dir / "fresh_new/fresh_apr_oct_provenance.json")
                 or fresh["predictions_sha256"] != sha256(
                     args.output_dir / "fresh_audit_predictions.parquet")):
-            raise ValueError("Fresh v10 audit used another source, weight or model")
-        fresh_frame = pd.read_parquet(
+            raise ValueError("Fresh v11 audit used another source, weight or model")
+        fresh_held = pd.read_parquet(
             args.output_dir / "fresh_audit_predictions.parquet",
-            columns=["MVT_ID_mvt", "target", "fold", "month",
-                     "MVT_TIME_UTC_mvt", "selected", "expert",
-                     "v10_blend"])
-        if (len(fresh_frame) != fresh.get("rows_valid_aobt_finite")
-                or fresh_frame.MVT_ID_mvt.isna().any()
-                or fresh_frame.MVT_ID_mvt.duplicated().any()
+            columns=["MVT_ID_mvt", "target", "month", "MVT_TIME_UTC_mvt",
+                     "selected", "fold", "expert", "v11_blend"])
+        prior = pd.read_parquet(
+            args.v7_dir / "fresh_audit_predictions.parquet",
+            columns=["MVT_ID_mvt", "target", "MVT_TIME_UTC_mvt",
+                     "candidate"])
+        exact_ids(fresh_held.MVT_ID_mvt, prior.MVT_ID_mvt,
+                  "v11 fresh audit versus v7 held-out comparator")
+        aligned = prior.set_index("MVT_ID_mvt").loc[
+            fresh_held.MVT_ID_mvt.to_numpy()]
+        if (not np.array_equal(fresh_held.target.to_numpy(dtype=float),
+                               aligned.target.to_numpy(dtype=float))
                 or not np.array_equal(
-                    pd.to_datetime(fresh_frame.MVT_TIME_UTC_mvt, utc=True)
-                    .dt.month.to_numpy(), fresh_frame.month.to_numpy())):
-            raise ValueError("Fresh v10 held-out metadata changed")
-        fresh_args = argparse.Namespace(**vars(args))
-        fresh_args.output_dir = args.output_dir / "fresh_new"
-        verify_fold_provenance(fresh_args, "fresh_apr_oct", fresh_frame)
-        fresh_expert = verify_expert(fresh_args, "fresh_apr_oct",
-                                     fresh_frame.MVT_ID_mvt)
-        aligned_expert = fresh_frame[["MVT_ID_mvt"]].merge(
-            fresh_expert, on="MVT_ID_mvt", how="left", sort=False,
-            validate="one_to_one")
-        if not np.array_equal(fresh_frame.expert.to_numpy(dtype=float),
-                              aligned_expert.expert.to_numpy(dtype=float)):
-            raise ValueError("Fresh paired expert differs from sealed OOF")
-        fresh_y = fresh_frame.target.to_numpy(dtype=float)
-        fresh_base = fresh_frame.selected.to_numpy(dtype=float)
-        fresh_candidate = np.maximum(
-            fresh_base + weight * (fresh_frame.expert.to_numpy(dtype=float)
-                                   - fresh_base), 0)
-        if not np.array_equal(fresh_frame.v10_blend.to_numpy(dtype=float),
-                              fresh_candidate):
-            raise ValueError("Fresh paired prediction differs from fixed blend")
-        fresh_month = fresh_frame.month.to_numpy(dtype=int)
-        for month in FRESH_MONTHS:
-            selected = fresh_month == month
-            saved_score = fresh["scores"][str(month)]
-            if (saved_score["n"] != int(selected.sum())
-                    or not np.isclose(saved_score["v7_rmse"],
-                                      deep.rmse(fresh_y[selected],
-                                                fresh_base[selected]),
-                                      rtol=0, atol=1e-9)
-                    or not np.isclose(saved_score["v10_blend_rmse"],
-                                      deep.rmse(fresh_y[selected],
-                                                fresh_candidate[selected]),
-                                      rtol=0, atol=1e-9)):
-                raise ValueError("Fresh saved score differs from paired predictions")
-        recomputed_bootstrap = arrival.bootstrap(
-            fresh_frame, fresh_base, fresh_candidate, seed=BOOTSTRAP_SEED)
-        if not np.allclose(recomputed_bootstrap["gain_ci95_sec"],
-                           fresh["bootstrap"]["gain_ci95_sec"],
-                           rtol=0, atol=1e-9):
-            raise ValueError("Fresh paired-day confidence interval changed")
-        audit_gate = all(fresh["scores"][str(month)]["v10_blend_rmse"]
-                         < fresh["scores"][str(month)]["v7_rmse"]
+                    fresh_held.selected.to_numpy(dtype=float),
+                    aligned.candidate.to_numpy(dtype=float))
+                or not np.array_equal(
+                    pd.to_datetime(fresh_held.MVT_TIME_UTC_mvt, utc=True)
+                    .to_numpy(),
+                    pd.to_datetime(aligned.MVT_TIME_UTC_mvt, utc=True)
+                    .to_numpy())):
+            raise ValueError("Fresh v11 labels or times differ from v7 matched holdout")
+        new_args = argparse.Namespace(**vars(args))
+        new_args.output_dir = args.output_dir / "fresh_new"
+        verify_fold_provenance(new_args, "fresh_apr_oct", fresh_held)
+        sealed_expert = pd.read_parquet(
+            new_args.output_dir / "fresh_apr_oct_oof.parquet",
+            columns=["MVT_ID_mvt", "expert"])
+        exact_ids(sealed_expert.MVT_ID_mvt, fresh_held.MVT_ID_mvt,
+                  "v11 fresh output versus sealed expert")
+        expert_values = sealed_expert.set_index("MVT_ID_mvt").loc[
+            fresh_held.MVT_ID_mvt.to_numpy(), "expert"].to_numpy(dtype=float)
+        y_fresh = fresh_held.target.to_numpy(dtype=float)
+        base_fresh = fresh_held.selected.to_numpy(dtype=float)
+        candidate_fresh = np.maximum(
+            base_fresh + weight * (expert_values - base_fresh), 0)
+        if (fresh["rows_valid_aobt_finite"] != len(fresh_held)
+                or not np.isfinite(fresh_held[
+                    ["selected", "expert", "v11_blend"]]
+                    .to_numpy(dtype=float)).all()
+                or not np.array_equal(
+                    fresh_held.expert.to_numpy(dtype=float), expert_values)
+                or not np.array_equal(
+                    fresh_held.v11_blend.to_numpy(dtype=float), candidate_fresh)):
+            raise ValueError("Fresh v11 predictions differ from the sealed blend")
+        month = fresh_held.month.to_numpy(dtype=int)
+        scores = {str(value): {
+            "n": int((month == value).sum()),
+            "v7_rmse": deep.rmse(y_fresh[month == value],
+                                  base_fresh[month == value]),
+            "v11_blend_rmse": deep.rmse(y_fresh[month == value],
+                                         candidate_fresh[month == value]),
+        } for value in FRESH_MONTHS}
+        bootstrap = arrival.bootstrap(fresh_held, base_fresh, candidate_fresh,
+                                      seed=BOOTSTRAP_SEED)
+        if fresh["scores"] != scores or fresh["bootstrap"] != bootstrap:
+            raise ValueError("Fresh v11 saved scores or day interval changed")
+        audit_gate = all(scores[str(month)]["v11_blend_rmse"]
+                         < scores[str(month)]["v7_rmse"]
                          for month in FRESH_MONTHS) and (
-                             recomputed_bootstrap["gain_ci95_sec"][0] > 0)
+                             bootstrap["gain_ci95_sec"][0] > 0)
         if bool(fresh["passed"]) != bool(audit_gate):
-            raise ValueError("Fresh v10 audit pass flag conflicts with fixed gate")
+            raise ValueError("Fresh v11 audit pass flag conflicts with fixed gate")
         report["fresh_audit_passed"] = bool(audit_gate)
         report["fresh_audit_sha256"] = sha256(fresh_path)
     write_json(args.output_dir / "validation.json", report)
@@ -619,13 +638,13 @@ def evaluate(args: argparse.Namespace, include_fresh: bool = True) -> dict:
 
 def fresh_audit(args: argparse.Namespace) -> None:
     if (args.output_dir / "fresh_audit.json").exists():
-        raise FileExistsError("v10 fresh audit already exists; do not overwrite")
+        raise FileExistsError("v11 fresh audit already exists; do not overwrite")
     local = evaluate(args, include_fresh=False)
     if not local["existing_folds_passed"]:
         raise ValueError("Existing-fold gates failed before April/October audit")
     frozen = protocol(args)
-    root_protocol_sha256 = sha256(args.output_dir / "protocol.json")
-    require_memory(max(10.0, args.min_free_gib))
+    protocol_sha = sha256(args.output_dir / "protocol.json")
+    flow.require_memory(max(10.0, args.min_free_gib))
     rows, features = load_features(args)
     proxy = rows.proxy.to_numpy(dtype=float)
     y = rows.target.to_numpy(dtype=float)
@@ -670,11 +689,11 @@ def fresh_audit(args: argparse.Namespace) -> None:
     if any((new_args.output_dir / f"fresh_apr_oct{suffix}").exists()
            for suffix in ("_oof.parquet", ".cbm", "_validation.json",
                           "_provenance.json")):
-        raise FileExistsError("v10 fresh expert artifacts already exist")
-    assert_frozen_inputs(args, frozen, root_protocol_sha256)
+        raise FileExistsError("v11 fresh expert artifacts already exist")
+    verify_source_snapshot(args, frozen, protocol_sha)
     deep.fit_fold("fresh_apr_oct", FRESH_MONTHS, rows, features, reference,
                   new_args)
-    assert_frozen_inputs(args, frozen, root_protocol_sha256)
+    verify_source_snapshot(args, frozen, protocol_sha)
     seal_fold(new_args, "fresh_apr_oct", reference, features)
     expert = verify_expert(new_args, "fresh_apr_oct", expected.MVT_ID_mvt)
     paired = reference.merge(expert, on="MVT_ID_mvt", how="left", sort=False,
@@ -684,22 +703,22 @@ def fresh_audit(args: argparse.Namespace) -> None:
                                   expected.MVT_ID_mvt.to_numpy())
             or not np.isfinite(paired[["target", "selected", "expert"]]
                                .to_numpy(dtype=float)).all()):
-        raise ValueError("v10 fresh matched expert or comparator coverage failed")
+        raise ValueError("v11 fresh matched expert or comparator coverage failed")
     base = paired.selected.to_numpy(dtype=float)
     candidate = np.maximum(base + local["selected_weight"]*(
         paired.expert.to_numpy(dtype=float)-base), 0)
-    paired["v10_blend"] = candidate
+    paired["v11_blend"] = candidate
     month = paired.month.to_numpy(dtype=int)
     scores = {str(value): {"n": int((month == value).sum()),
                            "v7_rmse": deep.rmse(paired.target.to_numpy(dtype=float)[month == value],
                                                 base[month == value]),
-                           "v10_blend_rmse": deep.rmse(
+                           "v11_blend_rmse": deep.rmse(
                                paired.target.to_numpy(dtype=float)[month == value],
                                candidate[month == value])}
               for value in FRESH_MONTHS}
     bootstrap = arrival.bootstrap(paired, base, candidate,
                                   seed=BOOTSTRAP_SEED)
-    passed = (all(scores[str(value)]["v10_blend_rmse"]
+    passed = (all(scores[str(value)]["v11_blend_rmse"]
                   < scores[str(value)]["v7_rmse"] for value in FRESH_MONTHS)
               and bootstrap["gain_ci95_sec"][0] > 0)
     output_path = args.output_dir / "fresh_audit_predictions.parquet"
@@ -713,26 +732,27 @@ def fresh_audit(args: argparse.Namespace) -> None:
         "v7_paired_sha256": sha256(v7_path),
         "v7_fresh_model_sha256": sha256(args.v7_dir / "fresh_new/fresh_apr_oct.cbm"),
         "v6_fresh_model_sha256": sha256(args.v6_dir / "fresh_new/fresh_apr_oct.cbm"),
-        "v10_expert_oof_sha256": sha256(new_args.output_dir /
+        "v11_expert_oof_sha256": sha256(new_args.output_dir /
                                         "fresh_apr_oct_oof.parquet"),
-        "v10_model_sha256": sha256(new_args.output_dir / "fresh_apr_oct.cbm"),
-        "fresh_fold_provenance_sha256": sha256(new_args.output_dir /
-                                               "fresh_apr_oct_provenance.json"),
+        "v11_model_sha256": sha256(new_args.output_dir / "fresh_apr_oct.cbm"),
+        "fresh_fold_provenance_sha256": sha256(
+            new_args.output_dir / "fresh_apr_oct_provenance.json"),
         "predictions_sha256": sha256(output_path),
         "scope": "Matched architecture comparison; not unbiased complete ensemble OOF",
     }
     write_json(args.output_dir / "fresh_audit.json", audit)
-    del rows, features, proxy, y, expected, prior, reference, expert, paired
+    del rows, features, proxy, y, held, valid, expected, prior
+    del paired, reference, expert, base, candidate, month
     gc.collect()
     evaluate(args)
 
 
 def fit_final(_: argparse.Namespace) -> None:
-    raise RuntimeError("V10 final training requires a separately frozen later guard")
+    raise RuntimeError("V11 final training requires a separately frozen May/September guard")
 
 
 def final_predict(_: argparse.Namespace) -> None:
-    raise RuntimeError("V10 ranking output requires a separately frozen later guard")
+    raise RuntimeError("V11 ranking output requires a separately frozen May/September guard")
 
 
 def main() -> None:
@@ -752,13 +772,13 @@ def main() -> None:
     parser.add_argument("--runway-dir", type=Path,
                         default=Path("artifacts/v6-runway-arrival"))
     parser.add_argument("--taxi-dir", type=Path,
-                        default=Path("artifacts/v10-runway-arrival-taxi"))
+                        default=Path("artifacts/v11-taxi-flow"))
     parser.add_argument("--v7-dir", type=Path,
                         default=Path("artifacts/v7-runway-traffic"))
     parser.add_argument("--v6-dir", type=Path,
                         default=Path("artifacts/v6-deep-arrival"))
     parser.add_argument("--output-dir", type=Path,
-                        default=Path("artifacts/v10-runway-taxi"))
+                        default=Path("artifacts/v11-taxi-flow-expert"))
     parser.add_argument("--min-free-gib", type=float, default=10.0)
     args = parser.parse_args()
     args.iterations, args.depth, args.threads = 10000, 10, 2
