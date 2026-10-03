@@ -183,6 +183,8 @@ The older v6-based standalone v8 ranking path is excluded from this portfolio. I
 
 Only after that check passes, `assemble` reads fully guarded component outputs and verifies their model, source, input and validation manifests. It snapshots hashes before ranking reads and rechecks the same hashes before output and the final manifest. It requires all 344,841 template IDs in exact order, finite nonnegative values, and unchanged predictions outside the disjoint gates. Existing outputs are never overwritten. These modes create internal candidate artifacts; finalization, publication and a fresh CLI quota check still precede any upload. Static compilation and peer review passed. Calls with the current pending prerequisites correctly refused without creating artifacts; no candidate OOF evaluation or ranking assembly has run.
 
+Before its first execution, the assembler's provenance check was strengthened to bind both v8 combo OOF outputs, including its April/October paired predictions and the two upstream fresh OOF files, to the accepted combo audit. These hashes remain in the before/after ranking snapshots even when a failed reserved guard retains v7. A synthetic temporary-file check accepted matching hashes and rejected modified combo bytes, modified upstream bytes and a failed audit. Scientific formulas, selection and gates are unchanged.
+
 ```powershell
 python compose_current_candidate.py --mode contract
 python compose_current_candidate.py --mode validate

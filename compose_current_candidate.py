@@ -149,6 +149,25 @@ def verify_failed_valid_guard(args: argparse.Namespace, route: str,
         raise ValueError("Valid-route report says failed despite passing its fixed gate")
 
 
+def verify_v8_combo_audit_outputs(args: argparse.Namespace) -> None:
+    """Bind both saved combo OOFs to their local audit, including the fresh one."""
+    audit = read_json(args.v8_combo_dir / "audit.json")
+    expected_outputs = {
+        "existing_oof": args.v8_combo_dir / "validation_predictions.parquet",
+        "fresh_oof": args.v8_combo_dir / "fresh_audit_predictions.parquet",
+    }
+    expected_sources = {
+        "v7_fresh": args.v7_dir / "fresh_audit_predictions.parquet",
+        "v8_fresh": args.v8_dir / "fresh_audit_predictions.parquet",
+    }
+    if (audit.get("accepted") is not True
+            or any(audit.get("output_sha256", {}).get(name) != sha256(path)
+                   for name, path in expected_outputs.items())
+            or any(audit.get("source_sha256", {}).get(name) != sha256(path)
+                   for name, path in expected_sources.items())):
+        raise ValueError("v8 combo existing/fresh OOF or audited source hash changed")
+
+
 def terminal_valid_route(args: argparse.Namespace) -> dict:
     selection_path = args.guard_dir / "selected_policy.json"
     selection = read_json(selection_path)
@@ -156,6 +175,8 @@ def terminal_valid_route(args: argparse.Namespace) -> dict:
     if chosen not in ("v7", "v8_combo", "v9b"):
         raise ValueError("Frozen selected valid route is unknown")
     reserved.require_selected_route(guard_args(args), chosen)
+    if chosen == "v8_combo":
+        verify_v8_combo_audit_outputs(args)
     if chosen == "v7":
         return {"chosen": chosen, "active": "v7", "terminal": "unchanged",
                 "selected_policy_sha256": sha256(selection_path)}
@@ -255,6 +276,13 @@ def source_paths(args: argparse.Namespace, valid: dict,
         paths.update(valid_guard_report=args.guard_dir / chosen / "guard_report.json",
                      chosen_oof=chosen_dir / "validation_predictions.parquet",
                      chosen_audit=chosen_dir / "audit.json")
+        if chosen == "v8_combo":
+            paths.update(chosen_fresh_oof=chosen_dir /
+                         "fresh_audit_predictions.parquet",
+                         v7_fresh_oof=args.v7_dir /
+                         "fresh_audit_predictions.parquet",
+                         v8_fresh_oof=args.v8_dir /
+                         "fresh_audit_predictions.parquet")
     if missing["active"]:
         paths.update(movement_oof=args.movement_dir /
                      "validation_predictions.parquet",
@@ -809,6 +837,19 @@ def assembly_source_files(args: argparse.Namespace, valid_status: dict,
         "v7_validation": args.v7_dir / "validation.json",
         "v7_fresh_audit": args.v7_dir / "fresh_audit.json",
     }
+    if valid_status["chosen"] == "v8_combo":
+        # Keep the local fresh architecture audit sealed even if the reserved
+        # guard later retained v7 for ranking. These paths are rehashed before
+        # and after ranking reads and again before the final manifest.
+        files.update(v8_combo_existing_oof=args.v8_combo_dir /
+                     "validation_predictions.parquet",
+                     v8_combo_fresh_oof=args.v8_combo_dir /
+                     "fresh_audit_predictions.parquet",
+                     v8_combo_audit=args.v8_combo_dir / "audit.json",
+                     v7_fresh_oof=args.v7_dir /
+                     "fresh_audit_predictions.parquet",
+                     v8_fresh_oof=args.v8_dir /
+                     "fresh_audit_predictions.parquet")
     if valid_status["active"] != "v7":
         route = valid_status["active"]
         root = args.v8_combo_dir if route == "v8_combo" else args.v9b_dir
