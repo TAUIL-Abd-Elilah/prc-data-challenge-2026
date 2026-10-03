@@ -1,0 +1,72 @@
+{
+  "purpose": "One fixed 20,000-tree capacity comparison on the existing 184-feature v11 residual architecture",
+  "reference": "locally sealed, unsubmitted v9 all-finite OOF policy and sealed v11 raw expert",
+  "architecture": {
+    "features": 184,
+    "categorical_features": 24,
+    "target": "finite taxi target minus valid own AOBT proxy",
+    "fit_target_range_sec": [
+      0,
+      86400
+    ],
+    "valid_proxy_range_sec": [
+      0,
+      7200
+    ],
+    "params": {
+      "task_type": "GPU",
+      "devices": "0",
+      "gpu_ram_part": 0.45,
+      "loss_function": "RMSE",
+      "eval_metric": "RMSE",
+      "iterations": 20000,
+      "depth": 10,
+      "learning_rate": 0.04,
+      "l2_leaf_reg": 12,
+      "random_strength": 0.5,
+      "bagging_temperature": 0.5,
+      "max_ctr_complexity": 1,
+      "one_hot_max_size": 20,
+      "border_count": 128,
+      "thread_count": 2,
+      "random_seed": 2026,
+      "allow_writing_files": false,
+      "verbose": 500
+    },
+    "max_iterations": 20000,
+    "only_change_from_v11": "CatBoost max iterations 10000 -> 20000",
+    "internal_early_stop": "unchanged seed-2026 permutation; max(20000,6 percent) early rows; patience 200; use_best_model=True",
+    "own_model_prefix": 10000,
+    "memory_launch_floor_gib": 10
+  },
+  "original_folds": {
+    "selection_months": [
+      1,
+      7
+    ],
+    "forward_months": [
+      11,
+      12
+    ],
+    "candidate": "clip(v9 + 0.5*(new20k_raw-old_sealed_v11_raw),0) on valid proxy only",
+    "prefix_diagnostic": "same formula with the same saved 20k model's exact ntree_end=10000 prediction",
+    "gate": "each fold: actual trees >10000, all-finite v9-to-full RMSE improves and paired UTC-day CI lower >0; full beats own prefix with paired UTC-day CI lower >0",
+    "bootstrap": {
+      "seed": 20261016,
+      "repeats": 1000
+    }
+  },
+  "fresh_audit": {
+    "months": [
+      4,
+      10
+    ],
+    "reference": "sealed matched v11 fresh_audit_predictions.v11_blend and fresh v11 raw expert",
+    "formula": "clip(v11_blend + 0.5*(new20k_raw-old_v11_fresh_raw),0)",
+    "gate": "actual trees >10000; both months improve against reference and own prefix; pooled paired-day lower gains >0 for both comparisons"
+  },
+  "after_fresh": "No final/ranking mode; separate frozen component guard and, if geometry succeeds, exact-composition compatibility required",
+  "separate_promotion_protocol_sha256": "bea09c4f944eaf66b48a6f4769bc052fd201ad3b587f6c151750694b92c9cf51",
+  "interpretation": "Repeated 2025 checks, not an untouched generalization estimate or evidence of a prize rank",
+  "leaderboard_use": false
+}
