@@ -33,7 +33,9 @@ import compose_current_candidate as current
 ROOT = Path(__file__).resolve().parent
 SPEC = ROOT / "reports/event_sequence_missing_spec_v14.json"
 SPEC_SHA256 = "26782bcd1c46662bb705525fa5a72c4d9eb1d57616bbca1ee42edcff1a50aabb"
-MOVEMENT_MANIFEST_SHA256 = "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4d8d6084825"
+INTEGRITY_ERRATUM = ROOT / "reports/event_sequence_integrity_erratum_v14.json"
+INTEGRITY_ERRATUM_SHA256 = "5d3b166c2971558d85ca491356dfab3acd93ed2f88fac05aeb804cc7f0ba1293"
+MOVEMENT_MANIFEST_SHA256 = "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4f8d6084825"
 V8_OOF_SHA256 = "575f1b5e8046135b92c5d051c0272045416d01078da0f4372c379c86d79a7f92"
 SEED = 20261017
 FOLDS = {"seasonal_jan_jul": (1, 7), "forward_nov_dec": (11, 12),
@@ -330,6 +332,7 @@ def source_paths(args: argparse.Namespace) -> dict[str, Path]:
     from solution import _training_files
     static = {
         "v14_source": Path(__file__), "v14_spec": SPEC,
+        "v14_integrity_erratum": INTEGRITY_ERRATUM,
         "event_builder_source": ROOT / "event_sequence_features_v14.py",
         "movement_source": ROOT / "movement_only_expert.py",
         "composition_source": ROOT / "compose_current_candidate.py",
@@ -396,6 +399,11 @@ def verify_existing_sources(args: argparse.Namespace, before: dict[str, str]) ->
     verify_sources(args, before)
     if sha256(SPEC) != SPEC_SHA256:
         raise ValueError("Published v14 scientific spec changed")
+    if (before["v14_integrity_erratum"] != INTEGRITY_ERRATUM_SHA256
+            or sha256(INTEGRITY_ERRATUM) != INTEGRITY_ERRATUM_SHA256
+            or read_json(INTEGRITY_ERRATUM).get("correct_manifest_sha256")
+            != MOVEMENT_MANIFEST_SHA256):
+        raise ValueError("Published v14 dependency-fingerprint erratum changed")
     if before["movement_manifest"] != MOVEMENT_MANIFEST_SHA256:
         raise ValueError("Original 79-field movement schema changed")
     if before["v8_oof"] != V8_OOF_SHA256:

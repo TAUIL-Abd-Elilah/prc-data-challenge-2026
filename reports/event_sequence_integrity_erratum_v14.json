@@ -1,0 +1,16 @@
+{
+  "correct_manifest_sha256": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4f8d6084825",
+  "evidence": "The published builder already pins and verifies the correct manifest; actual immutable movement/cache/source bytes are unchanged. The first trainer preparation refused at manifest identity verification before load_rows_and_reference or any fit.",
+  "incorrect_manifest_sha256_stated_in_spec_and_trainer": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4d8d6084825",
+  "manifest_categorical_count": 13,
+  "manifest_feature_count": 79,
+  "original_spec_sha256": "26782bcd1c46662bb705525fa5a72c4d9eb1d57616bbca1ee42edcff1a50aabb",
+  "original_trainer_sha256": "7d16c08ef1af2fdb77b6b66a1ab835e37fe3bea56986f88778aa6c708ee11343",
+  "raw_cache_model_or_original_receipt_bytes_changed": false,
+  "schema_version": 1,
+  "scientific_settings_changed": false,
+  "status": "published_before_first_successful_trainer_prepare_and_before_any_v14_fit_score_or_ranking",
+  "training_cache_receipt_sha256": "1c4ac4141015139f8ca42bb3c4b9c95d5d10a5a2800daa16a5296ff19d524ec3",
+  "type": "dependency_fingerprint_transcription_correction",
+  "unchanged_builder_sha256": "3719fd5b0048e0590f77f094bf1bc3829982e9fe3db4115688dc196cec4405e2"
+}
