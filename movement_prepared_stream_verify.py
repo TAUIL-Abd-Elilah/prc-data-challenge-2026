@@ -293,6 +293,84 @@ def independent_batch(cached: pd.DataFrame, rows: pd.DataFrame,
     return features, names
 
 
+def logical_batch_equal(original: pd.DataFrame, rebuilt: pd.DataFrame) -> bool:
+    """Compare pre-write values while preserving physical-schema checks later.
+
+    Pandas Arrow readback represents a string categorical vocabulary as ``str``
+    while the unchanged ``astype('string').astype('category')`` preparation
+    formula holds it as ``string`` before writing. Category labels, order and
+    codes must match here; the regenerated Parquet schema and post-write values
+    are compared separately with strict dtype/metadata equality.
+    """
+    if list(original) != list(rebuilt) or len(original) != len(rebuilt):
+        return False
+    for name in original:
+        left, right = original[name], rebuilt[name]
+        left_cat = isinstance(left.dtype, pd.CategoricalDtype)
+        right_cat = isinstance(right.dtype, pd.CategoricalDtype)
+        if left_cat != right_cat:
+            return False
+        if left_cat:
+            if (left.cat.ordered != right.cat.ordered
+                    or not left.cat.categories.equals(right.cat.categories)
+                    or not np.array_equal(left.cat.codes.to_numpy(),
+                                          right.cat.codes.to_numpy())):
+                return False
+        elif not left.equals(right):
+            return False
+    return True
+
+
+def source_category_storage(cached_path: Path, raw_files: list[Path]
+                            ) -> dict[str, pa.DataType]:
+    """Choose Arrow string storage from released inputs, never the old cache."""
+    baseline_file = pq.ParquetFile(cached_path)
+    try:
+        baseline_schema = baseline_file.schema_arrow
+    finally:
+        baseline_file.close()
+    storage = {}
+    for name in movement.SAFE_CACHED_CATEGORICAL:
+        field_type = baseline_schema.field(name).type
+        if (not pa.types.is_dictionary(field_type)
+                or not (pa.types.is_string(field_type.value_type)
+                        or pa.types.is_large_string(field_type.value_type))):
+            raise ValueError(f"Baseline source categorical storage changed: {name}")
+        storage[name] = field_type.value_type
+    raw_types = []
+    for path in raw_files:
+        raw_file = pq.ParquetFile(path)
+        try:
+            raw_types.append(raw_file.schema_arrow.field("FLIGHT_mvt").type)
+        finally:
+            raw_file.close()
+    if not raw_types or any(value != raw_types[0] for value in raw_types):
+        raise ValueError("Raw flight-name storage differs across canonical months")
+    if not (pa.types.is_string(raw_types[0])
+            or pa.types.is_large_string(raw_types[0])):
+        raise ValueError("Raw flight-name source is no longer an Arrow string")
+    storage["flight_name_mvt"] = raw_types[0]
+    return storage
+
+
+def encode_source_category_storage(table: pa.Table,
+                                   storage: dict[str, pa.DataType]) -> pa.Table:
+    """Serialize category labels with source Arrow string width, preserving codes."""
+    for name, value_type in storage.items():
+        index = table.schema.get_field_index(name)
+        if index < 0:
+            raise ValueError(f"Independently generated category missing: {name}")
+        field = table.schema.field(index)
+        if not pa.types.is_dictionary(field.type):
+            raise ValueError(f"Independently generated category type differs: {name}")
+        target = pa.dictionary(field.type.index_type, value_type,
+                               ordered=field.type.ordered)
+        if field.type != target:
+            table = table.set_column(index, field.with_type(target),
+                                     table.column(index).cast(target))
+    return table
+
+
 def source_paths(args: argparse.Namespace) -> dict[str, Path]:
     paths = {
         "baseline_training_rows": args.cache_dir / "training_rows.parquet",
@@ -400,6 +478,7 @@ def rebuild_in_batches(args: argparse.Namespace, rebuilt_dir: Path,
         cached_path, movement.SAFE_CACHED_CATEGORICAL, args.abort_free_gib)
     independent_flight_dtype = flight_category_dtype(
         raw_files, args.batch_size, args.abort_free_gib)
+    category_storage = source_category_storage(cached_path, raw_files)
     expected_categorical = [*movement.SAFE_CACHED_CATEGORICAL,
                             "flight_name_mvt"]
     if original_manifest["categorical"] != expected_categorical:
@@ -453,10 +532,12 @@ def rebuild_in_batches(args: argparse.Namespace, rebuilt_dir: Path,
                     raise ValueError("Independent feature name/order differs from manifest")
             elif current_names != names:
                 raise ValueError("Independent feature schema changed across batches")
-            if not old_feature_part.equals(rebuilt_part):
+            if not logical_batch_equal(old_feature_part, rebuilt_part):
                 raise ValueError(f"Independently rebuilt logical features differ at {offset}")
             feature_table = pa.Table.from_pandas(rebuilt_part,
                                                  preserve_index=False)
+            feature_table = encode_source_category_storage(
+                feature_table, category_storage)
             id_table = pa.Table.from_pandas(
                 row_part[["MVT_ID_mvt"]], preserve_index=False)
             if (not feature_table.schema.equals(original_schema,

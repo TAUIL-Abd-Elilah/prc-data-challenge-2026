@@ -252,6 +252,10 @@ The verifier's operational memory audit found no intended allocation above 1 GiB
 python run_bounded_worker.py --worker movement_prepared_stream_verify.py --report artifacts/v6-movement-only/stream_worker_memory.json -- --mode verify --min-free-gib 2.5 --abort-free-gib 1.5
 ```
 
+The first monitored full-cache attempt failed before sealing at the initial batch. Its sampled peak RSS was 0.579 GiB and minimum available RAM was 2.449 GiB. Diagnosis found no logical flight-category differences: pre-write Pandas `string` versus Parquet-readback `str` category representation caused strict Series equality to fail. The independent temporary writer now derives categorical UTF-8 storage from the baseline source schema and all twelve canonical raw flight-name schemas, rather than from the original prepared cache. Category labels, order and codes must match before writing; the original exact physical Arrow schema/metadata, reread values and categorical checks remain mandatory. A 1,024-row physical round-trip check passed; the complete rerun is still required.
+
+The saved-model streaming producer also accepts `--min-free-gib 2.5` for monitored runs while retaining its 4 GiB default. It enforces a 1.5 GiB runtime floor. This changes resource handling only; it preserves the same source receipts, model, features, masks, rounds, predictions and downstream validation checks.
+
 The latter three stages require the completed feature cache and at least 10 GiB free memory. Run them serially after current fitting and audit jobs.
 
 OpenStreetMap geometry was considered only for a read-only extraction audit. No maps were obtained, matching coverage is unknown, and no OSM data enter a model or submission. ODbL is an open-data license; the challenge's external-data wording says open-source license without naming accepted data licenses. Geometry is excluded while that interpretation remains unresolved. No OurAirports or OpenAP data are used.

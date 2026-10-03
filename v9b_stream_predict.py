@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
 import tempfile
 from pathlib import Path
@@ -175,7 +176,9 @@ def predict_fold(args: argparse.Namespace) -> None:
         raise ValueError("predict-fold requires --fold")
     if Path.cwd().resolve() != Path(__file__).resolve().parent:
         raise ValueError("Run streaming inference from the repository root")
-    movement.require_memory(MIN_FREE_GIB)
+    if not math.isfinite(args.min_free_gib) or args.min_free_gib < 2.5:
+        raise ValueError("Streaming-only initial memory gate must be finite and >=2.5 GiB")
+    movement.require_memory(args.min_free_gib)
     name, months = args.fold, v9b.FOLDS[args.fold]
     output_path = args.output_dir / f"{name}_valid_oof.parquet"
     manifest_path = args.output_dir / f"{name}_prediction_manifest.json"
@@ -210,7 +213,7 @@ def predict_fold(args: argparse.Namespace) -> None:
     try:
         for rows, features in streaming.iter_prepared_training_batches(
                 args.movement_dir, args.cache_dir, BATCH_SIZE):
-            movement.require_memory(1.0)
+            movement.require_memory(1.5)
             check_batch_categories(features, prepared_manifest, model)
             target = rows.target.to_numpy(dtype=float)
             proxy = rows.proxy.to_numpy(dtype=float)
@@ -273,6 +276,8 @@ def predict_fold(args: argparse.Namespace) -> None:
                                 "MVT_ID_mvt"]
     v9b.verify_prediction(args, name, expected_ids, months)
     audit = {"purpose": "Bounded saved-model inference; no fit or scoring",
+             "initial_memory_gate_gib": args.min_free_gib,
+             "runtime_memory_floor_gib": 1.5,
              "fold": name, "batch_rows": BATCH_SIZE,
              "source_sha256_before": before,
              "source_sha256_after": after,
@@ -363,6 +368,8 @@ def main() -> None:
     parser.add_argument("--v5-oof", type=Path,
                         default=Path("artifacts/v5-ensemble/validation_predictions.parquet"))
     parser.add_argument("--receipt", type=Path, default=RECEIPT)
+    parser.add_argument("--min-free-gib", type=float, default=MIN_FREE_GIB,
+                        help="Streaming-only start gate; monitored runs may use 2.5 GiB")
     parser.add_argument("--receipt-sha256", default=RECEIPT_SHA256,
                         help="SHA-256 of the independently frozen own-fit receipt; "
                              "supply with --receipt for a relocated frozen receipt")
