@@ -347,3 +347,29 @@ No version 8 upload or official score exists yet. At 2026-10-03 02:24 UTC the co
 The prospective v11 departure-flow cache is now built without reading departure block/taxi labels. Independent readback confirms exact baseline/raw departure IDs and original order for all 2,085,047 training and 344,841 ranking rows; ID plus ten float32 fields; no infinite or negative counts; and exact all-NaN invalid-query masks (23,501 training and 5,464 ranking). Frozen source and input hashes matched before and after verification. Exact aggregates are `reports/taxi_interval_flow_protocol_v11.json` and `reports/taxi_interval_flow_build_v11.json`. Training output SHA-256 is `093cdd432177de02ce798e30bdc071536ed6c735dbd783c5638dc717c05d4ab4`; ranking output is `c17f204f581b6a9718eeac1b798ff6dea422b3e09f02bc2624385d14d04b89c4`. No v11 model has been fitted or scored.
 
 The fixed v10 model inputs and complementary-fold reference are sealed in `reports/runway_taxi_model_protocol_v10.json` (SHA-256 `b83783bf2c58403403de9c7edc65ab91d47d68874a08fbda796212c2abf34cfd`). Its original complementary validation fitting has started. All scientific settings remain those of the prospective v10 model specification; the new cache build did not select them. Later portfolio selection binds the complete current baseline and both candidate specifications and sources before their model outcomes.
+
+
+### V10 original gates passed
+
+The same-runway arrival-taxi candidate passed both original all-finite gates at January/July's selected weight **0.25**. January/July RMSE is 322.310529 → 322.128076 seconds, with paired UTC-day gain interval [0.123041, 0.264010]. November/December retains 0.25 and improves 215.198602 → 214.700432, interval [0.388600, 0.621016]. The original tree counts are 9,999 and 9,997. Exact original-stage evidence is `reports/runway_taxi_original_validation_v10.json` and the two `runway_taxi_*_provenance_v10.json` receipts. Their pending fresh flag describes that snapshot. The April/October audit is running next, and this candidate remains unauthorized for ranking.
+
+A repository audit found Git's automatic line-ending conversion made some published JSON bytes differ from the original recorded hashes. `.gitattributes` now preserves Python/JSON bytes, and all affected tracked files were republished with the exact original bytes. An independent normalized-content check proved no source algorithm, specification, record value or working file changed. The existing frozen hashes remain authentic; see README's independent-reproduction guidance.
+
+
+### Executable later selection and reserved guard
+
+`later_feature_portfolio.py` implements the already published v10/v11/current compatibility policy. It verifies original/fresh source and model receipts and recomputes their fixed scores from saved OOF before comparing the two eligible compositions with the current policy. All 25 published baseline/spec/source bindings and every original candidate's transitive input/source/raw-file hash remain sealed through the decision, including rejected routes. It preserves the missing-clock correction and selects only after both families have terminal evidence. Its source SHA-256 is `f0dde94e95479b0e0dae00d9d4b37b3437bcc7c8804f4dfd912cba2f78568a0d`.
+
+`later_reserved_guard.py` freezes the selected family/weight before May/September scoring and binds feature-cache inputs back to the selected family's original protocol. It runs serial matched v7 and selected-family refits, excluding May/September from both training and internal early stopping, then checks each reserved month and the pooled paired UTC-day interval for the single fixed blend. Guard failure retains the current policy. Its source SHA-256 is `3e655cafb47286a4dd5004f7d678d5f197c3336ab5734ec445617f18e29247d8`. Compile, synthetic ID/mask/formula/source-tamper checks and independent static review passed. Neither executable has yet compared real candidates or scored May/September.
+
+After both original/fresh candidate decisions are terminal, and after publishing the selection receipt before the reserved fits:
+
+```powershell
+python later_feature_portfolio.py --mode evaluate-select --expected-source-sha256 f0dde94e95479b0e0dae00d9d4b37b3437bcc7c8804f4dfd912cba2f78568a0d
+python later_reserved_guard.py --mode freeze
+python later_reserved_guard.py --mode fit-comparator
+python later_reserved_guard.py --mode fit-replacement
+python later_reserved_guard.py --mode evaluate
+```
+
+The three fit/evaluate commands are conditional on selecting a replacement; unchanged current selection creates its terminal receipt without a reserved fit or score. Full jobs remain serial with a 10 GiB initial memory gate. Final fitting/ranking additionally requires the separately implemented, reviewed and published final-stage source and a passing selected replacement guard.
