@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "status": "prospective_source_only_no_real_run_authorized",
+  "purpose": "Prove actual isolated genesis and complete fixed scientific replay of the nine remaining v3 stages, then issue a full v3 parent receipt only if all eleven stage transactions pass",
+  "baseline_proof_adapter_sha256": "a2bb0dece86e388c05c3a34d6aa7be8062494cc5138e63fd1295ec790d7deaa9",
+  "baseline_proof_spec_sha256": "c91134290e0b3bac94d1fdb283d722c8d3fb5bddd8df93c43e41352eb3beabe2",
+  "clean_parent_producer_sha256": "01841e79851963fe3e5ec34334f48309cee41d24be39f4cf3daaf70e86ee4203",
+  "clean_parent_producer_spec_sha256": "d82dcd356f788e7dba0e6d30a58e8133c19b90668f08509cc268e74054d60e6c",
+  "legacy_validation_erratum_sha256": "209176e6e75453aa18d68406992f6ac17994622d9244b06a341738acbe99a4f3",
+  "ordered_stages": ["baseline_train", "baseline_predict", "missing", "grouped", "weather", "airports", "tail", "lirf", "ensemble", "lobt", "lobt_blend"],
+  "supported_stages": ["missing", "grouped", "weather", "airports", "tail", "lirf", "ensemble", "lobt", "lobt_blend"],
+  "original_commands": "Use only clean_parent_producers.stage_commands with cwd=isolated run root, source scripts from the pinned published checkout and canonical isolated data/cache/weather/parent paths. No original downloader or source-root artifact use.",
+  "genesis_and_replay": {
+    "prelaunch": "Hash source closure, independently acquired raw/weather manifest and every prior actual stage transaction/output byte. Reverify two baseline source/model/OOF transactions before the first downstream child. Require 10 GiB free physical RAM and exclusive fresh stage/transaction paths before running.",
+    "actual_run": "Run the allowlisted original CLI once with fixed arguments into a fresh stage. Rehash source, raw/weather and all prior outputs after each command. No resume after partial failure.",
+    "independent_replay": "Independently reconstruct saved model predictions and fixed source formulas from SHA-sealed inputs. Compare exact ordered IDs, labels, folds, covariate schemas and prediction values with the stage outputs; recompute reported scoring/selection fields. Do not use a claim written by the child as sole evidence. Every actual output byte is then SHA-bound in the transaction.",
+    "saved_models": "For every .txt LightGBM model produced by missing, weather, airports and LOBT, load the actual saved model, require source-consistent schema/objective/rounds and replay its heldout OOF and ranking predictions through original pure feature/proxy functions. Training, early and heldout ordered ID/label SHA are captured where each stage exposes them.",
+    "deterministic_stages": "Grouped, schedule tail, ensemble and LOBT blend use source-pure table/statistics/formula recomputation with exact ID and value comparison. LIRF saves no model files, so one separate fixed-source refit in a fresh replay directory is required; compare its OOF/ranking/report scientific values, allowing only explicitly named output-path fields to differ.",
+    "promotion": "Promote only independently verified files exclusively to the canonical isolated stage directory; read back output hashes and write a single actual transaction. A stage with an orphaned partial file refuses."
+  },
+  "full_v3_receipt": "No real remaining-v3 stage or full receipt is currently authorized. The corrected prospective parent contract truthfully records original heldout-label early stopping and policy selection. Once the exact reviewed adapter SHA is published, eleven actual-genesis stage transactions can be proved and the complete receipt emitted without a fabricated fit-and-early exclusion assertion.",
+  "review_authorization": {
+    "current_state": "The corrected parent spec pins the exact independently reviewed remaining.py file SHA; every real stage and emit-v3 additionally require matching Git HEAD source/spec bytes and independently sealed isolated inputs before any value read",
+    "review_pin_scope": "The reviewed pin authenticates only SHA256(replica_v3_remaining.py file), never the adapter spec hash or a source-snapshot aggregate; the adapter source bytes contain no parent-spec or remaining-spec literal hash",
+    "acyclic_publication_order": [
+      "Independently review and publish the corrected legacy erratum and parent, timestamp and baseline proof source/spec bytes",
+      "Independently review and publish this remaining-stage adapter source file at a fixed SHA",
+      "Publish the parent reviewed_v3_proof_adapter_sha256 equal to that fixed file SHA and revise its prospective synthetic test to verify the enabled exact pin",
+      "Repin the resulting parent source/spec SHA in the baseline proof spec, then repin the baseline spec and parent source/spec SHAs in this remaining-stage spec",
+      "Publish all final source/spec bytes; before each real stage require exact Git HEAD file bytes, isolated-root source/raw seals and proved prior-stage genesis; emit the full receipt only after all eleven stage proofs and the reviewed adapter pin"
+    ],
+    "cycle_check": "Parent spec pin to remaining.py file SHA does not depend on parent or remaining spec bytes; parent spec changes propagate only forward to baseline spec and remaining spec. Runtime source snapshots hash these final spec bytes after publication.",
+    "failure_policy": "Any null/mismatched reviewed pin, unpublished or changed Git HEAD bytes, stale transitive spec SHA or missing actual-genesis prior-stage transaction refuses; no generic caller-supplied hash bypass"
+  },
+  "known_science_contract_blocker": {
+    "original_baseline_source": "solution.train: early_idx = core_labeled & valid_month; model fit excludes heldout, early stopping uses heldout",
+    "other_original_sources": ["missing_expert.py", "weather_model.py", "airport_models.py", "lobt_expert.py"],
+    "corrected_parent_requirement": "clean_parent_producers.verify_external_v3 and replica_v4_timestamp.validate_manifest_metadata now require the exact pinned legacy erratum fields: fit_excludes_heldout=true, early_stop_uses_heldout=true, fit_and_early_exclude_heldout=false, and a full per-stage policy map",
+    "consequence": "emit-v3 still refuses before any value read or receipt write until the corrected parent contract and this adapter are independently reviewed and published"
+  },
+  "resource_and_validation_limits": "LIRF's unsaved models require an extra small fixed-source fit. Saved-model stages use their actual model files for replay and do not require a second full training pass. The 2025 validation months are repeatedly inspected and do not represent untouched evaluation.",
+  "authorized_now": ["new_source", "new_spec", "plan", "synthetic_metadata_tests", "compile", "static_peer_review"],
+  "not_authorized_now": ["real_raw_cache_or_model_reads", "original_child_launch", "real_fit_or_score", "clone_or_copy_original_artifacts", "emit_real_receipt", "upload_or_leaderboard_use"]
+}

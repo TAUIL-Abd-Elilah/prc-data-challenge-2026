@@ -29,7 +29,7 @@
     "outputs": "Fresh isolated staging, exclusive canonical source files/weather/manifest/producer receipt; never overwrite or resume partial outputs",
     "source_and_protocol_recheck": "Fresh source hashes before/after, each acquired source URL and raw byte SHA, exact saved Parquet value readback, all station-year source reaggregation on verify",
     "RAM_launch_floor_GiB": 10,
-    "download_boundary": "HTTPS www.ncei.noaa.gov only including redirect target; maximum 64 MiB each station-year; 45 second request timeout",
+    "download_boundary": "HTTPS www.ncei.noaa.gov only including redirect target; maximum 64 MiB each station-year; 45 second request timeout; at most three transient request/read attempts with one/three second backoff. Each attempt is exclusive and failed bytes remain separate; only a complete response is linked to the staged canonical input.",
     "same_algorithm_replay_limit": "Value replay uses the same pinned public processing functions; it verifies acquisition/output correspondence, not an independent scientific weather oracle",
     "new_snapshot": "NOAA records update; fresh bytes have their own SHA and receipt. Never assert equality to the original weather snapshot or official score transfer."
   },

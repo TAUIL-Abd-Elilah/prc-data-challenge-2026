@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "status": "prospective_source_only_no_real_run_authorized",
+  "purpose": "Isolated clean reproduction of the locally accepted v5 missing-clock, clean-arrival, and fixed composition stages",
+  "upstream": {
+    "adapter": "replica_v4_timestamp.py",
+    "requirement": "A disjoint run root with independently rebuilt v3, GPU, source-classifier and timestamp models, fold OOF, final models, ranking outputs and complete producer receipts. The v4 adapter must replay its reference, both timestamp folds, final model and ranking output before v5 preparation. Training-file discovery must equal the twelve sealed canonical monthly paths with no extra matching files.",
+    "no_original_artifact_replacement": true
+  },
+  "run_order_after_publication_and_independent_v4_completion": [
+    "prepare",
+    "build-arrival-train",
+    "fit-missing-fold --fold seasonal_jan_jul",
+    "fit-missing-fold --fold forward_nov_dec",
+    "fit-arrival-fold --fold seasonal_jan_jul",
+    "fit-arrival-fold --fold forward_nov_dec",
+    "evaluate",
+    "fit-missing-final",
+    "fit-arrival-final",
+    "ranking-seal",
+    "build-arrival-rank",
+    "predict"
+  ],
+  "scientific_policy": {
+    "folds": {"seasonal_jan_jul": [1, 7], "forward_nov_dec": [11, 12]},
+    "all_finite_universe": 672428,
+    "missing_direct": {
+      "source": "missing_catboost.py",
+      "features": "Exact original direct NUMERIC, weather wx_, and DIRECT_CATEGORICAL selection and order, with original category vocabularies and unclipped schedule clock",
+      "train": "No NM AOBT or LOBT, invalid own AOBT proxy, finite target 0..7200 seconds, complementary months. Includes LIRF in training as the original source does.",
+      "test": "Held months, finite target, invalid own AOBT proxy, no NM AOBT or LOBT, airport other than LIRF",
+      "params": "CatBoost CPU RMSE, iterations 700, depth 6, learning rate 0.045, L2 20, random strength 0.5, bagging temperature 0.5, max CTR complexity 1, one-hot 20, border count 128, seed 2026, four threads",
+      "early": "Original name-seeded shuffled 10 percent split, minimum 500 for >=1000 training rows, at most one-third; patience 70 and use_best_model true",
+      "accepted_policy": "Fixed clip(0.5 * v4 + 0.5 * direct, 0) only on the no-NM invalid-AOBT non-LIRF gate; all other rows unchanged. Rejected LIRF ratio/classifier candidates are outside the accepted route and are not fitted by this adapter.",
+      "final_trees": "Integer median of the two original fold best_iteration + 1; all eligible 2025 ordinary rows"
+    },
+    "arrival_direct": {
+      "source": "arrival_residual_expert.py and arrival_features.py",
+      "features": "Original baseline + released flight and NOAA weather + 14 ARR-ground features. Departure BLOCK and TAXITIME are never predictors; ARR BLOCK and TAXITIME are permitted as released ranking covariates.",
+      "train": "Finite target 0..86400 seconds and own proxy 0..7200, complementary months",
+      "test": "Held months, finite target and own proxy 0..7200, including negative and >86400 held labels",
+      "params": "Original LightGBM regression parameters, at most 1200 rounds, four threads, seed 2026",
+      "early": "Complement-only seed 2026 seasonal / 2033 forward shuffle; max(30000, 6 percent) internal early rows; patience 100",
+      "accepted_policy": "Seasonal grid {0, 0.1, 0.25, 0.5, 1} must select 0.25 against clean v4; unchanged 0.25 must improve forward. Apply 0.25 toward raw ARR expert after deep and missing stages only on valid own proxy.",
+      "final_trees": "Integer median of only original fold best_iteration values; all 2025 core valid-proxy rows"
+    },
+    "composition": "Clipped v4 -> fixed 0.5 deep timestamp on valid AOBT -> fixed 0.5 direct missing on disjoint ordinary no-NM non-LIRF gate -> fixed 0.25 clean ARR on valid AOBT. Both incremental missing and clean ARR stages must improve both all-finite folds. The legacy arrival correction stack is never included.",
+    "ranking": "After source/model/input seal, use the independently rebuilt v4 ranking parent and saved full v5 models; exact template ID/order, 344841 rows, 339377 valid proxy rows, 5464 outside-valid rows unchanged except the disjoint missing gate, finite nonnegative without upper clipping."
+  },
+  "integrity": {
+    "minimum_free_physical_memory_gib": 10,
+    "run_root_disjoint_from_source": true,
+    "source_and_parent_input_hashes": "Prepare writes a frozen protocol from exact original and independently rebuilt parent/raw/cache/weather/model/output bytes before its v4 saved-model replay, then writes a separate successful prepare receipt. Every later mode requires both. Rehash all source and parent inputs before and after each fit, score and inference. Source publication SHA is an external attestation; local equality alone does not prove public publication.",
+    "receipts": "Exclusive per-fold and full-model receipts bind ordered fit/early/held IDs and target hashes, exact feature schema and category levels, requested and actual model params/trees, saved model, model-to-OOF readback, ranking probe and output hashes. No overwrite or resume by trusting an orphan output.",
+    "failure": "Any missing upstream producer, changed bytes, split/model/prediction mismatch, changed accepted weight or failed paired-fold gate stops downstream stages without substitute artifacts or retuning."
+  },
+  "validation_limit": "The new v5 missing and ARR component fits and early-stop sets exclude their held months. The inherited legacy v3 parent used held-month labels for early stopping, so full-policy comparisons do not have a strictly untouched fold lineage. January/July and November/December were also used repeatedly during local development. These are checks of a frozen reproduction policy, not untouched generalization estimates. Independent CPU/GPU reproduction need not produce byte-identical models or identical scores.",
+  "authorized_now": ["new_spec", "new_adapter", "plan", "synthetic_self_test", "compile", "read_only_peer_review"],
+  "not_authorized_now": ["real_raw_or_cache_value_read", "real_fit_or_score", "ranking_inference", "clone_or_copy_original_artifacts", "upload_or_leaderboard_feedback"]
+}

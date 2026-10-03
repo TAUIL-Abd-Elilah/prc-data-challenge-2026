@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "status": "prospective_source_only_no_real_run_authorized",
+  "legacy_validation_erratum_sha256": "209176e6e75453aa18d68406992f6ac17994622d9244b06a341738acbe99a4f3",
   "purpose": "Clean v4 reference and depth-9 timestamp component under an isolated run root; original scientific settings, independently rebuilt parent bytes and new receipts",
   "replica_of": "published local v4 sequential reference and original v5 timestamp expert component",
   "upstream_prerequisites": [
@@ -10,7 +11,7 @@
     "Twelve 2025 raw files, 2026 ranking and submission template, baseline training/ranking rows and features, NOAA weather"
   ],
   "scientific_choices": {
-    "v4_reference": "Call v4_reference.load_v4(root=isolated_run_root, verify_snapshot=False); require exact independently rebuilt parent IDs, finite labels, month/fold/time and nonnegative clipping. The optional historical RMSE equality is not a gate on new GPU bytes.",
+    "v4_reference": "Call v4_reference.load_v4(root=isolated_run_root, verify_snapshot=False); require exact independently rebuilt parent IDs, finite labels, month/fold/time and nonnegative clipping. The optional historical RMSE equality is not a gate on new GPU bytes. Inherited original-v3 heldout scores used some held labels for early stopping and policy selection and are indicative, as the pinned legacy-validation erratum records.",
     "folds": {"seasonal_jan_jul": [1, 7], "forward_nov_dec": [11, 12]},
     "timestamp_model": "Call deep_timestamp_expert.load_features and fit_fold with explicit isolated source/cache/output paths. GPU CatBoost residual, requested 4500 trees, depth 9, seed 2026, 2 CPU threads for data operations, original params, internal 6 percent shuffled early stop with at least 20000 rows and patience 200. Fit and early stop exclude heldout months.",
     "features": "Exact published timestamp/flight/weather feature order and category levels; only ranking-available projected raw fields. No departure BLOCK_TIME_UTC_mvt or TAXITIME_SEC_mvt feature.",
@@ -33,7 +34,7 @@
     "publication_trust_boundary": "A supplied source SHA is an operator publication attestation. Equality to local bytes alone does not prove a public commit; verify the source commit before any real mode."
   },
   "provenance": {
-    "parent_receipts": "Named independent v3/lobt, GPU and source producer receipts must bind all own raw/cache/weather input SHAs, relevant upstream output SHAs, source commit/source hashes, parameter/split choices, model/report/OOF/ranking output SHAs and ordered IDs. No historical private artifact byte hashes are authentication pins.",
+    "parent_receipts": "Named independent v3/lobt, GPU and source producer receipts must bind all own raw/cache/weather input SHAs, relevant upstream output SHAs, source commit/source hashes, parameter/split choices, model/report/OOF/ranking output SHAs and ordered IDs. The v3 receipt must truthfully state fit exclusion with heldout-label early stopping and original policy selection. GPU/source receipts state only their own component's heldout exclusion and the inherited-v3 limitation. No historical private artifact byte hashes are authentication pins.",
     "adapter_receipts": "Rehash all parent/source/spec bytes before and after each operation; record exact schema/category vocabularies, fit/early/held ID hashes, saved model parameters and tree count, OOF model readback predictions, all-finite score replay, full-training ID hash, template/ranking input seal, invalid-row equality and final Parquet readback.",
     "failure_policy": "Any missing/changed parent, schema, model replay, split, selected-weight or output check refuses dependent stages. No retuning, resume or overwrite."
   },

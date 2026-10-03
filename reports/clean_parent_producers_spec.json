@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "status": "prospective_source_only_no_real_run_authorized",
+  "legacy_validation_erratum_sha256": "209176e6e75453aa18d68406992f6ac17994622d9244b06a341738acbe99a4f3",
   "purpose": "Isolated actual-transaction producer receipts for the accepted v3 LOBT parent, fixed v4 GPU residual and source classifier; inputs/outputs must be independently rebuilt and replayed",
   "source_checkout_role": "published GPLv3 source and pinned helper code only; no raw, cache, model, prediction or credential bytes are read from this checkout",
   "frozen_original_source_sha256": {
@@ -18,7 +19,9 @@
     "catboost_source.py": "e67c8c2c2ff4993cccab9e34685908d9f4887ca25b7ae8277bf3eb211714c6e2",
     "catboost_expert.py": "1e1ecfec5acfe41524f028339984ae56fdb1b8c6e360fde704acdd64258345f2",
     "download_noaa_weather.py": "bbb8fe3dc64250fbc41519ba716913af3349d5724fc65e388d399a3b1d380525",
-    "replica_v4_timestamp.py": "3782ceaf8bf8844f1ee67a633e5381f68b2c625d4090949008af03e062657d06",
+    "replica_v4_timestamp.py": "7f8f5fd0cfe7b54f10e110e80aeddf0ca6e84966978de6a6f0e44604d2d96a11",
+    "reports/clean_replication_timestamp_spec.json": "19444e6349f39a5830901b12926a291078ff4b1461e8bddb5017157a010e8fc7",
+    "replica_v3_remaining.py": "545e5ab1c077a219f2a74087b16cc3f4dada49091bae9ee3c1b3042a7f390806",
     "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
     "requirements-lock.txt": "2d201a484bc8c8f7027e56f608da51114958dd5c628ab32a5f2018a437086254",
     "requirements-research.txt": "07638af4d9936b23622feeef799ff60dd5c226918352837768aed118d1417b4f"
@@ -38,19 +41,19 @@
   },
   "scientific_contract": {
     "folds": {"seasonal_jan_jul": [1, 7], "forward_nov_dec": [11, 12]},
-    "v3": "Published solution, missing, grouped, weather, airport, tail, LIRF, ensemble, LOBT and LOBT blend commands with full intermediate model/OOF/ranking byte provenance; fixed accepted LOBT valid-disagreement weight 1.0, invalid fallback 1.0 and gap threshold 3600 seconds",
-    "gpu": "catboost_gpu.py GPU depth8, 1500 tree cap, seed2026, original 6 percent complement-month early stop with at least 20000 and patience120; Jan/Jul eligible selection must be .25, unchanged forward all-finite gain; final all-eligible 1500 trees and fixed .25 ranking blend",
-    "source_classifier": "catboost_source.py CPU depth7, 600 tree cap, seed2026, original LIRF/LTFM valid-AOBT schedule candidate and target-within-60s training class; complement-month 8 percent early stop with at least3000 and patience100; Jan/Jul scale must be .5 and transfer gains positive; final integer median original best_iteration+1; sequential ranking applies fixed GPU .25 then source .5",
+    "v3": "Published solution, missing, grouped, weather, airport, tail, LIRF, ensemble, LOBT and LOBT blend commands with full intermediate model/OOF/ranking byte provenance; fit excludes each named held pair where applicable, but legacy baseline/missing/weather/airport/LOBT early stopping uses that held pair and other v3 policies select on held labels. The pinned erratum gives each stage's exact validation use. Fixed accepted LOBT valid-disagreement weight 1.0, invalid fallback 1.0 and gap threshold 3600 seconds",
+    "gpu": "catboost_gpu.py GPU depth8, 1500 tree cap, seed2026, own-component 6 percent complement-month early stop with at least 20000 and patience120; Jan/Jul eligible selection must be .25, unchanged forward all-finite gain; final all-eligible 1500 trees and fixed .25 ranking blend. Its own heldout exclusion does not make the inherited v3 reference untouched",
+    "source_classifier": "catboost_source.py CPU depth7, 600 tree cap, seed2026, own-component LIRF/LTFM valid-AOBT schedule candidate and target-within-60s training class; complement-month 8 percent early stop with at least3000 and patience100; Jan/Jul scale must be .5 and transfer gains positive; final integer median original best_iteration+1; sequential ranking applies fixed GPU .25 then source .5. Its own heldout exclusion does not make the inherited v3 reference untouched",
     "all_finite_and_ranking": "Recompute OOF labels, heldout IDs, model readback and all reported fixed-policy metrics; exact 344841 template order, finite nonnegative output and unchanged invalid/off-gate rows; no ranking label or leaderboard use"
   },
   "upstream_v3_gap": {
-    "reviewed_v3_proof_adapter_sha256": null,
-    "required_next_work": "A separately reviewed and published v3 producer proof adapter must construct actual transaction receipts for all eleven intermediate stages; each must replay saved model/OOF and ranking or deterministic formula. The v3 producer receipt must bind those transaction SHAs, all intermediate output bytes and model roles. The current driver refuses every v3 child stage before launch and refuses any v3 receipt while this adapter SHA remains null.",
+    "reviewed_v3_proof_adapter_sha256": "545e5ab1c077a219f2a74087b16cc3f4dada49091bae9ee3c1b3042a7f390806",
+    "required_next_work": "The separately reviewed v3 producer proof adapter must be published together with this pin before real use. It constructs actual transaction receipts for all eleven intermediate stages, replays saved model/OOF and ranking or deterministic formulas, and binds every intermediate output and model role. The current parent driver still refuses its own v3 child stages; only the separately pinned adapter may execute them. No full v3 receipt is accepted until all eleven transactions are proved.",
     "no_inferred_proof": true
   },
-  "reviewed_v3_proof_adapter_sha256": null,
+  "reviewed_v3_proof_adapter_sha256": "545e5ab1c077a219f2a74087b16cc3f4dada49091bae9ee3c1b3042a7f390806",
   "parent_receipts": {
-    "v3": "parents/v3_producer_receipt.json (future separate reviewed adapter)",
+    "v3": "parents/v3_producer_receipt.json (only from the separately reviewed and published eleven-stage adapter)",
     "gpu": "parents/gpu_producer_receipt.json built only from verified gpu_fit/gpu_final transactions",
     "source": "parents/source_producer_receipt.json built only from verified source_fit/source_final transactions",
     "timestamp_manifest": "parents/v4_timestamp_parents.json with canonical file roles required by replica_v4_timestamp.py",

@@ -26,6 +26,10 @@ import pandas as pd
 
 SOURCE_ROOT = Path(__file__).resolve().parent
 SPEC = SOURCE_ROOT / "reports/clean_parent_producers_spec.json"
+LEGACY_ERRATUM_REL = "reports/clean_replication_legacy_validation_erratum.json"
+LEGACY_ERRATUM_SHA256 = "209176e6e75453aa18d68406992f6ac17994622d9244b06a341738acbe99a4f3"
+REVIEWED_V3_PROOF_REL = "replica_v3_remaining.py"
+REVIEWED_V3_PROOF_SHA256 = "545e5ab1c077a219f2a74087b16cc3f4dada49091bae9ee3c1b3042a7f390806"
 MIN_FREE_GIB = 10.0
 FOLDS = {"seasonal_jan_jul": (1, 7), "forward_nov_dec": (11, 12)}
 HEX64 = re.compile(r"[0-9a-f]{64}\Z")
@@ -36,7 +40,9 @@ SOURCE_CLOSURE = (
     "airport_models.py", "schedule_tail.py", "lirf_expert.py", "ensemble.py",
     "lobt_expert.py", "lobt_blend.py", "catboost_gpu.py",
     "catboost_source.py", "catboost_expert.py", "download_noaa_weather.py",
-    "replica_v4_timestamp.py", "LICENSE", "requirements-lock.txt",
+    "replica_v4_timestamp.py", "reports/clean_replication_timestamp_spec.json",
+    REVIEWED_V3_PROOF_REL,
+    "LICENSE", "requirements-lock.txt",
     "requirements-research.txt",
 )
 
@@ -186,6 +192,14 @@ def source_snapshot(expected_published_sha: str | None = None) -> dict[str, str]
     actual = {name: sha256(SOURCE_ROOT / name) for name in SOURCE_CLOSURE}
     if spec.get("frozen_original_source_sha256") != actual:
         raise ValueError("A published original producer source changed")
+    if (spec.get("legacy_validation_erratum_sha256") != LEGACY_ERRATUM_SHA256
+            or sha256(SOURCE_ROOT / LEGACY_ERRATUM_REL) != LEGACY_ERRATUM_SHA256):
+        raise ValueError("Published clean legacy-validation erratum changed")
+    if (spec.get("reviewed_v3_proof_adapter_sha256") != REVIEWED_V3_PROOF_SHA256
+            or spec.get("upstream_v3_gap", {}).get(
+                "reviewed_v3_proof_adapter_sha256") != REVIEWED_V3_PROOF_SHA256):
+        raise ValueError("Published reviewed full-v3 adapter pin changed")
+    actual[LEGACY_ERRATUM_REL] = LEGACY_ERRATUM_SHA256
     actual["reports/clean_parent_producers_spec.json"] = sha256(SPEC)
     actual["clean_parent_producers.py"] = sha256(Path(__file__).resolve())
     if expected_published_sha is not None:
@@ -418,14 +432,27 @@ def canonical_prior(root: Path, stage: str) -> dict[str, Path]:
     return named
 
 
+def check_legacy_v3_claim(receipt: dict) -> None:
+    """Accept the source-derived legacy split disclosure, never an untouched-fold claim."""
+    if sha256(SOURCE_ROOT / LEGACY_ERRATUM_REL) != LEGACY_ERRATUM_SHA256:
+        raise ValueError("Published legacy-validation erratum changed")
+    expected = read_json(SOURCE_ROOT / LEGACY_ERRATUM_REL)["legacy_v3_receipt_policy"]
+    if (receipt.get("legacy_validation_erratum_sha256") != LEGACY_ERRATUM_SHA256
+            or any(receipt.get(key) != expected[key] for key in (
+                "fit_excludes_heldout", "early_stop_uses_heldout",
+                "fit_and_early_exclude_heldout", "validation_interpretation"))
+            or receipt.get("stage_validation_policy") != expected["stage_validation_policy"]):
+        raise ValueError("Original v3 heldout/early-stop policy is misstated")
+
+
 def verify_external_v3(root: Path, raw_snapshot: dict) -> dict:
     """Demand an independently generated full-v3 replay receipt; never infer it."""
     from replica_v4_timestamp import CANONICAL as TIMESTAMP_FILES
     path = child(root, TIMESTAMP_FILES["v3_producer_receipt"])
     receipt = read_json(path)
     approved = read_json(SPEC).get("reviewed_v3_proof_adapter_sha256")
-    if approved is None:
-        raise RuntimeError("No reviewed v3 saved-model/OOF policy proof adapter is pinned; "
+    if approved != REVIEWED_V3_PROOF_SHA256:
+        raise RuntimeError("Reviewed full-v3 adapter pin differs; "
                            "v3 receipt acceptance and all downstream fits refuse")
     sha_required(approved, "reviewed v3 proof adapter")
     if receipt.get("v3_proof_adapter_sha256") != approved:
@@ -436,10 +463,10 @@ def verify_external_v3(root: Path, raw_snapshot: dict) -> dict:
                 "invalid_aobt_lobt_fallback_weight": 1.0,
                 "valid_disagreement_threshold_sec": 3600}
             or receipt.get("heldout_folds") != {key: list(value) for key, value in FOLDS.items()}
-            or receipt.get("fit_and_early_exclude_heldout") is not True
             or receipt.get("independent_model_and_policy_replay_passed") is not True
             or receipt.get("full_intermediate_replay_status") != "passed"):
         raise ValueError("Reviewed independent full-v3 model/OOF/ranking proof is absent")
+    check_legacy_v3_claim(receipt)
     proof = receipt.get("intermediate_transaction_sha256")
     if not isinstance(proof, dict) or set(proof) != set(V3_STAGES):
         raise ValueError("Full v3 transaction chain is absent")
@@ -1088,7 +1115,14 @@ def make_producer_receipt(name: str, root: Path, files: dict,
             "input_sha256": {role: files[role]["sha256"] for role in sorted(required_inputs)},
             "output_sha256": {role: files[role]["sha256"] for role in sorted(output_roles)},
             "heldout_folds": {fold: list(months) for fold, months in FOLDS.items()},
-            "fit_and_early_exclude_heldout": True,
+             "fit_excludes_heldout": True,
+             "early_stop_uses_heldout": False,
+             "fit_and_early_exclude_heldout": True,
+             "legacy_validation_erratum_sha256": LEGACY_ERRATUM_SHA256,
+             "component_only_scope": read_json(SOURCE_ROOT / LEGACY_ERRATUM_REL)[
+                 "new_component_receipt_policy"]["component_only_scope"],
+             "legacy_parent_limit": read_json(SOURCE_ROOT / LEGACY_ERRATUM_REL)[
+                 "new_component_receipt_policy"]["legacy_parent_limit"],
             "published_choices": choices,
             "ordered_validation_ids_sha256": a["ordered_validation_ids_sha256"],
             "ordered_ranking_ids_sha256": b["ranking_ids_sha256"],
@@ -1144,6 +1178,7 @@ def emit_parent_manifest(args: argparse.Namespace) -> dict:
         "path": timestamp.CANONICAL["source_producer_receipt"],
         "sha256": json_sha(source)}
     manifest = {"schema_version": 1, "status": "complete", "files": files,
+                "legacy_validation_erratum_sha256": LEGACY_ERRATUM_SHA256,
                 "heldout_folds": {name: list(months) for name, months in FOLDS.items()},
                 "producers": {
                     "v3": v3_declared,
@@ -1179,8 +1214,20 @@ def synthetic_self_test() -> dict:
     """Only source/spec bytes and in-memory metadata; no private values/models."""
     source_snapshot()
     spec = read_json(SPEC)
-    if spec.get("reviewed_v3_proof_adapter_sha256") is not None:
-        raise AssertionError("This prospective source unexpectedly authorizes a v3 proof adapter")
+    legacy_policy = read_json(SOURCE_ROOT / LEGACY_ERRATUM_REL)["legacy_v3_receipt_policy"]
+    truthful_legacy = {**legacy_policy,
+                       "legacy_validation_erratum_sha256": LEGACY_ERRATUM_SHA256}
+    check_legacy_v3_claim(truthful_legacy)
+    fabricated = {**truthful_legacy, "fit_and_early_exclude_heldout": True}
+    try:
+        check_legacy_v3_claim(fabricated)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Fabricated original-v3 early-stop exclusion was accepted")
+    if (spec.get("reviewed_v3_proof_adapter_sha256") != REVIEWED_V3_PROOF_SHA256
+            or sha256(SOURCE_ROOT / REVIEWED_V3_PROOF_REL) != REVIEWED_V3_PROOF_SHA256):
+        raise AssertionError("Reviewed v3 source or published pin differs")
     if len(ORDER) != 15 or set(ORDER) != set(OUTPUT_DIR) or set(ORDER) != set(REQUIRED_OUTPUTS):
         raise AssertionError("Stage closure registry differs")
     for stage in ORDER:
@@ -1246,7 +1293,8 @@ def synthetic_self_test() -> dict:
     for stage in ("gpu_fit", "source_fit", "gpu_final", "source_final"):
         if stage in PENDING_V3_PROOF:
             raise AssertionError("GPU/source proof stage unexpectedly missing")
-    return {"source_and_spec_pin": "passed", "all_stage_commands_explicit": "passed",
+    return {"source_and_spec_pin": "passed", "legacy_v3_false_exclusion": "refused",
+            "all_stage_commands_explicit": "passed",
             "v3_unproved_stages": "refused_before_child",
             "source_root_and_path_escape": "refused",
             "schema_and_ordered_ID": "passed", "baseline_stage_alias_and_receipt_hash": "passed",

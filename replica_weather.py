@@ -11,9 +11,11 @@ import hashlib
 import json
 import os
 import subprocess
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
+from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 import pandas as pd
@@ -187,6 +189,39 @@ def weather_table(paths: list[Path]) -> tuple[pd.DataFrame, list[dict]]:
     return result, details
 
 
+def download_station(url: str, path: Path) -> None:
+    """Bound transient retries and preserve failed attempt bytes separately."""
+    destination = urlsplit(url)
+    if destination.scheme != "https" or destination.hostname != "www.ncei.noaa.gov":
+        raise ValueError("Only fixed official NOAA URLs are allowed")
+    for attempt in range(1, 4):
+        attempted = path.with_name(f"{path.stem}_attempt_{attempt:02d}{path.suffix}")
+        request = Request(url, headers={"User-Agent": "PRC-clean-replica-weather/1.0"})
+        try:
+            with build_opener(NOAARedirectHandler()).open(request, timeout=45) as response, attempted.open("xb") as handle:
+                final = urlsplit(response.geturl())
+                if final.scheme != "https" or final.hostname != "www.ncei.noaa.gov":
+                    raise ValueError("NOAA download redirected outside the allowlist")
+                total = 0
+                for block in iter(lambda: response.read(2 ** 20), b""):
+                    total += len(block)
+                    if total > 64 * 2 ** 20:
+                        raise ValueError("Station-year file exceeds the documented download bound")
+                    handle.write(block)
+                handle.flush()
+                os.fsync(handle.fileno())
+        except (HTTPError, URLError, TimeoutError) as error:
+            print(json.dumps({"transient_download_error": type(error).__name__,
+                              "attempt": attempt, "maximum_attempts": 3}), flush=True)
+            if attempt == 3:
+                raise
+            time.sleep(1 if attempt == 1 else 3)
+            continue
+        os.link(attempted, path)  # Canonical staged input exists only after a complete response.
+        return
+    raise RuntimeError("No complete NOAA station-year response")
+
+
 def build(root: Path, published: str, published_protocol: str) -> dict:
     memory_guard()
     _, before = protocol(root, published, published_protocol)
@@ -197,21 +232,8 @@ def build(root: Path, published: str, published_protocol: str) -> dict:
     stage.mkdir(exist_ok=False)
     local = []
     for index, item in enumerate(inputs()):
-        url = urlsplit(item["url"])
-        if url.scheme != "https" or url.hostname != "www.ncei.noaa.gov":
-            raise ValueError("Only fixed official NOAA URLs are allowed")
         path = stage / f"source_{index:02d}.parquet"
-        request = Request(item["url"], headers={"User-Agent": "PRC-clean-replica-weather/1.0"})
-        with build_opener(NOAARedirectHandler()).open(request, timeout=45) as response, path.open("xb") as handle:
-            final = urlsplit(response.geturl())
-            if final.scheme != "https" or final.hostname != "www.ncei.noaa.gov":
-                raise ValueError("NOAA download redirected outside the allowlist")
-            total = 0
-            for block in iter(lambda: response.read(2 ** 20), b""):
-                total += len(block)
-                if total > 64 * 2 ** 20:
-                    raise ValueError("Station-year file exceeds the documented download bound")
-                handle.write(block)
+        download_station(item["url"], path)
         local.append(path)
         if source_snapshot(published) != before:
             raise ValueError("Processing source changed during download")

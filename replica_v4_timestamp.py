@@ -22,6 +22,8 @@ import pandas as pd
 
 SOURCE_ROOT = Path(__file__).resolve().parent
 SPEC = SOURCE_ROOT / "reports/clean_replication_timestamp_spec.json"
+LEGACY_ERRATUM_REL = "reports/clean_replication_legacy_validation_erratum.json"
+LEGACY_ERRATUM_SHA256 = "209176e6e75453aa18d68406992f6ac17994622d9244b06a341738acbe99a4f3"
 SOURCE_SHA256 = {
     "deep_timestamp_expert.py": "8edf1eb0b00b065c2d6b5fbb1d7b85b013ba861b12c55a574d53dc8ead14ad82",
     "v4_reference.py": "5bf163d64863cc695f0a3fdfab379e2d76b6c056332622f9ffa9d9ee5eeddaa0",
@@ -155,6 +157,11 @@ def source_snapshot() -> dict[str, str]:
     actual = {name: sha256(SOURCE_ROOT / name) for name in SOURCE_SHA256}
     if actual != SOURCE_SHA256:
         raise ValueError("A published original scientific helper changed")
+    if sha256(SOURCE_ROOT / LEGACY_ERRATUM_REL) != LEGACY_ERRATUM_SHA256:
+        raise ValueError("Published legacy validation erratum changed")
+    if read_json(SPEC).get("legacy_validation_erratum_sha256") != LEGACY_ERRATUM_SHA256:
+        raise ValueError("Timestamp spec detached from legacy validation erratum")
+    actual[LEGACY_ERRATUM_REL] = LEGACY_ERRATUM_SHA256
     actual["reports/clean_replication_timestamp_spec.json"] = sha256(SPEC)
     actual["replica_v4_timestamp.py"] = sha256(Path(__file__).resolve())
     return actual
@@ -173,8 +180,15 @@ def publication_check(expected: str | None) -> dict[str, str]:
 
 
 def validate_manifest_metadata(manifest: dict) -> None:
+    if sha256(SOURCE_ROOT / LEGACY_ERRATUM_REL) != LEGACY_ERRATUM_SHA256:
+        raise ValueError("Published legacy validation erratum changed")
+    legacy = read_json(SOURCE_ROOT / LEGACY_ERRATUM_REL)
+    legacy_v3 = legacy["legacy_v3_receipt_policy"]
+    new_component = legacy["new_component_receipt_policy"]
     if manifest.get("schema_version") != 1 or manifest.get("status") != "complete":
         raise ValueError("Independent parent manifest not complete")
+    if manifest.get("legacy_validation_erratum_sha256") != LEGACY_ERRATUM_SHA256:
+        raise ValueError("Parent manifest omits the published legacy validation erratum")
     files = manifest.get("files")
     if not isinstance(files, dict) or not set(CANONICAL).issubset(files):
         raise ValueError("Incomplete clean parent file inventory")
@@ -234,8 +248,20 @@ def validate_manifest_metadata(manifest: dict) -> None:
             raise ValueError(f"Detached {name} producer input")
         if producer.get("heldout_folds") != {k: list(v) for k, v in FOLDS.items()}:
             raise ValueError(f"{name} producer heldout months differ")
-        if producer.get("fit_and_early_exclude_heldout") is not True:
-            raise ValueError(f"{name} producer did not prove heldout separation")
+        if name == "v3":
+            if any(producer.get(key) != legacy_v3[key] for key in (
+                    "fit_excludes_heldout", "early_stop_uses_heldout",
+                    "fit_and_early_exclude_heldout", "validation_interpretation")):
+                raise ValueError("Legacy v3 fit/early-stop disclosure differs")
+            if producer.get("stage_validation_policy") != legacy_v3["stage_validation_policy"]:
+                raise ValueError("Legacy v3 per-stage validation policy differs")
+        elif (producer.get("fit_excludes_heldout") is not True
+              or producer.get("early_stop_uses_heldout") is not False
+              or producer.get("fit_and_early_exclude_heldout") is not True
+              or producer.get("legacy_validation_erratum_sha256") != LEGACY_ERRATUM_SHA256
+              or producer.get("component_only_scope") != new_component["component_only_scope"]
+              or producer.get("legacy_parent_limit") != new_component["legacy_parent_limit"]):
+            raise ValueError(f"{name} own-component heldout disclosure differs")
         choices = producer.get("published_choices")
         if not isinstance(choices, dict):
             raise ValueError(f"{name} scientific choices missing")
@@ -1058,6 +1084,9 @@ def plan() -> dict:
 def synthetic_self_test() -> dict:
     """Only in-memory fabricated metadata, no competition data or model calls."""
     fake = lambda role: hashlib.sha256(role.encode()).hexdigest()
+    legacy = read_json(SOURCE_ROOT / LEGACY_ERRATUM_REL)
+    v3_policy = legacy["legacy_v3_receipt_policy"]
+    component_policy = legacy["new_component_receipt_policy"]
     files = {role: {"path": path, "sha256": fake(role)} for role, path in CANONICAL.items()}
     for name, policy in PRODUCERS.items():
         role = policy["prefix"] + "synthetic"
@@ -1077,7 +1106,17 @@ def synthetic_self_test() -> dict:
             "output_sha256": {role: files[role]["sha256"] for role in outputs},
             "input_sha256": {role: files[role]["sha256"] for role in inputs},
             "heldout_folds": {k: list(v) for k, v in FOLDS.items()},
-            "fit_and_early_exclude_heldout": True,
+             **({"fit_excludes_heldout": v3_policy["fit_excludes_heldout"],
+                 "early_stop_uses_heldout": v3_policy["early_stop_uses_heldout"],
+                 "fit_and_early_exclude_heldout": v3_policy["fit_and_early_exclude_heldout"],
+                 "validation_interpretation": v3_policy["validation_interpretation"],
+                 "stage_validation_policy": v3_policy["stage_validation_policy"]}
+                if name == "v3" else
+                 {"fit_excludes_heldout": True, "early_stop_uses_heldout": False,
+                  "fit_and_early_exclude_heldout": True,
+                 "legacy_validation_erratum_sha256": LEGACY_ERRATUM_SHA256,
+                 "component_only_scope": component_policy["component_only_scope"],
+                 "legacy_parent_limit": component_policy["legacy_parent_limit"]}),
             "published_choices": ({"route": "lobt_ensemble"} if name == "v3" else
                                   {"gpu_weight": .25} if name == "gpu" else
                                   {"gpu_weight": .25, "source_scale": .5}),
@@ -1086,9 +1125,18 @@ def synthetic_self_test() -> dict:
             "independent_model_and_policy_replay_passed": True,
             "feature_schema_sha256": fake(name + "-schema")}
     manifest = {"schema_version": 1, "status": "complete", "files": files,
-                "producers": producers,
-                "heldout_folds": {k: list(v) for k, v in FOLDS.items()}}
+                 "producers": producers,
+                 "legacy_validation_erratum_sha256": LEGACY_ERRATUM_SHA256,
+                 "heldout_folds": {k: list(v) for k, v in FOLDS.items()}}
     validate_manifest_metadata(manifest)
+    poisoned = copy.deepcopy(manifest)
+    poisoned["producers"]["v3"]["fit_and_early_exclude_heldout"] = True
+    try:
+        validate_manifest_metadata(poisoned)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Fabricated original-v3 early-stop exclusion was accepted")
     poisoned = copy.deepcopy(manifest)
     poisoned["producers"]["source"]["input_sha256"]["raw_training_01"] = fake("other")
     try:

@@ -65,6 +65,8 @@ def require_source(published_sha: str | None = None, *, require_git: bool = Fals
     pinned = {
         "clean_parent_producers.py": spec["producer_driver_sha256"],
         "reports/clean_parent_producers_spec.json": spec["producer_driver_spec_sha256"],
+        "reports/clean_replication_legacy_validation_erratum.json": spec[
+            "legacy_validation_erratum_sha256"],
         "solution.py": spec["solution_sha256"],
     }
     for name, digest in pinned.items():
@@ -294,6 +296,8 @@ def proof_baseline_train(root: Path, output_dir: Path) -> dict:
                                             if name not in TRAIN_OUTPUTS)
     return {
         "stage": "baseline_train", "replay_passed": True,
+        "legacy_validation_erratum_sha256": parent.LEGACY_ERRATUM_SHA256,
+        "fit_excludes_heldout": True, "early_stop_uses_heldout": True,
         "original_source": "solution.py train --threads 8 --rounds 900",
         "training_rows": len(rows), "training_ids_sha256": parent.ids_sha(rows.MVT_ID_mvt),
         "training_labels_sha256": labels_sha(y),
@@ -573,7 +577,9 @@ def plan() -> dict:
 
 
 def self_test() -> dict:
-    require_source()
+    source = require_source()
+    if source.get(parent.LEGACY_ERRATUM_REL) != parent.LEGACY_ERRATUM_SHA256:
+        raise AssertionError("Baseline proof is detached from legacy-validation erratum")
     if set(SUPPORTED) | set(BLOCKED) != set(parent.V3_STAGES):
         raise AssertionError("V3 stage closure differs")
     for stage in BLOCKED:

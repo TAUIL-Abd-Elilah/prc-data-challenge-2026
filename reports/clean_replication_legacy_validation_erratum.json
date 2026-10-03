@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "prospective_prefit_metadata_correction",
+  "scope": "Clean-reproduction receipts and validators only; original scientific code, historic artifacts and original-run receipts are unchanged",
+  "historical_prospective_sha256": {
+    "clean_parent_producers.py": "c31178f84522f337947537085e6d748b7a0fd8431fac45e815f821ac88d803ca",
+    "reports/clean_parent_producers_spec.json": "26c9250f88493216e3ed5b4a1804726a95789f56cb5b82416ab158512a623fe1",
+    "replica_v4_timestamp.py": "3782ceaf8bf8844f1ee67a633e5381f68b2c625d4090949008af03e062657d06",
+    "reports/clean_replication_timestamp_spec.json": "47928d51b82011dbba4318f36a7a41ee45598e21350bb203b8db550630f81dab",
+    "replica_v3_proofs.py": "4e2de7b7eceb432df4725ef8ac9fdf43393dc25a6f4f2ca79e091f4045ac98ad",
+    "reports/clean_replication_v3_proof_spec.json": "1884b1c38ea4ede5caf8c39aaa532347205c92888b98de30f1138c5deb93b1b0"
+  },
+  "legacy_v3_receipt_policy": {
+    "fit_excludes_heldout": true,
+    "early_stop_uses_heldout": true,
+    "fit_and_early_exclude_heldout": false,
+    "validation_interpretation": "Named heldout-month labels select tree counts or later policy weights, so the original v3 fold scores are indicative rather than untouched estimates",
+    "stage_validation_policy": {
+      "baseline_train": "Fit direct and conditional residual trees on core labels outside each named held pair; early-stop on core held-pair labels; score all finite held labels; pooled held labels select alpha and residual share; full-2025 final trees use fold-median rounds",
+      "baseline_predict": "Use saved full-2025 baseline models and selected blend on ranking covariates; no ranking labels or early stop",
+      "missing": "Fit direct and schedule residual trees on finite missing-proxy labels outside each held pair; early-stop and score on finite held labels; full-2025 final trees use fold-median rounds",
+      "grouped": "Fit descriptive statistics outside each held pair and validate held pair; no early stop; final statistics use all 2025 training rows",
+      "weather": "Fit residual trees on core finite target and proxy labels outside each held pair; early-stop on core held labels; complete OOF scores all finite target and proxy held rows; full-2025 final tree count is fold median",
+      "airports": "Fit per-airport residual trees on eligible labels outside each held pair; early-stop and score eligible held labels; full-2025 per-airport trees use fold-median rounds",
+      "tail": "Fit route analogs outside each held pair and score held rows; pooled held labels report a diagnostic best threshold, while ranking uses fixed 12000-second threshold; no early stop",
+      "lirf": "Fit fixed-round Rome classifier, nonmatch and ratio models outside each held pair; held labels supply metrics and either-fold inclusion gate; full-2025 ranking fit; no early stop",
+      "ensemble": "Use five-way nested seasonal OOF diagnostics, seasonal policy selection and forward transfer; final ranking weights fit on all Jan/Jul/Nov/Dec OOF labels; no tree early stop",
+      "lobt": "Fit LOBT residual trees on eligible labels outside each held pair; early-stop on eligible held labels; both held folds support full-fit gate; full-2025 final trees use fold-median rounds",
+      "lobt_blend": "Use seasonal nested diagnostics and Jan/Jul selected valid-disagreement weight, then unchanged Nov/Dec transfer; ranking applies chosen weight; no gradient fit or early stop"
+    }
+  },
+  "new_component_receipt_policy": {
+    "fit_and_early_exclude_heldout": true,
+    "component_only_scope": "Only the new GPU or source component excludes its named heldout months from fit and internal early stopping",
+    "legacy_parent_limit": "The inherited v3 reference used named heldout labels for early stopping or policy selection"
+  },
+  "no_clean_real_mode_or_protocol_before_correction": true
+}
