@@ -1,0 +1,69 @@
+{
+  "purpose": "One 2025 local comparison of fixed released-ARR taxi covariates",
+  "architecture": {
+    "base": "v7 depth-10 traffic CatBoost residual to own AOBT proxy",
+    "trainer": "deep_timestamp_expert.fit_fold, unchanged",
+    "depth": 10,
+    "max_iterations": 10000,
+    "random_seed": 2026,
+    "other_params": "deep_timestamp_expert.params, unchanged",
+    "additional_features": [
+      "runway_arr_taxi_completed_15m_count",
+      "runway_arr_taxi_completed_15m_mean",
+      "runway_arr_taxi_completed_15m_std",
+      "runway_arr_taxi_completed_60m_count",
+      "runway_arr_taxi_completed_60m_mean",
+      "runway_arr_taxi_completed_60m_std",
+      "runway_arr_taxi_completed_180m_count",
+      "runway_arr_taxi_completed_180m_mean",
+      "runway_arr_taxi_completed_180m_std",
+      "runway_arr_taxiing_now_count"
+    ],
+    "additional_feature_count": 10,
+    "training_labels": "finite 2025 labels in [0,86400], own AOBT proxy in [0,7200]",
+    "scoring_labels": "all finite, including negative/extreme",
+    "forbidden_prediction_sources": [
+      "own departure BLOCK",
+      "own departure TAXITIME",
+      "opaque movement IDs",
+      "ranking labels"
+    ],
+    "ARR_availability": "released retrospective batch ARR BLOCK/TAXITIME, not real-time forecasting"
+  },
+  "existing_folds": {
+    "selection_months": [
+      1,
+      7
+    ],
+    "forward_months": [
+      11,
+      12
+    ],
+    "weights": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "selection": "minimum clipped all-finite Jan/Jul RMSE; ties favor smaller weight",
+    "forward": "use the same Jan/Jul-selected weight without adjustment",
+    "gate": "nonzero selected weight, RMSE improvement and paired UTC-day CI lower >0 in both folds",
+    "reference": "frozen v7 candidate all-finite OOF, with invalid-AOBT rows unchanged"
+  },
+  "fresh_matched_audit": {
+    "months": [
+      4,
+      10
+    ],
+    "reference": "saved v7 fresh_audit_predictions candidate; both v7 component models excluded April/October labels",
+    "candidate": "new v10 depth-10 residual expert excluding April/October labels from fit and early stopping",
+    "weight": "unchanged selected Jan/Jul blend weight",
+    "gate": "exact all finite-label valid-AOBT ID/label/time coverage; each month improves RMSE and pooled paired-day CI lower >0"
+  },
+  "february_august_policy": "Their labels may occur in complementary training but do not select this feature family, architecture, blend or gates",
+  "may_september_policy": "Remain reserved; no later guard is specified or run by this script",
+  "ranking_status": "No final fit, ranking predictions, upload or submission from this script",
+  "limitations": "Architecture comparison after repeated 2025 exploration; not an unbiased complete ensemble estimate or guaranteed ranking performance",
+  "leaderboard_use": false
+}

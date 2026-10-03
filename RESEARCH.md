@@ -189,6 +189,19 @@ python runway_arrival_taxi_features.py --mode prepare
 python runway_arrival_taxi_features.py --mode build
 ```
 
-The full build requires at least 4 GiB free memory and should be scheduled after current fitting jobs. A model protocol and local gates must be published before testing this family; the builder itself cannot promote a component or generate a submission.
+The full build requires at least 4 GiB free memory and should be scheduled after current fitting jobs. The builder itself cannot promote a component or generate a submission.
+
+`v10_runway_taxi_expert.py` now freezes the model specification in `reports/runway_taxi_model_spec_v10.json` before full feature construction. It keeps the v7 depth-10, at most 10,000-tree CatBoost residual trainer, seed and other parameters unchanged, adding exactly the ten declared ARR taxi fields. January/July select one of 0, 0.1, 0.25, 0.5 or 1 against the accepted v7 candidate. November/December use that weight unchanged, with positive paired UTC-day confidence bounds required in both folds. A complementary April/October refit then compares the same fixed blend with the saved, independently refitted v7 candidate; both months must improve and the pooled day interval must be positive.
+
+Preparation binds all twelve training files, source, feature caches, weather, exact reference IDs/labels/times and saved comparator models by hash. Loading the ten-field cache requires exact baseline ID order and the ARR-only provenance manifest. Static compilation and peer review passed. Full construction, preparation, fitting and scored comparison have not run. Final fitting and ranking modes reject until a later guard is frozen; February/August do not select this family, and May/September remain reserved.
+
+```powershell
+python v10_runway_taxi_expert.py --mode show-spec
+python v10_runway_taxi_expert.py --mode prepare
+python v10_runway_taxi_expert.py --mode fit-folds
+python v10_runway_taxi_expert.py --mode fresh-audit
+```
+
+The latter three stages require the completed feature cache and at least 10 GiB free memory. Run them serially after current fitting and audit jobs.
 
 OpenStreetMap geometry was considered only for a read-only extraction audit. No maps were obtained, matching coverage is unknown, and no OSM data enter a model or submission. ODbL is an open-data license; the challenge's external-data wording says open-source license without naming accepted data licenses. Geometry is excluded while that interpretation remains unresolved. No OurAirports or OpenAP data are used.
