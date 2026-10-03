@@ -1,0 +1,43 @@
+{
+  "months": [
+    4,
+    10
+  ],
+  "weight": 0.25,
+  "scores": {
+    "4": {
+      "n": 174154,
+      "v11_rmse": 185.6769039363051,
+      "v12_blend_rmse": 185.31584948191096
+    },
+    "10": {
+      "n": 183659,
+      "v11_rmse": 203.56151761811142,
+      "v12_blend_rmse": 203.06446762909144
+    }
+  },
+  "bootstrap": {
+    "days": 61,
+    "repeats": 1000,
+    "gain_ci95_sec": [
+      0.360049771800864,
+      0.5099853127853684
+    ],
+    "fraction_positive": 1.0,
+    "observed_gain_sec": 0.43351495195238954
+  },
+  "passed": true,
+  "coverage_verified": true,
+  "rows_valid_aobt_finite": 357813,
+  "protocol_sha256": "ba430895452f7834beb677f0c585c55a1a05d6018b6d7712a11c7b174bea6981",
+  "original_validation_sha256": "47a4fa9a3a15fe742eaa3a1c078ece9633bb8dca9aa88b4f1e6f2602bfee6af7",
+  "v11_fresh_report_sha256": "1d905eb770121da1d4ea4f848c3dcb919eea6321197258a843ccfb8e510220f4",
+  "v11_paired_sha256": "d397d058db76d2546f9f6940da8184254372bfc79c3d8fadd3890ee24043d027",
+  "v11_fresh_model_sha256": "4738f622a40dc7d730ac914ceb46047d0a513a1420cda5f7d29689e1e2906d95",
+  "v12_expert_oof_sha256": "a745d77321307a2a3a517d76da1d8ef3944f64f46579fa9e01f955cddbfe35a2",
+  "v12_model_sha256": "e7e213131d37f23f6459a8044f2610bb26b147c8aad1d00eae0a3435f407d380",
+  "fresh_fold_provenance_sha256": "f12911a91f315382aa76384e080dcd652781f200fd59631c5e6bec995a0eadb4",
+  "predictions_sha256": "b1e56312226e0a8978f466d6518eaea26a376e97597be9610099c8de6919655c",
+  "ranking_authorized": false,
+  "scope": "Repeated 2025 matched component comparison; not untouched generalization"
+}
