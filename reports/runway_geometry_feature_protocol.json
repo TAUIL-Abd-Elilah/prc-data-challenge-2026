@@ -1,0 +1,147 @@
+{
+  "spec": {
+    "purpose": "Prospective 16-column original runway geometry, true wind, and other-strip traffic family",
+    "source": {
+      "provider": "OurAirports",
+      "commit": "59574226b6df9417f5a7a8d03eeb6c7158a76168",
+      "data_page": "https://ourairports.com/data/",
+      "data_dictionary": "https://ourairports.com/help/data-dictionary.html",
+      "repository": "https://github.com/davidmegginson/ourairports-data",
+      "license": "Public Domain on provider data page; pinned repository LICENSE is Unlicense",
+      "pinned_sha256": {
+        "LICENSE": "6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e",
+        "airports.csv": "a5f3b2ba662528c92fcda43fbbb11f00261eec580b339d4ac98537f882f9fd9d",
+        "runways.csv": "7be01aa01204b13edde729d603505cf4c1661d274128b70a137c2285be728197"
+      },
+      "temporal_note": "2024-12-30 snapshot predates both periods; later runway changes may be unrepresented. Current closed flags are excluded."
+    },
+    "scientific_motivation": "https://web.mit.edu/hamsa/www/pubs/SimaiakisBalakrishnanTRR.pdf",
+    "originality": "Geometry and traffic algorithms in this source are original; no research code or datasets beyond the licensed OurAirports snapshot are reused.",
+    "movement_phase_first_allowlist": {
+      "DEP": [
+        "PHASE_mvt",
+        "MVT_ID_mvt",
+        "ADEP_mvt",
+        "RUNWAY_mvt",
+        "MVT_TIME_UTC_mvt"
+      ],
+      "ARR": [
+        "PHASE_mvt",
+        "MVT_ID_mvt",
+        "ADES_mvt",
+        "RUNWAY_mvt",
+        "MVT_TIME_UTC_mvt"
+      ]
+    },
+    "weather_allowlist": [
+      "airport",
+      "weather_hour_utc",
+      "wx_wind_direction_deg",
+      "wx_wind_speed_mps"
+    ],
+    "baseline_id_allowlist": [
+      "MVT_ID_mvt"
+    ],
+    "forbidden_values": [
+      "BLOCK_TIME_UTC_mvt",
+      "TAXITIME_SEC_mvt",
+      "departure labels",
+      "ranking labels"
+    ],
+    "features": [
+      "rgeom_heading_sin",
+      "rgeom_heading_cos",
+      "rgeom_strip_length_m",
+      "rgeom_headwind_mps",
+      "rgeom_tailwind_positive_mps",
+      "rgeom_crosswind_abs_mps",
+      "rgeom_intersecting_other_strip_count",
+      "rgeom_near_parallel_other_strip_count",
+      "rgeom_intersecting_arr_past15_count",
+      "rgeom_intersecting_arr_past60_count",
+      "rgeom_intersecting_dep_past15_count",
+      "rgeom_intersecting_dep_past60_count",
+      "rgeom_near_parallel_arr_past15_count",
+      "rgeom_near_parallel_arr_past60_count",
+      "rgeom_near_parallel_dep_past15_count",
+      "rgeom_near_parallel_dep_past60_count"
+    ],
+    "feature_dtype": "float32",
+    "geometry": {
+      "airport_runway_matching": "Exact ICAO airport and trimmed-uppercase runway-end identifier only; ambiguous/invalid mapping missing",
+      "length_heading": "Endpoint-to-reciprocal haversine length and true initial bearing; reverse end gets reverse true bearing",
+      "relation_projection": "Per-airport local equirectangular metric projection from mean runway endpoints",
+      "intersecting": "Closed physical line segments intersect; own reciprocal physical strip excluded",
+      "near_parallel": "Nonintersecting strips with unoriented bearing difference <=15 degrees and segment distance <=2000 m",
+      "wind": "NOAA wind-from direction, exact airport/UTC hour; signed headwind, max(-headwind,0) tailwind, absolute crosswind"
+    },
+    "counts": {
+      "groups": [
+        "other intersecting strips",
+        "other nearby parallel strips"
+      ],
+      "phases": [
+        "ARR",
+        "DEP"
+      ],
+      "windows_seconds": [
+        900,
+        3600
+      ],
+      "bounds": "Past [query MVT minus window, query MVT); own row and tied-time events excluded",
+      "only_event_values": [
+        "airport",
+        "runway",
+        "MVT_TIME_UTC_mvt"
+      ],
+      "ranking_availability": "Full retrospective ranking batch is released; not a live forecast"
+    },
+    "missing": {
+      "unmapped_runway": "All 16 NaN",
+      "missing_query_MVT": "Heading sin/cos, strip length and two strip-neighbor counts remain; three wind and eight traffic counts NaN",
+      "missing_invalid_NOAA_wind": "Only the three wind components NaN",
+      "valid_group_without_events": "Eight traffic counts are zero"
+    },
+    "output": "MVT_ID_mvt for exact alignment only, followed by exactly 16 float32 features; no ID as model predictor",
+    "input_seal": "Prepare pins helper/spec/source/raw/weather/baseline ID cache/runtime hashes before feature reads; build verifies before and after",
+    "output_seal": "Exclusive cache/report names, Parquet readback, exact baseline ID/order and float32/finite-or-NaN checks",
+    "memory_floor_gib": 4.0,
+    "validation_status": "No feature cache, model fitting, label comparison, ranking selection, or submission has run; root freezes any later test policy separately."
+  },
+  "snapshot": {
+    "spec_sha256": "a9606cedf5dfd7800f17fa4534ed121c27c8764185f0529fe4fa09458b365fc7",
+    "source_script_sha256": "2e4429306cfabad8c6b4ee7990718e4350fb952daf08c325367a48ff381c1059",
+    "runtime": {
+      "python": "3.11.9",
+      "platform": "Windows-10-10.0.26200-SP0",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "polars": "1.43.2",
+      "pyarrow": "25.0.1"
+    },
+    "input_sha256": {
+      "data\\training_2025-01-01_2025-02-01.parquet": "a4dc8f152c082c650cd7eb745fe9c641089f34f74df127e6944a188990a0ed94",
+      "data\\training_2025-02-01_2025-03-01.parquet": "b6f9ff2cdb1cfe07c5442f4e1f11bbcdbeafe52852dcb0b8175f62ab84c6a066",
+      "data\\training_2025-03-01_2025-04-01.parquet": "58fde7e5f8b539546af63b41d7f6ec0f2884fdc3d3dd9b6bfca7c59a420dcdd3",
+      "data\\training_2025-04-01_2025-05-01.parquet": "9ffe0cf5741c4863799c41be81475dfaecedabe0ba687b8f8e4eacba992f9390",
+      "data\\training_2025-05-01_2025-06-01.parquet": "5481c0642a8fbb4dc395f93bc713c57f4cc16854fb361d404967077e1fce2ff9",
+      "data\\training_2025-06-01_2025-07-01.parquet": "c3ef5080f2cc636c3416baf1555f7d0ee3519f9046e8043c1c0c8f017a244025",
+      "data\\training_2025-07-01_2025-08-01.parquet": "34d1c5bba7c8596a1c20c09edd3cb2f63277b5a684fa801911660fe0eaf63c9d",
+      "data\\training_2025-08-01_2025-09-01.parquet": "6c8d2aa7a1b6c9dff9a0305a37eb02de1e87a68d07557264f41b77738272c540",
+      "data\\training_2025-09-01_2025-10-01.parquet": "955308a4000947e32a00586d3ee13928949d2231b67f84f6dfb0631893f3754a",
+      "data\\training_2025-10-01_2025-11-01.parquet": "4a31a35601c1bdcd74b8cd6379231ba516a48324e4c2478bf1c9360cd23e687f",
+      "data\\training_2025-11-01_2025-12-01.parquet": "ac36b17db7a537e3baeb682fa4763dacaa1fcc5d9bfa6bf32b3ee5d9f91300b0",
+      "data\\training_2025-12-01_2026-01-01.parquet": "2d357f2f403a86778a69e93f72d8754effe77f1ac0942399b3d1b7728241f724",
+      "data\\ranking.parquet": "9db75e3a56fa09b87aab72e191a53da3fe763d9887ad2b23aea9cde6a6325f86",
+      "artifacts\\baseline\\training_rows.parquet": "b19e760a11b15e77996203ee84431fbcc225e0e2a325b15cd43bc38a00c47fcc",
+      "artifacts\\baseline\\ranking_rows.parquet": "da1a018792fba6531616fd32e5bcb4021dac0690676ea28a5eefdbb021c28235",
+      "data\\external\\weather.parquet": "cf8b9d15f38a9f516cf47d18974caae87b1c9aba48cc3bf112853d49ab8cb925",
+      "artifacts\\prospective-runway-geometry\\feature_spec.json": "a9606cedf5dfd7800f17fa4534ed121c27c8764185f0529fe4fa09458b365fc7",
+      "runway_geometry_features.py": "2e4429306cfabad8c6b4ee7990718e4350fb952daf08c325367a48ff381c1059",
+      "artifacts\\prospective-runway-geometry\\source_receipt.json": "fd44c1ce4c5c12a2e8c1829f82597e2082ff19efb6e5cfd3089d2beaedeab78a",
+      "artifacts\\prospective-runway-geometry\\LICENSE": "6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e",
+      "artifacts\\prospective-runway-geometry\\airports.csv": "a5f3b2ba662528c92fcda43fbbb11f00261eec580b339d4ac98537f882f9fd9d",
+      "artifacts\\prospective-runway-geometry\\runways.csv": "7be01aa01204b13edde729d603505cf4c1661d274128b70a137c2285be728197"
+    }
+  }
+}
