@@ -302,3 +302,13 @@ The original LightGBM April/October audit passed at fixed weight 0.25 on all 357
 The separately frozen v7 combination was then evaluated without choosing another weight. January/July improves 322.310529 → 321.858278 seconds with gain interval [0.218506, 0.730483]. April/October improves 195.888222 → 195.264389 with interval [0.366230, 0.890854]. November/December improves only 215.198602 → 215.174044, and its interval [-0.152834, 0.211483] crosses zero. The mandatory combination gate therefore fails; the LightGBM replacement is excluded from this portfolio without retuning. The full aggregate is `reports/combination_validation_v8.json`. Together with v9b's failed original folds, this leaves v7 as the eligible valid-AOBT policy.
 
 The selector initially refused because its v7 master was aligned to chronological baseline order while the saved expert OOFs were concatenated by fold. All 672,428 unique IDs, targets, folds, months, gates and UTC timestamps were exactly equal after alignment by ID. Its operational fix now proves the complete unique ID set, aligns the expert to the master with a one-to-one join, and then performs every existing metadata and unchanged-row check. It does not rewrite OOF files or change scores, weights or eligibility. Independent synthetic checks reject duplicate, missing, extra and null IDs. The repair is published before the selection receipt is created.
+
+The repaired selector has frozen **v7** for the valid-AOBT route; its exact receipt is `reports/current_selected_policy.json`. No valid-route February/August fit is needed because no replacement passed its required gates. The independent missing-clock correction retains its previously selected weight 1.0.
+
+The final composed 2025 OOF passed on the exact 672,428-row common universe before ranking prediction. January/July RMSE changes 322.310529 → 321.389265 seconds with UTC-day gain interval [0.510029, 1.328221]; November/December changes 215.198602 → 213.443318 with interval [0.502394, 3.396335]. All 7,841 missing-clock OOF rows are covered, the two masks are disjoint, v5 and v7 match exactly on that gate, and all other predictions remain unchanged. The exact aggregate is `reports/current_composition_validation.json`. The original full-data movement fit is now running at 931 rounds. Ranking generation, assembly, finalization and quota clearance remain pending.
+
+```powershell
+python reserved_valid_guard.py --mode select-policy
+python compose_current_candidate.py --mode validate
+python movement_only_expert.py --mode fit-final
+```

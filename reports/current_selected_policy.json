@@ -1,0 +1,44 @@
+{
+  "selected_route": "v7",
+  "tie_order": [
+    "v7",
+    "v8_combo",
+    "v9b"
+  ],
+  "selection_metric": "all-finite January/July RMSE among routes that passed existing Jan/Jul, Nov/Dec and Apr/Oct gates",
+  "all_finite_rows": 672428,
+  "n_valid_aobt": 663664,
+  "scores": {
+    "v7": {
+      "eligible": true,
+      "seasonal_all_finite_rmse": 322.3105287178819,
+      "forward_all_finite_rmse": 215.19860172054854
+    },
+    "v8_combo": {
+      "eligible": false,
+      "seasonal_all_finite_rmse": 321.8582781045662,
+      "forward_all_finite_rmse": 215.17404363142887
+    },
+    "v9b": {
+      "eligible": false,
+      "reason": "existing local audit absent"
+    }
+  },
+  "source_sha256": {
+    "current_candidate_policy": "9dca07f04ae0cf4f9da4484fce42fc962bbec54fc4ee80cfc7e41f4882488c7c",
+    "master_reserved_guard": "caae60a1d84b7266c98d870e885d5ddf14b3ee1badacaa85ee282381968ebe9d",
+    "baseline_training_rows": "b19e760a11b15e77996203ee84431fbcc225e0e2a325b15cd43bc38a00c47fcc",
+    "v7_protocol": "27de40f395a76c98fb2fda5d2de4b677d0a2a7ddf43538234e3ca2d6b83a0680",
+    "v7_validation": "a382b46fa064b811e1a83d5c4eda93f3b783db1f2b2e652ed10fd69e2e0694e8",
+    "v7_oof": "a5e1e8911f30d1c346be17b6b2d666c2571cfa7eb8727a85c082d9b0bab8d095",
+    "v8_validation": "7cb94d4b7c8f86637fc949834d44145406f78727f593a5178a9ec2ef12ae2413",
+    "v9b_existing_folds": "2e10d51e2383029bc9179010658892b99f9f6f668b62f35f6d8230835b97fb6f",
+    "v8_combo_oof": "79c84dbacfe1019dd4f2d789f32bc9bfb077db3f6774032d04260e149b8fdfb4",
+    "v8_combo_audit": "e05abffcad936185023339062149cd86990adfdcbe6bfe86fd21409239ec1456",
+    "v8_combo_protocol": "31ae507ee09bbb36d02caa6b1a296d95d67e8e65c1207642e86d6ece023946b6"
+  },
+  "guard_months_not_scored_for_selection": [
+    2,
+    8
+  ]
+}
