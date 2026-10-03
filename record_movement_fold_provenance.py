@@ -23,9 +23,9 @@ def source_files(args: argparse.Namespace) -> dict:
         "original_protocol": args.output_dir / "protocol.json",
         "original_validation": args.output_dir / "validation.json",
         "public_original_validation": args.public_validation,
-        "recorder_source": Path(__file__).resolve(),
+        "recorder_source": Path(__file__).name,
     }
-    return {role: {"path": str(path), "sha256": movement.sha256(path)}
+    return {role: {"path": str(path), "sha256": movement.sha256(Path(path))}
             for role, path in paths.items()}
 
 
@@ -99,7 +99,7 @@ def main() -> None:
     parser.add_argument("--public-validation", type=Path,
                         default=Path("reports/movement_only_validation_v6.json"))
     parser.add_argument("--receipt", type=Path,
-                        default=Path("reports/movement_fold_model_provenance.json"))
+                        default=Path("reports/movement_fold_model_provenance_v2.json"))
     args = parser.parse_args()
     report = build_receipt(args)
     if args.receipt.exists():

@@ -218,11 +218,24 @@ python v10_runway_taxi_expert.py --mode fresh-audit
 
 ### Saved movement fold provenance
 
-`record_movement_fold_provenance.py` records the existing movement models, fit reports, original OOF files, feature cache, raw/source inputs and published original validation before any new valid-AOBT inference. It reads model metadata and hashes, without prediction or scoring. The immutable receipt is `reports/movement_fold_model_provenance.json`; both model hashes and cache hashes match the prior audit. Reproduction can generate a new receipt from its own fitted models using the same recorder. The receipt does not promote either movement route or replace the required feature-cache proof and later validation gates.
+`record_movement_fold_provenance.py` records the existing movement models, fit reports, original OOF files, feature cache, raw/source inputs and published original validation before any new valid-AOBT inference. It reads model metadata and hashes, without prediction or scoring. The current immutable receipt is `reports/movement_fold_model_provenance_v2.json`; both model hashes and cache hashes match the prior audit. V2 stores the recorder source path relative to the repository for portability. The earlier receipt remains historical evidence. Reproduction can generate a new receipt from its own fitted models using the same recorder and a fresh `--receipt` path. The receipt does not promote either movement route or replace the required feature-cache proof and later validation gates.
 
 ```powershell
 python record_movement_fold_provenance.py
 ```
+
+The optional operational helpers preserve the frozen feature and model policy while avoiding full pandas matrices. `movement_prepared_stream_verify.py` independently derives the global category vocabulary, rebuilds all 79 columns in bounded batches, and proves exact values, category levels/order, Arrow schema metadata, IDs and manifest before writing the original cache's integrity sidecar. It does not rewrite the original cache. `v9b_stream_predict.py` then uses that sidecar and the published fold receipt, the same held-out valid-AOBT mask, saved rounds and three prediction threads. Its output must pass the existing `v9b.verify_prediction` checks before the unchanged evaluator can select a weight. The synthetic categorical test checks bitwise equality of full and uneven-batch predictions. Neither helper trains competition models or reads ranking data. The original training memory gates remain 10 GiB.
+
+```powershell
+python movement_prepared_stream_verify.py --mode preview
+python movement_prepared_stream_verify.py --mode verify
+python v9b_stream_predict.py --mode parity-test
+python v9b_stream_predict.py --mode predict-fold --fold seasonal_jan_jul
+python v9b_stream_predict.py --mode predict-fold --fold forward_nov_dec
+python v9b_movement_valid_audit.py --mode evaluate-folds
+```
+
+Streaming verification requires 3.5 GiB available initially, and saved inference requires 4 GiB. Each has a runtime memory floor and refuses to overwrite output. For independent reproduction, freeze a new receipt with the recorder's `--receipt` option and pass its SHA-256 through `v9b_stream_predict.py --receipt ... --receipt-sha256 ...`. The current run uses the published v2 receipt. Actual cache verification and valid-AOBT prediction outcomes remain pending.
 
 The latter three stages require the completed feature cache and at least 10 GiB free memory. Run them serially after current fitting and audit jobs.
 
