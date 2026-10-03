@@ -1,0 +1,42 @@
+{
+  "selected_route": "v11",
+  "selected_weight": 0.5,
+  "prepared_protocol_sha256": "bef108147ba14eacc71e5de768c7fede208cc4094bd4cee2275af81beb537bed",
+  "source_sha256": {
+    "base_loader_source": "98cdd405aec2ba6cdc4ead2197a2b20d238aa6a53d5b1d2361b463f92578f425",
+    "guard_source": "3e655cafb47286a4dd5004f7d678d5f197c3336ab5734ec445617f18e29247d8",
+    "own_final_source": "b5d0c9d49e293b16f1c42cb7dce5d12a3429e27e29713330e6aa96b630852fad",
+    "portfolio_source": "f0dde94e95479b0e0dae00d9d4b37b3437bcc7c8804f4dfd912cba2f78568a0d",
+    "residual_trainer_source": "8edf1eb0b00b065c2d6b5fbb1d7b85b013ba861b12c55a574d53dc8ead14ad82",
+    "v10_builder_source": "8c8527d63eaf28fa1cefabf4a6b3bdd21e7c1d2f2ceac5e04977de703aac96a0",
+    "v10_source": "bd25c47d81021d38e7e9c1ea464dcc0699bc10a447130a5752eee60b60b2e9de",
+    "v11_builder_source": "99c0e0c3ae6f1a73b01fd39517a7524f6deb40fc455bf79ef993487277d1e3ef",
+    "v11_source": "8d2027973780495bb7f4715aa4a665889020f6250903211ee80f2e4e73258298"
+  },
+  "ranking_input_sha256": {
+    "arrival_ranking": "f7dad5ee2b62b38d41d4d7aef2fcb465a26150b9580f4cb6fee78ea8daec2bcc",
+    "baseline_ranking_features": "4761235dc63160998955d09de234e5a733aeb78b8d52a2a574ebbb7f40dee38a",
+    "baseline_ranking_rows": "da1a018792fba6531616fd32e5bcb4021dac0690676ea28a5eefdbb021c28235",
+    "current_ranking": "8fc6519610a573dd77a4b5ca18f49ab816a564754db13d26d91f26b53d04b9e5",
+    "current_ranking_manifest": "8acc90526363ba2aa7f12efd3ee774a889e179efb898c8d5a975df65eaa31458",
+    "current_ranking_sources": "6dac1dc0ef78672e6c552bbe9725d3ca864a8937b22420ffeab144bc66719218",
+    "final_model": "dccda016515f0af4b8941e2dcce1b2915ee1f446487a176feea0edaacf9b87bd",
+    "final_model_report": "d5bd0c4e2d1f9411997c64c3ddf07996a46ed0e848225c39527587113472909e",
+    "final_protocol": "bef108147ba14eacc71e5de768c7fede208cc4094bd4cee2275af81beb537bed",
+    "guard_protocol": "622a3586c1e6f07d0b0d0192d34503a0cbeb6035c5ac203c21bc934231b87019",
+    "guard_terminal": "647c9bb1965a1196f175bd7933f9bf6fd061a7d634601e383a6fa74578d87713",
+    "neighbour_ranking": "1931dec6be7b656ecf9980d2103677b33bd249106fa92a394525e2b4e1c3207a",
+    "raw_ranking": "9db75e3a56fa09b87aab72e191a53da3fe763d9887ad2b23aea9cde6a6325f86",
+    "runway_sequence_ranking": "7f1c2bf4830dbe5526ed16c867a0552cface11d49a7f2175355f07ff190f10df",
+    "selection": "72c9099bb32d0fc337e93b305062e426ef7c0ffef6db3da413bf9ee0c23c14a4",
+    "selection_evaluation": "cc476112287ddc93a2fd85a2574e5beb19a48bd2be9108f54f61c39a4f09f3f5",
+    "taxi_builder_manifest": "b14be666e965a64334577aa4d81356223f3703caeabf4a3b49a59bb31ffb7f9b",
+    "taxi_builder_protocol": "722cc5367239a24363689b28ee24b462a3be46f1d1162a5f7e83b8c144fece53",
+    "taxi_ranking": "c17f204f581b6a9718eeac1b798ff6dea422b3e09f02bc2624385d14d04b89c4",
+    "template": "0d383408ed5ac27bfcfd12d6b961cee77c8a6364b10dad9fe3ec81115c79652b",
+    "v7_ranking": "314e5dcc537b46954744ddc02018c7e2a65cd1dfe10be8e13da313c69eb0b0eb",
+    "v7_ranking_manifest": "d0b8e07de497f501a5ddda3d9e99c2ee8c0403401b1209b015323991b75e4a62",
+    "weather": "cf8b9d15f38a9f516cf47d18974caae87b1c9aba48cc3bf112853d49ab8cb925"
+  },
+  "status": "sealed_before_any_ranking_feature_read"
+}
