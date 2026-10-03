@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "sample_rows": 24,
+  "months": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "airport_count": 10,
+  "empty_sample_rows": 4,
+  "boundary_sample_rows": 4,
+  "mismatched_rows": 0,
+  "mismatched_float16_values_by_channel": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "aggregate_selection_evidence": {
+    "past_events": 289,
+    "future_events": 261,
+    "same_flight_excluded": 0,
+    "same_time_excluded": 24,
+    "month_excluded": 0
+  },
+  "oracle_source_sha256": "4f813ad20d7cb50dd0d45e3e38d37871ea742e17603548b9eb4f789064137581",
+  "builder_receipt_sha256": "1c4ac4141015139f8ca42bb3c4b9c95d5d10a5a2800daa16a5296ff19d524ec3",
+  "event_bank_sha256": "c3c14583674dfb2adba97ccddd2b64b70c0e5fc4e4df3dbc0b52fd020fad9ebe",
+  "presence_sha256": "fd279a43ea7dd2f7d3941f866e214af27e226fecff88c507c52d7d3f82fe5757",
+  "ids_sha256": "56fd647d68a82a61d02ffc03c06657567eaf81e1f091d46862b26f77b45e243b",
+  "departure_labels_read": false,
+  "ranking_values_read": false,
+  "peak_observed_rss_bytes": 702038016
+}
