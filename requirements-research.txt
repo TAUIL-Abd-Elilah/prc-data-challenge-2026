@@ -1,3 +1,4 @@
 -r requirements-lock.txt
 catboost==1.2.10
 scikit-learn==1.9.0
+psutil==7.2.2
