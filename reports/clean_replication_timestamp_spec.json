@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "status": "prospective_source_only_no_real_run_authorized",
+  "purpose": "Clean v4 reference and depth-9 timestamp component under an isolated run root; original scientific settings, independently rebuilt parent bytes and new receipts",
+  "replica_of": "published local v4 sequential reference and original v5 timestamp expert component",
+  "upstream_prerequisites": [
+    "Independent clean v3 lobt pipeline with its baseline, ensemble and lobt parent reports, models, OOF and ranking output",
+    "Independent clean v4 GPU original-fold OOF, final GPU ranking blend and model receipts",
+    "Independent clean v4 source-classifier original-fold OOF, final source ranking probabilities, sequential ranking prediction and model receipts",
+    "Twelve 2025 raw files, 2026 ranking and submission template, baseline training/ranking rows and features, NOAA weather"
+  ],
+  "scientific_choices": {
+    "v4_reference": "Call v4_reference.load_v4(root=isolated_run_root, verify_snapshot=False); require exact independently rebuilt parent IDs, finite labels, month/fold/time and nonnegative clipping. The optional historical RMSE equality is not a gate on new GPU bytes.",
+    "folds": {"seasonal_jan_jul": [1, 7], "forward_nov_dec": [11, 12]},
+    "timestamp_model": "Call deep_timestamp_expert.load_features and fit_fold with explicit isolated source/cache/output paths. GPU CatBoost residual, requested 4500 trees, depth 9, seed 2026, 2 CPU threads for data operations, original params, internal 6 percent shuffled early stop with at least 20000 rows and patience 200. Fit and early stop exclude heldout months.",
+    "features": "Exact published timestamp/flight/weather feature order and category levels; only ranking-available projected raw fields. No departure BLOCK_TIME_UTC_mvt or TAXITIME_SEC_mvt feature.",
+    "weights": [0.0, 0.1, 0.25, 0.5, 1.0],
+    "selected_weight": 0.5,
+    "validation_gate": "Recompute every all-finite fold score from saved OOF; January/July must select fixed 0.5 by original smaller-weight tie rule, and unchanged 0.5 must improve November/December versus zero. Failure is terminal with no weight search.",
+    "all_finite_policy": "Apply deep timestamp expert only where the own AOBT proxy is finite and 0..7200; use clip(v4 + 0.5*(deep_raw-v4),0); all other rows retain the clipped v4 parent prediction exactly.",
+    "final_model": "All 2025 rows with finite target 0..86400 and finite own proxy 0..7200; median integer of only original Jan/Jul and Nov/Dec saved tree counts; otherwise same published CatBoost params and feature order.",
+    "ranking": "Seal every ranking source, cache, model and template byte before value read; exact 344841 template IDs/order, valid-proxy fixed 0.5 blend against independently rebuilt v4 sequential parent ranking prediction, every invalid-proxy row unchanged, finite nonnegative readback. No finalizer or upload."
+  },
+  "run_isolation": {
+    "manifest": "<run_root>/parents/v4_timestamp_parents.json",
+    "source_repository_supplies": "published source and this spec only",
+    "run_root_disjoint_from_source": true,
+    "all_private_inputs_and_outputs_under_run_root": true,
+    "exact_canonical_paths_for_pure_upstream_loader": true,
+    "no_global_monkeypatch_or_original_SHA_substitution": true,
+    "exclusive_new_outputs": true,
+    "minimum_free_physical_memory_gib_for_value_reads_fits_and_predict": 10,
+    "publication_trust_boundary": "A supplied source SHA is an operator publication attestation. Equality to local bytes alone does not prove a public commit; verify the source commit before any real mode."
+  },
+  "provenance": {
+    "parent_receipts": "Named independent v3/lobt, GPU and source producer receipts must bind all own raw/cache/weather input SHAs, relevant upstream output SHAs, source commit/source hashes, parameter/split choices, model/report/OOF/ranking output SHAs and ordered IDs. No historical private artifact byte hashes are authentication pins.",
+    "adapter_receipts": "Rehash all parent/source/spec bytes before and after each operation; record exact schema/category vocabularies, fit/early/held ID hashes, saved model parameters and tree count, OOF model readback predictions, all-finite score replay, full-training ID hash, template/ranking input seal, invalid-row equality and final Parquet readback.",
+    "failure_policy": "Any missing/changed parent, schema, model replay, split, selected-weight or output check refuses dependent stages. No retuning, resume or overwrite."
+  },
+  "scope_limit": "This is a v4 reference and timestamp component adapter, not a complete v3-v13 clean reproduction driver. Independent v3, GPU and source builders/receipts must be supplied first; missing-clock, clean arrival and later adapters remain separate. Reproduction does not claim byte-identical GPU outputs or official score transfer.",
+  "authorized_now": ["new_spec", "new_adapter", "plan", "synthetic_self_test", "compile", "read_only_peer_review"],
+  "not_authorized_now": ["read_real_raw_or_cache_values", "clone_or_copy_original_artifacts", "fit_real_model", "score_real_validation", "make_ranking_prediction", "upload_or_consult_leaderboard"]
+}
