@@ -237,6 +237,15 @@ python v9b_movement_valid_audit.py --mode evaluate-folds
 
 Streaming verification requires 3.5 GiB available initially, and saved inference requires 4 GiB. Each has a runtime memory floor and refuses to overwrite output. For independent reproduction, freeze a new receipt with the recorder's `--receipt` option and pass its SHA-256 through `v9b_stream_predict.py --receipt ... --receipt-sha256 ...`. The current run uses the published v2 receipt. Actual cache verification and valid-AOBT prediction outcomes remain pending.
 
+`lightgbm_stream_feasibility.py` tests a separate disk-backed training input on synthetic data only. Bounded conversion through the installed LightGBM pandas encoder retains global categorical coding and writes a C-contiguous float64 NumPy memmap. The default-parameter test and a synthetic bin-sampling stress test both match full pandas encoded values, complete model text and predictions exactly; see `reports/lightgbm_stream_feasibility.json`. This establishes an operational hypothesis, not a competition fit or score. Native binning memory and full-scale equivalence remain untested, so the production 10 GiB gate is unchanged.
+
+```powershell
+python lightgbm_stream_feasibility.py
+python lightgbm_stream_feasibility.py --synthetic-bin-sample-count 1000
+```
+
+Further hypotheses from primary research are deferred until prospective local tests can be frozen. The [Simaiakis–Balakrishnan airport congestion paper](https://web.mit.edu/hamsa/www/pubs/SimaiakisBalakrishnan_TS2014.pdf) motivates counting other proxy pushbacks during a target's supplied taxi interval and estimating low-traffic taxi priors. The [MIT runway queue study](https://dspace.mit.edu/entities/publication/f0891972-627a-409e-9fbc-2e12fe4ba28b) motivates recent airport-wide runway configuration summaries. These methods could be implemented originally from released timestamps and categories; a target-based prior would require fold-only fitting and date cross-fitting. No feature cache, model, selection or ranking prediction uses these ideas yet.
+
 The latter three stages require the completed feature cache and at least 10 GiB free memory. Run them serially after current fitting and audit jobs.
 
 OpenStreetMap geometry was considered only for a read-only extraction audit. No maps were obtained, matching coverage is unknown, and no OSM data enter a model or submission. ODbL is an open-data license; the challenge's external-data wording says open-source license without naming accepted data licenses. Geometry is excluded while that interpretation remains unresolved. No OurAirports or OpenAP data are used.

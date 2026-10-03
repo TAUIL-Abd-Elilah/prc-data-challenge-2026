@@ -1,0 +1,37 @@
+{
+  "scope": "Synthetic only; no competition data, models, score or ranking read",
+  "source_sha256": "fd62c5ed69583eb4f3e8765564741ba8a0522e105e5b3350a88d6e10fc90768c",
+  "production_memory_gate_unchanged_gib": 10,
+  "results": [
+    {
+      "lightgbm_version": "4.7.0",
+      "synthetic_rows": 6600,
+      "fit_rows": 5005,
+      "early_rows": 495,
+      "matrix_dtype": "float64",
+      "synthetic_bin_sample_count": "LightGBM default",
+      "encoded_values_exact": true,
+      "best_iteration_pandas": 90,
+      "best_iteration_memmap": 90,
+      "tree_dump_equal": true,
+      "model_text_equal": true,
+      "prediction_bitwise_equal": true,
+      "prediction_max_abs_diff": 0.0
+    },
+    {
+      "lightgbm_version": "4.7.0",
+      "synthetic_rows": 6600,
+      "fit_rows": 5005,
+      "early_rows": 495,
+      "matrix_dtype": "float64",
+      "synthetic_bin_sample_count": 1000,
+      "encoded_values_exact": true,
+      "best_iteration_pandas": 90,
+      "best_iteration_memmap": 90,
+      "tree_dump_equal": true,
+      "model_text_equal": true,
+      "prediction_bitwise_equal": true,
+      "prediction_max_abs_diff": 0.0
+    }
+  ]
+}
