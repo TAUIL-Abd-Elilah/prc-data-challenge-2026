@@ -135,7 +135,7 @@ The locally validated v7 traffic blend was finalized and published before its up
 
 The separate `movement_only_expert.py` protocol tests transfer from all ordinary 2025 departures to the sparse invalid-AOBT/no-NM/non-Rome gate. Its predictor allowlist removes all NM fields and off-block proxies, while retaining common movement, schedule, traffic, NOAA and released ARR fields. It is a direct taxi-time model rather than a residual-to-NM expert. Preparation does not promote or upload it; the same independent local validation gates are required.
 
-Its first two complementary-fold fits are complete. January/July select full replacement on the predeclared missing-clock gate: all-finite RMSE changes from 325.822 to 324.910 seconds, with gain interval 0.556 to 1.346. November/December at the unchanged weight changes from 221.142 to 219.434, with gain interval 0.488 to 3.314. The April/October architecture audit is pending, so the component is not promoted and has no ranking prediction. Aggregate evidence is in `reports/movement_only_validation_v6.json`.
+Its first two complementary-fold fits are complete. January/July select full replacement on the predeclared missing-clock gate: all-finite RMSE changes from 325.822 to 324.910 seconds, with gain interval 0.556 to 1.346. November/December at the unchanged weight changes from 221.142 to 219.434, with gain interval 0.488 to 3.314. Aggregate original-fold evidence is in `reports/movement_only_validation_v6.json`. The later audit results are recorded below; no ranking prediction has been created yet.
 
 The same saved ordinary movement models can be assessed on valid-AOBT rows independently. The original `v9_movement_valid_audit.py` protocol relies entirely on already saved models and is preserved. A separate prospective `v9b_movement_valid_audit.py` protocol adds a gated April/October refit if the original missing-clock route cannot produce one. It reuses the unchanged training architecture and requires valid-route improvement with positive day intervals in both original folds, followed by both April/October point gains and a positive pooled day interval. Any final full-data model and ranking prediction require all those gates. Invalid-AOBT predictions remain at the v7 reference. No valid-route selection result has been examined yet.
 
@@ -177,7 +177,7 @@ The current candidate portfolio is also fixed before any v8/v9b scored OOF outco
 
 The missing-clock movement branch independently runs `movement_only_expert.py --mode fresh-audit`, then `--mode reserved-audit` only if the preceding audit passes. Its final modes require both audits and the original two-fold gates. Existing prepared movement caches must first pass `--mode verify-prepared`, which rebuilds the unchanged allowed covariates in a separate directory and proves exact schema, categorical levels, values and ID order before adding an immutable sidecar. The original cache, manifest and model-fold evidence remain intact. Future preparations create that sidecar directly. Ranking inputs are separately sealed before feature reads and rechecked before output.
 
-The older v6-based standalone v8 ranking path is excluded from this portfolio. Its `--mode final-predict` now refuses that path. Only the selected and guarded v7 combination can use `reserved_valid_guard.py --mode final-v8-combo`; v9b's final modes likewise require its selected-route guard. No reserved guard result or new ranking prediction is available yet.
+The older v6-based standalone v8 ranking path is excluded from this portfolio. Its `--mode final-predict` now refuses that path. Only the selected and guarded v7 combination can use `reserved_valid_guard.py --mode final-v8-combo`; v9b's final modes likewise require its selected-route guard. The missing-clock guard has since completed as recorded below. The valid-route guard and new ranking predictions remain pending.
 
 `compose_current_candidate.py` implements the final fixed policy after those routes are terminal. Its prospective specification is `reports/current_composition_spec.json`. `validate` checks the exact common 672,428-row finite-label universe, labels, fold/month/time metadata and routing masks. It verifies that v5 and v7 agree on the missing-clock gate, applies each permitted correction once, and requires positive RMSE gains and paired UTC-day confidence bounds in both original folds. A failed composition is rejected without retuning; an unchanged v7 composition cannot pass a positive-gain gate.
 
@@ -274,3 +274,21 @@ A synthetic alternative using `LightGBM.Sequence` was also rejected as an equiva
 The latter three stages require the completed feature cache and at least 10 GiB free memory. Run them serially after current fitting and audit jobs.
 
 OpenStreetMap geometry was considered only for a read-only extraction audit. No maps were obtained, matching coverage is unknown, and no OSM data enter a model or submission. ODbL is an open-data license; the challenge's external-data wording says open-source license without naming accepted data licenses. Geometry is excluded while that interpretation remains unresolved. No OurAirports or OpenAP data are used.
+
+### Missing-clock audits completed, October 3
+
+The original April/October and February/August missing-clock architecture audits both completed successfully, with the previously selected weight **1.0** unchanged. Each refits the movement expert and the ordinary no-NM CatBoost comparator while excluding its audit months from fitting and internal early stopping. Exact finite-label gate coverage, prepared-cache provenance, prediction hashes and saved-model hashes passed the original verifiers.
+
+| Audit | Finite gate rows | First month RMSE, reference → candidate | Second month RMSE, reference → candidate | Pooled UTC-day gain, 95% interval |
+|---|---:|---:|---:|---:|
+| April/October | 2,813 | 371.391 → 331.916 s | 438.152 → 418.021 s | 26.147 s [7.556, 44.846] |
+| February/August | 3,185 | 1720.756 → 1654.592 s | 374.906 → 364.871 s | 38.745 s [22.792, 55.360] |
+
+The exact aggregate copies are `reports/movement_only_fresh_audit.json` (SHA-256 `083fbc90551c46ec7084c9767b7710bb5764a0b478cf3743f9977d8d36ec0be0`) and `reports/movement_only_reserved_audit.json` (`5839fbdbd11f19e9d4d4c5ce349052caa1eb0289568eab1575c07d141d384132`). These are component-change checks and do not estimate the complete ensemble's unseen score. May/September remain reserved for later research. The missing-clock route is eligible for final fitting under the fixed current portfolio. The final round count remains **931**, the integer median of the original 876/987 complementary-fold rounds; the later audit rounds do not change it.
+
+The v8 April/October audit is running next with its original 0.25 weight. Its v7 combination and the portfolio's valid-route choice remain pending. Full fitting, ranking output, combined OOF verification and submission are still required; no new file has been uploaded.
+
+```powershell
+python movement_only_expert.py --mode fresh-audit
+python movement_only_expert.py --mode reserved-audit
+```

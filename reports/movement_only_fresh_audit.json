@@ -1,0 +1,128 @@
+{
+  "heldout_months": [
+    4,
+    10
+  ],
+  "fixed_weight": 1.0,
+  "validation_reference_sha256": "036da1502f4ae68238927e31a0479b9cb82a6fb31b7acdbab26aa0657b7a67f8",
+  "features_manifest_sha256": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4f8d6084825",
+  "prepared_features_sha256": "454c9c8c9220564bd9b208c666143056725541683e05da774a479f55e6083a5f",
+  "row_ids_sha256": "ac1d9cf6a5b4665fe2abcf4b4aa73d9ada52feda482247bff4e1ae179d319ec3",
+  "prediction_sha256": "787f50e27fc31eb3d491a4319f28485c092dc13b3697f7ae96aeddbc87d00b75",
+  "gate_rows": 2813,
+  "coverage_verified": true,
+  "reference_architecture": "v5 ordinary CatBoost direct 700-round cap, depth 6, internal early stop 70",
+  "reference_training": {
+    "model": "ordinary_direct",
+    "kind": "regression",
+    "train_rows": 18838,
+    "fit_rows": 16955,
+    "internal_early_rows": 1883,
+    "best_iteration": 697,
+    "fit_seconds": 45.125,
+    "feature_names": [
+      "dep_prev5",
+      "dep_prev15",
+      "dep_prev30",
+      "dep_next15",
+      "arr_prev15",
+      "arr_prev30",
+      "arr_next15",
+      "same_runway_prev15",
+      "takeoff_minus_SCHED_TIME_UTC_mvt",
+      "takeoff_minus_ARVT_1_flt",
+      "takeoff_minus_ARVT_3_flt",
+      "utc_hour",
+      "utc_weekday",
+      "utc_month",
+      "utc_dayofyear",
+      "local_hour",
+      "local_weekday",
+      "hour_sin",
+      "hour_cos",
+      "year_sin",
+      "year_cos",
+      "schedule_proxy_unclipped",
+      "schedule_day_offset",
+      "wx_temperature_c",
+      "wx_dewpoint_c",
+      "wx_relative_humidity_pct",
+      "wx_wind_speed_mps",
+      "wx_wind_gust_mps",
+      "wx_precip_mm",
+      "wx_snow_depth_mm",
+      "wx_visibility_km",
+      "wx_ceiling_m",
+      "wx_snow_reported",
+      "wx_fog_reported",
+      "wx_mist_reported",
+      "wx_rain_reported",
+      "wx_freezing_precip_reported",
+      "wx_obs_count",
+      "wx_wind_direction_deg",
+      "wx_fog_proxy",
+      "wx_deicing_proxy",
+      "wx_headwind_mps",
+      "wx_crosswind_abs_mps",
+      "ADEP_mvt",
+      "ADES_mvt",
+      "RUNWAY_mvt",
+      "STAND_mvt",
+      "AIRCRAFT_TYPE_mvt",
+      "MARKET_SEGMENT_flt",
+      "flight_prefix",
+      "flight_name",
+      "stand_zone",
+      "airport_runway",
+      "route"
+    ],
+    "categorical": [
+      "ADEP_mvt",
+      "ADES_mvt",
+      "RUNWAY_mvt",
+      "STAND_mvt",
+      "AIRCRAFT_TYPE_mvt",
+      "MARKET_SEGMENT_flt",
+      "flight_prefix",
+      "flight_name",
+      "stand_zone",
+      "airport_runway",
+      "route"
+    ]
+  },
+  "movement_training": {
+    "ordinary_complement_rows": 1723254,
+    "fit_rows": 1563926,
+    "internal_early_rows": 159328,
+    "best_round": 1135
+  },
+  "model_sha256": {
+    "catboost": "a651b9da72fa84c2b745d835f144ed3d40e3b410eaeff0a22af680b1251cbfb3",
+    "movement": "efe13af82b8a3d72d71ed555bee24e2157d77fd9bfe30fa981cf3f7d1d1bca23"
+  },
+  "month_scores": {
+    "4": {
+      "n": 1015,
+      "reference_rmse_sec": 371.3912459135712,
+      "candidate_rmse_sec": 331.9164242833369
+    },
+    "10": {
+      "n": 1798,
+      "reference_rmse_sec": 438.1517802401963,
+      "candidate_rmse_sec": 418.0210747066376
+    }
+  },
+  "pooled_day_stability": {
+    "days": 61,
+    "repeats": 1000,
+    "observed_gain_sec": 26.146770409400574,
+    "gain_ci95_sec": [
+      7.556348937358843,
+      44.84597466610598
+    ],
+    "fraction_positive": 0.998
+  },
+  "passed": true,
+  "no_in_sample_v5_predictions": true,
+  "promotion_pending": "Final full-data fit and ranking reference checks"
+}

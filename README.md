@@ -179,6 +179,10 @@ After v7, the conservative preceding-24-hour upload count is five. The next coun
 
 The synthetic pipeline check is `python tests/smoke.py`. It tests execution and Parquet alignment; its generated RMSE has no competition meaning.
 
+## Current local research
+
+The fixed missing-clock movement expert passed its original January/July and November/December comparisons, followed by independently refitted April/October and February/August component audits. Both months improved in each audit, with positive pooled UTC-day confidence intervals. The original weight remains 1.0 and final training remains 931 rounds. Exact aggregate results are [fresh audit](reports/movement_only_fresh_audit.json) and [reserved audit](reports/movement_only_reserved_audit.json). Final fitting, guarded composition and upload are still pending. The separate valid-AOBT movement route failed and is excluded. See [RESEARCH.md](RESEARCH.md) for the frozen protocols and commands; accepted v7 remains the submitted solution.
+
 ## Improving a submission
 
 Compare `validation.json` overall RMSE and per-airport RMSE with the `audit` proxy. Investigate missing AOBT and flight/movement mismatches before tuning. A validation gain is evidence for a candidate submission; there is no guarantee it transfers to January and July 2026. The [live ranking](https://prc-data-challenge-2026.netlify.app/ranking.html) accepts at most five submissions per team per day. Do not tune to individual leaderboard responses; the organizer prohibits exploiting the ranking process.
