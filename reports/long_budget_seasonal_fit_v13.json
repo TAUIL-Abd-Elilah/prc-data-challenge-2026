@@ -1,0 +1,28 @@
+{
+  "fold": "seasonal_jan_jul",
+  "heldout_months": [
+    1,
+    7
+  ],
+  "requested_iterations": 20000,
+  "saved_trees": 19997,
+  "prefix_trees": 10000,
+  "exact_prefix_available": true,
+  "early_stopping_rounds": 200,
+  "use_best_model": true,
+  "fit_seconds": 741.125,
+  "fit_rows": 1619296,
+  "early_rows": 103359,
+  "heldout_valid_rows": 338802,
+  "heldout_all_finite_rows": 344419,
+  "fit_indices_sha256": "5a0d69c8f02bd8f6882b4d28312512d5cad7b7f203339d5e80a8b51901b026ee",
+  "early_indices_sha256": "3779db21ecdaa86c1d9b02d01956347d7ae29f6c3629133cda2938a575767060",
+  "test_indices_sha256": "153a3e917540ad83c9e268cbaa9e4413ccca4800135d8d6d41b9df7c822abf3a",
+  "held_all_indices_sha256": "236a63878546811db3bf21b845e98da83516ddea0ed649a7d4180132d2fa337a",
+  "fit_ids_sha256": "096716197efd04efaa16e18eadca88bedaa7775f120766d120fc8ea096cf7f17",
+  "early_ids_sha256": "84d418edcce58ff2a70803248a2fe5004cd8169265feea5ae78bbbda110937ea",
+  "test_ids_sha256": "516f441b832870d31160a6c6dce8207ef21784496012f699b22a070243426cbb",
+  "held_all_ids_sha256": "ff7ed96289ed6013ea0fdb0107a69caded343234e412599ff1fbe223c032eb85",
+  "model_sha256": "682174c806719ecad797dc2bac87dde61dae624972ff25c27fdba602b2053183",
+  "oof_sha256": "7f2fb9bb17772fc4f6ba18912ea05f7e88db593b56198150dbbddc6d8adb8db0"
+}
