@@ -1,0 +1,64 @@
+{
+  "protocol_sha256": "b83783bf2c58403403de9c7edc65ab91d47d68874a08fbda796212c2abf34cfd",
+  "frozen_reference_sha256": "372443f5a09b576031dc6192f4855ce54f09c93a88a559e14b1325e5e7db144d",
+  "folds": {
+    "seasonal_jan_jul": {
+      "rows_all_finite": 344419,
+      "rows_valid_aobt": 338802,
+      "scores_all_finite_rmse": {
+        "0.0": 322.3105287178819,
+        "0.1": 322.21300091817625,
+        "0.25": 322.1280763647468,
+        "0.5": 322.1502937919015,
+        "1.0": 322.8081796498276
+      },
+      "day_bootstrap": {
+        "days": 62,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          0.12304053868813583,
+          0.264009634437734
+        ],
+        "fraction_positive": 1.0,
+        "observed_gain_sec": 0.18245235313509056
+      },
+      "expert_oof_sha256": "55ffe26a5620b92eff8124c2864b833b54258d16fee35b9075e31ecc9f7f8203",
+      "model_sha256": "f330d18c7af5a3edc9092db501eba4aca2b301e5a864d11054f421a49925b72d",
+      "fit_report_sha256": "791be5942a92614c953141e3a1a0c81d3ed692af2369c72e9bb03427c640de38",
+      "fold_provenance_sha256": "4778e1fc7fa914cff806f198b3a67a190b67d902a9373b0fbbb84581b95d4d1c",
+      "trees": 9999
+    },
+    "forward_nov_dec": {
+      "rows_all_finite": 328009,
+      "rows_valid_aobt": 324862,
+      "scores_all_finite_rmse": {
+        "0.0": 215.19860172054857,
+        "0.1": 214.96825357141842,
+        "0.25": 214.70043212317523,
+        "0.5": 214.46205255876927,
+        "1.0": 214.76718101873544
+      },
+      "day_bootstrap": {
+        "days": 61,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          0.3886002645741968,
+          0.6210156074739067
+        ],
+        "fraction_positive": 1.0,
+        "observed_gain_sec": 0.4981695973733338
+      },
+      "expert_oof_sha256": "49e6fd21f69e3f81292dbee3c6bdd9482fc374553fdef1f6635728d9b63e76cb",
+      "model_sha256": "fdec517b65527cfaf6893a6282a0eb60112e5a4a2d6f0b1583ff141c93c205db",
+      "fit_report_sha256": "21b848e636e636dafad1ff2ce932a44764c6830b1e0512a1c6997081425077e2",
+      "fold_provenance_sha256": "22792505864519dd4d909661de9eb4dbe0106d7da0d70e76b3deb103f13d1ff9",
+      "trees": 9997
+    }
+  },
+  "selected_weight": 0.25,
+  "existing_folds_passed": true,
+  "fresh_audit_passed": true,
+  "ranking_authorized": false,
+  "validation_predictions_sha256": "0dabd753e04ac5ec2b8f4dd236c45123afb5e1fa465220b8efdb059438b2c5ac",
+  "fresh_audit_sha256": "bc10490b8ad7a7fda869f293c66643c60ca474f92433755be907f2eb646f4f99"
+}

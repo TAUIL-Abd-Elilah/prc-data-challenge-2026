@@ -373,3 +373,10 @@ python later_reserved_guard.py --mode evaluate
 ```
 
 The three fit/evaluate commands are conditional on selecting a replacement; unchanged current selection creates its terminal receipt without a reserved fit or score. Full jobs remain serial with a 10 GiB initial memory gate. Final fitting/ranking additionally requires the separately implemented, reviewed and published final-stage source and a passing selected replacement guard.
+
+
+### V10 matched audit passed; v11 fitting
+
+The unchanged 0.25 same-runway arrival-taxi blend passed April/October on all 357,813 finite-label valid-AOBT rows. April RMSE improves 186.344151 → 185.882733 seconds and October 204.527379 → 203.983989; the pooled UTC-day gain interval is [0.428200, 0.590764]. Its independently refitted model used 10,000 trees, which does not alter the original-fold median rule. Independent read-only verification recomputed all original weight scores, selected-weight day intervals, fresh formulas and scores, and checked actual model metadata plus 69 source/model/cache/report fingerprints. Exact snapshots are `reports/runway_taxi_fresh_audit_v10.json`, `reports/runway_taxi_complete_validation_v10.json` and `reports/runway_taxi_fresh_provenance_v10.json`. This remains a component architecture comparison, with no ranking authorization.
+
+The v11 model input protocol is now sealed in `reports/taxi_flow_model_protocol_v11.json`, and its original complementary-fold fits have started with the published settings. The later compatibility/choice waits for both families to be terminal. No May/September score, replacement final fit or new submission has occurred.
