@@ -1,0 +1,141 @@
+{
+  "purpose": "Assess exactly 16 original runway geometry, wind and other-strip flow features",
+  "architecture": {
+    "base": "locally sealed v11 184-feature CatBoost residual to own AOBT proxy",
+    "trainer": "deep_timestamp_expert.fit_fold with unchanged split and CatBoost parameters",
+    "base_feature_count": 184,
+    "added_feature_count": 16,
+    "feature_count": 200,
+    "categorical_feature_count": 24,
+    "additional_features": [
+      "rgeom_heading_sin",
+      "rgeom_heading_cos",
+      "rgeom_strip_length_m",
+      "rgeom_headwind_mps",
+      "rgeom_tailwind_positive_mps",
+      "rgeom_crosswind_abs_mps",
+      "rgeom_intersecting_other_strip_count",
+      "rgeom_near_parallel_other_strip_count",
+      "rgeom_intersecting_arr_past15_count",
+      "rgeom_intersecting_arr_past60_count",
+      "rgeom_intersecting_dep_past15_count",
+      "rgeom_intersecting_dep_past60_count",
+      "rgeom_near_parallel_arr_past15_count",
+      "rgeom_near_parallel_arr_past60_count",
+      "rgeom_near_parallel_dep_past15_count",
+      "rgeom_near_parallel_dep_past60_count"
+    ],
+    "depth": 10,
+    "max_iterations": 10000,
+    "random_seed": 2026,
+    "params": {
+      "task_type": "GPU",
+      "devices": "0",
+      "gpu_ram_part": 0.45,
+      "loss_function": "RMSE",
+      "eval_metric": "RMSE",
+      "iterations": 10000,
+      "depth": 10,
+      "learning_rate": 0.04,
+      "l2_leaf_reg": 12,
+      "random_strength": 0.5,
+      "bagging_temperature": 0.5,
+      "max_ctr_complexity": 1,
+      "one_hot_max_size": 20,
+      "border_count": 128,
+      "thread_count": 2,
+      "random_seed": 2026,
+      "allow_writing_files": false,
+      "verbose": 500
+    },
+    "fit_labels": "finite 2025 targets in [0,86400] with AOBT proxy in [0,7200]",
+    "score_labels": "all finite targets, including negative and extreme values",
+    "early_stop": "same complement-month RNG permutation, six percent or 20,000, 200 patience",
+    "forbidden": [
+      "own departure BLOCK",
+      "own departure TAXITIME",
+      "opaque movement IDs as predictors",
+      "ranking labels"
+    ]
+  },
+  "reference": {
+    "all_finite_oof": "sealed v9 evaluation_predictions.selected, 672428 exact IDs",
+    "selected_route": "v11",
+    "selected_weight": 0.5,
+    "unsubmitted_ranking_sha256": "bc465ae7ff48deac5f93cd449a3799fee1a361a8021ec2ca03ff70baccc0f417",
+    "outside_valid_proxy": "copy locally sealed, unsubmitted v9 without change",
+    "prior_may_september_guard": "verify its already sealed v9 terminal as provenance only; those labels do not select any v12 weight or feature"
+  },
+  "original_folds": {
+    "selection": [
+      1,
+      7
+    ],
+    "forward": [
+      11,
+      12
+    ],
+    "fit_and_early_stop": "complementary 2025 months only; held months absent from both",
+    "weights": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "selection_rule": "minimum clipped Jan/Jul all-finite RMSE; ties favor smaller weight",
+    "formula": "clip(v9 + w * (new_raw_200 - v9), lower=0) only on valid AOBT proxy",
+    "forward_rule": "same fixed Jan/Jul weight without adjustment",
+    "gate": "nonzero weight; all-finite RMSE improves and paired UTC-day bootstrap 95 percent lower gain >0 in both folds",
+    "bootstrap": {
+      "repeats": 1000,
+      "seed": 20261015
+    }
+  },
+  "fresh_april_october": {
+    "months": [
+      4,
+      10
+    ],
+    "expected_valid_ids": 357813,
+    "reference": "sealed v11 fresh_audit_predictions.v11_blend with both components excluding 4/10",
+    "replacement": "same 200-feature residual architecture refit excluding 4/10 from fit and early stop",
+    "formula": "clip(v11_blend + original selected weight * (new_raw_200 - v11_blend), lower=0)",
+    "gate": "exact ID/target/UTC-time coverage; each month RMSE improves and pooled paired UTC-day CI lower gain >0"
+  },
+  "separate_guard": {
+    "months": [
+      2,
+      8
+    ],
+    "comparator": "fresh v11 raw residual model excluding 2/8 from fit and early stop",
+    "replacement": "fresh v12 raw residual model with identical exclusions and frozen weight",
+    "status": "prospective separate protocol required; neither refit nor score is implemented here"
+  },
+  "builder": {
+    "source": "pre-2025 pinned public-domain OurAirports endpoints and released movements/NOAA wind",
+    "features": [
+      "rgeom_heading_sin",
+      "rgeom_heading_cos",
+      "rgeom_strip_length_m",
+      "rgeom_headwind_mps",
+      "rgeom_tailwind_positive_mps",
+      "rgeom_crosswind_abs_mps",
+      "rgeom_intersecting_other_strip_count",
+      "rgeom_near_parallel_other_strip_count",
+      "rgeom_intersecting_arr_past15_count",
+      "rgeom_intersecting_arr_past60_count",
+      "rgeom_intersecting_dep_past15_count",
+      "rgeom_intersecting_dep_past60_count",
+      "rgeom_near_parallel_arr_past15_count",
+      "rgeom_near_parallel_arr_past60_count",
+      "rgeom_near_parallel_dep_past15_count",
+      "rgeom_near_parallel_dep_past60_count"
+    ],
+    "batch_caveat": "Counts use complete released batches. January/July 2026 batch boundaries may lack prior-window history present in full-year 2025 training.",
+    "availability": "retrospective released-batch context, not complete live traffic"
+  },
+  "final_and_ranking": "refuse until separate February/August component guard is frozen, run and passed; missing policy remains unchanged",
+  "interpretation": "Repeated 2025 component comparison, not an untouched generalization estimate or guaranteed prize rank",
+  "leaderboard_use": false
+}
