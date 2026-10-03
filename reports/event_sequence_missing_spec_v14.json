@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "status": "prospective_spec_only_no_feature_build_fit_scoring_or_ranking",
+  "purpose": "Test whether the ordered pattern of other released airport movements improves direct taxi-time prediction on the exact locally sealed v8 missing-clock gate.",
+  "hypothesis": "A fixed local event sequence can represent departure queue spacing, runway switches and arrival interference that aggregate movement counts lose. This is an information and representation test, not another target-loss mixture or a new valid-AOBT residual route.",
+  "prior_evidence_and_scope": {
+    "movement_only_source": "movement_only_expert.py",
+    "movement_only_source_sha256_at_spec": "bacd7a8c9446ea740969f3eeb1f59d4839eb83a8b6a348c7d3f07a8bf7f5ea26",
+    "movement_feature_manifest": "artifacts/v6-movement-only/features_manifest.json",
+    "movement_feature_manifest_sha256": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4d8d6084825",
+    "existing_feature_count": 79,
+    "existing_categorical_count": 13,
+    "v8_missing_weight": 1.0,
+    "v8_finalized_local_file_sha256": "8fc6519610a573dd77a4b5ca18f49ab816a564754db13d26d91f26b53d04b9e5",
+    "v8_composed_oof_reference": "artifacts/current-candidate/validation_predictions.parquet",
+    "v8_composed_oof_sha256_from_published_report": "575f1b5e8046135b92c5d051c0272045416d01078da0f4372c379c86d79a7f92",
+    "original_all_finite_oof_rows": 672428,
+    "original_finite_gate_rows": 7841,
+    "original_gate_rows_by_fold": {
+      "seasonal_jan_jul": 4976,
+      "forward_nov_dec": 2865
+    },
+    "ranking_gate_rows": 4907,
+    "failed_prior_ideas_not_reopened": [
+      "Historical flight analog worsened the unchanged forward check.",
+      "All-airport long-target Huber/classifier mixture worsened the unchanged forward check.",
+      "Movement-only application to valid-AOBT rows selected zero weight."
+    ]
+  },
+  "exact_gate": {
+    "source": "movement_only_expert.read_gate",
+    "predicate": "AOBT_3_flt_missing AND LOBT_flt_missing AND NOT isfinite(cached_proxy) AND airport != 'LIRF'",
+    "gate_fields_are_filter_metadata_only": true,
+    "nonfinite_proxy_includes": ["NaN", "positive_infinity", "negative_infinity"],
+    "out_of_range_but_finite_proxy_is_not_this_gate": true,
+    "heldout_scoring": "Exact gate AND finite target; include negative and extreme finite target values in score.",
+    "ranking": "Exact gate over the original 344841-row template, expected 4907 rows; source flags and proxy are never predictors."
+  },
+  "event_builder": {
+    "scope": "Released retrospective batch only; construct training and ranking event banks independently with identical code and no labels.",
+    "partition": ["UTC calendar year", "UTC calendar month", "airport"],
+    "airport_for_phase": {
+      "DEP": "ADEP_mvt",
+      "ARR": "ADES_mvt"
+    },
+    "phase_first_raw_projection": {
+      "query_DEP": ["MVT_ID_mvt", "FLIGHT_ID_mvt", "PHASE_mvt", "ADEP_mvt", "RUNWAY_mvt", "MVT_TIME_UTC_mvt"],
+      "peer_DEP": ["MVT_ID_mvt", "FLIGHT_ID_mvt", "PHASE_mvt", "ADEP_mvt", "RUNWAY_mvt", "MVT_TIME_UTC_mvt", "AOBT_3_flt"],
+      "peer_ARR": ["MVT_ID_mvt", "FLIGHT_ID_mvt", "PHASE_mvt", "ADES_mvt", "RUNWAY_mvt", "MVT_TIME_UTC_mvt"],
+      "forbidden_even_in_projection": ["BLOCK_TIME_UTC_mvt on DEP", "TAXITIME_SEC_mvt on DEP", "all ranking labels"]
+    },
+    "query_anchor": "The query's released MVT_TIME_UTC_mvt, never its NM off-block time.",
+    "window_seconds": 3600,
+    "event_slots": 32,
+    "past_slots": 16,
+    "future_slots": 16,
+    "past_interval": "[query_MVT_time - 3600 seconds, query_MVT_time)",
+    "future_interval": "(query_MVT_time, query_MVT_time + 3600 seconds]",
+    "same_time_peers": "Excluded for every query; this also removes any own movement from the time window.",
+    "self_and_same_flight_exclusion": "Exclude exact query MVT_ID. A usable FLIGHT_ID_mvt is a non-null source identity: numeric values must be finite integral values; string values must remain nonempty after trimming and cannot be a null placeholder. Normalize within that source type only, then exclude every peer with the exact same normalized identity as the query. IDs are alignment/filter keys only and are never model channels, embeddings, ordering keys or target encodings. With no usable flight ID, exclude exact movement ID and same-time peers; do not infer identity from callsigns.",
+    "selection_and_order": "Within each airport-month, select the 16 closest strictly earlier and 16 closest strictly later eligible events by absolute UTC time distance. Order the selected past events oldest-to-newest and future events earliest-to-latest. At a peer-time tie, use phase ARR then DEP, trimmed-uppercase runway, then the VALID peer DEP AOBT timestamp; ARR or invalid peer DEP AOBT ties use one canonical missing value. Peers still identical on every channel are interchangeable; never break ties with an opaque ID.",
+    "runway_normalization": "Trim and uppercase. Null, empty and placeholder runway values have relation code -1; exact equality to the normalized query runway has relation code 1, all other valid runways code 0. No fuzzy match or geometry lookup.",
+    "peer_nm_proxy_rule": "For a peer DEP only, use AOBT_3_flt if both timestamps are finite and 0 < peer MVT minus AOBT_3_flt <= 7200 seconds. Peer ARR never supplies an off-block proxy. Invalid peer DEP AOBT never affects event ordering or channels. The query's own NM timestamp is never read into an event channel or neighbor aggregate.",
+    "six_float16_channels_in_order": [
+      {"name": "relative_mvt_time", "encoding": "clip((peer_MVT-query_MVT)/3600,-1,1)"},
+      {"name": "phase", "encoding": "ARR=-1, DEP=1"},
+      {"name": "runway_relation", "encoding": "missing=-1, other_valid=0, exact_same=1"},
+      {"name": "peer_nm_aobt_relative_time", "encoding": "clip((peer_AOBT-query_MVT)/3600,-1,1) for valid peer DEP proxy, else 0"},
+      {"name": "peer_nm_aobt_valid", "encoding": "1 for valid peer DEP proxy, else 0"},
+      {"name": "peer_nm_proxy_interval", "encoding": "(peer_MVT-peer_AOBT)/7200 for valid peer DEP proxy, else 0"}
+    ],
+    "padding": "Past half is left-padded; future half is right-padded. All six padding values are zero. A separate 32-position boolean event-presence mask, never a seventh event channel, prevents padding from entering masked pooling.",
+    "missing_query_time_or_airport": "All 32 positions padded and mask false; retain the 79 movement fields if available.",
+    "source_boundary_caveat": "The UTC calendar-month partition deliberately withholds adjacent-month events in both 2025 training and the separate 2026 ranking batches. Other missing event history within a released batch remains unobservable."
+  },
+  "model": {
+    "family": "One fixed compact masked temporal CNN plus movement tabular branch; direct taxi-time regression.",
+    "library": "PyTorch 2.13.0+cu126 on CUDA device 0",
+    "seed": 20261017,
+    "determinism": "Set Python, NumPy and PyTorch seeds, CUBLAS_WORKSPACE_CONFIG, torch.use_deterministic_algorithms(true), and deterministic CUDA convolution settings before any fit. Record exact runtime, CUDA, device and package versions.",
+    "movement_input": "Exactly the existing 79 movement_only_expert prepared columns in manifest order: 66 numeric and 13 categorical, including its existing flight_name_mvt derived from FLIGHT_mvt. Add no *_flt, own NM timestamp/proxy, opaque ID, raw CALLSIGN_flt or event-channel callsign, own AOBT-time backlog or departure BLOCK/TAXI input.",
+    "numeric_preprocessing": "For each of the 66 numeric movement fields, estimate median and IQR from fit rows only; divide (value-median) by max(IQR,1), clip finite values to [-10,10], and encode missing/nonfinite as -11. Freeze these 66 scalers per fold; heldout and ranking rows cannot update them.",
+    "categorical_preprocessing": "For each of the 13 categorical movement fields, build a fit-row-only vocabulary: observed nonmissing levels sorted by descending fit frequency then UTF-8 lexical order, at most 4096 levels. Index 0 is missing and 1 is unseen/overflow; remaining levels get 2..4097. Each field has an 8-dimensional embedding. Record ordered vocabulary SHA and fit-row IDs. Heldout and ranking levels never expand the vocabulary.",
+    "event_branch": "Convert one float16 disk-backed 32x6 sequence to float32 per streamed batch, split into independent 16-position past and future halves, and apply the same shared-weight Conv1d(6,32,kernel=3,padding=1), GELU, Conv1d(32,32,kernel=3,padding=1), GELU stack to each half. Multiply by its presence mask before and after EVERY convolution so padding/bias never enters a valid convolution neighborhood. Each half gets masked mean and masked max pooling, with zero vectors for an empty half. Concatenate the four 32-vectors and apply Linear(128,64). No convolution crosses the past/future seam between slots 15 and 16.",
+    "tabular_branch": "Concatenate 66 standardized numerics and thirteen 8-dimensional categorical embeddings; Linear(170,128), GELU, Linear(128,64), GELU.",
+    "head": "Concatenate 64 event and 64 tabular outputs; Linear(128,64), GELU, Linear(64,1). No dropout and no auxiliary loss.",
+    "loss_and_output": "Optimize mean squared error of target/3600; multiply the scalar output by 3600 and clip to zero for scored or ranking predictions. Do not cap the upper prediction.",
+    "optimizer": {"name": "AdamW", "learning_rate": 0.001, "weight_decay": 0.0001},
+    "batch_size": 4096,
+    "max_epochs": 30,
+    "early_stop_patience_epochs": 4,
+    "early_stop_metric": "Unclipped direct-target RMSE on the internal early-stop rows only; ties choose earlier epoch.",
+    "no_architecture_or_hyperparameter_search": true,
+    "replacement_weight": 1.0,
+    "replacement_formula": "On exact v8 gate only, new=clip(v8_old + 1.0*(event_direct-v8_old), lower=0); copy every other old prediction exactly."
+  },
+  "training_and_validation": {
+    "ordinary_training_eligibility": "All 2025 DEP rows with finite taxi target in [0,7200] seconds, regardless of own NM availability; own NM fields are masked from all predictors. This exactly matches the old movement-only ordinary-target range.",
+    "fit_and_early_split": "For each audit, exclude all held-out UTC months from both fit and internal early stop. For each remaining eligible row, compute absolute Unix-epoch UTC day as floor(MVT_TIME_UTC_mvt to UTC day) divided by 86400 seconds; epoch_day modulo 11 == 0 is internal early stop, and the other eligible rows fit. This reproduces movement_only_expert.fit_movement_model rather than day-of-month modulo 11. Freeze ordered fit/early/held ID SHA and exact label/mask SHA before fitting.",
+    "original_folds": {
+      "seasonal_jan_jul": [1, 7],
+      "forward_nov_dec": [11, 12]
+    },
+    "original_reference": "Exact 672428-row sealed v8 composed all-finite OOF policy, joined one-to-one by unique MVT_ID and checked for equal target, UTC MVT time, month, airport and gate. The new model only replaces the exact 4976/2865 finite gate rows in the corresponding fold.",
+    "original_fixed_gate": "No blend selection. Weight 1.0 must improve gate RMSE separately in January, July, November and December; improve full-policy all-finite RMSE in each original fold; and give a positive 95-percent paired UTC-day bootstrap lower RMSE-gain bound separately in both folds. Bootstrap 1000 resamples, seed 20261017. Any failure rejects the route with no retuning.",
+    "fresh_april_october": "Only after both original folds pass, fit the same architecture excluding April and October from fit and early stop. Compare on exact finite v8 no-NM non-LIRF gate IDs/targets/times against artifacts/v6-movement-only/april_october_predictions.parquet fixed_blend (the saved movement-only weight-1 policy), requiring SHA equality to reports/movement_only_fresh_audit.json prediction_sha256 and its saved movement model/fit metadata before use. April and October each require lower gate RMSE and the pooled paired UTC-day 95-percent lower gain must be positive at seed 20261017/1000. This is a matched component check, not an untouched full-policy estimate.",
+    "reserved_february_august": "Only after fresh success, fit the same architecture excluding February and August from fit and early stop. Compare on exact finite gate IDs/targets/times against artifacts/v6-movement-only/february_august_predictions.parquet fixed_blend (the saved movement-only weight-1 policy), requiring SHA equality to reports/movement_only_reserved_audit.json prediction_sha256 and its saved movement model/fit metadata before use. February and August each require lower gate RMSE and the pooled paired UTC-day 95-percent lower gain must be positive at seed 20261017/1000. No weight or model changes follow a failure.",
+    "all_finite_policy_protection": "For original folds, compare both gate-only and complete all-finite v8 policies with exact non-gate equality. Fresh/reserved comparisons are component audits because complete independently refitted v8 policies for those months are not claimed.",
+    "heldout_labels": "Every finite gate target enters scoring, including negatives and >7200-second extremes excluded from ordinary training; disclose per-month row counts and squared-error concentration without selecting row exceptions.",
+    "repeated_inspection_limitation": "January/July, November/December, April/October and February/August 2025 labels have been used in prior research. These fixed gates check component stability, not an untouched generalization or an expected 2026 score."
+  },
+  "final_and_ranking": {
+    "authorization": "No full model, ranking values or finalizer until source/spec publication, independent peer review, exact cache/source receipts, both original folds, matched April/October and matched February/August all pass.",
+    "final_epochs": "Integer floor of the median of the two original-fold best epochs only; never use April/October or February/August selected epochs. Reinitialize with seed 20261017 and fit all ordinary eligible 2025 rows for exactly this epoch count, including former internal early-stop rows.",
+    "final_output": "Direct target prediction, clipped at zero, only on the exact ranking v8 gate. Require 4907 gate rows, full 344841 template ID set/order, finite nonnegative predictions and bitwise equality of every other prediction to an explicitly SHA-pinned current valid-route reference whose missing-gate values first match sealed v8.",
+    "v12_v13_relationship": "Current v8 missing-clock policy is unchanged by v9/v12/v13 valid-AOBT replacements. A future valid-route reference may be used only after proving exact equality with v8 on the missing-clock gate and exact outside-gate preservation by this candidate.",
+    "selected_output": "One replacement candidate only; no leaderboard-driven route, row exception, second blend or upload in this spec."
+  },
+  "provenance_and_resources": {
+    "publication_sequence": "Publish this spec, then implementation source and peer review, then freeze raw/cache/source/model-reference hashes before any real feature build or label read. Rehash before and after every build, fit, score and ranking operation; all outputs exclusive and immutable.",
+    "required_receipts": ["phase-first source column allowlist and raw file SHA", "event cache protocol and byte SHA", "exact 79-column movement feature manifest/cache SHA", "fit-only numeric scalers and categorical vocabulary SHA", "ordered fit/early/held IDs and labels SHA", "requested and actual model/epoch/optimizer/runtime settings", "saved model SHA and readback prediction SHA", "exact baseline/comparator OOF SHA and scored-pair SHA", "bootstrap/month/full-policy report SHA", "ranking source/template/reference/model/output SHA and unchanged-row proof"],
+    "event_cache_storage_estimate": "2,085,047 training rows x 32 events x 6 float16 channels is 800,658,048 bytes (about 0.75 GiB), plus a separate boolean presence mask and small ranking cache. Store disk-backed in exact baseline ID order and stream batches; do not materialize a dense all-row tensor in RAM.",
+    "available_hardware": "RTX 3090 with CUDA PyTorch 2.13.0+cu126; current approximately 14.5 GiB free physical RAM. Earlier 4.28 GiB observation was disk free, not host RAM.",
+    "memory_launch_floor_gib": 10,
+    "memory_floor_can_be_lowered_by_cli": false,
+    "serial_heavy_jobs": true,
+    "no_external_data": true,
+    "no_external_paper_code_or_data": true,
+    "no_public_leaderboard_feedback_for_selection": true,
+    "source_license": "Only organizer-released fields, existing NOAA weather/ARR caches and locally authored code are model inputs. Papers below motivate the event-order hypothesis and are not copied into the code or dataset."
+  },
+  "primary_methodological_background": [
+    {
+      "title": "A Queuing Model of the Airport Departure Process",
+      "url": "https://dspace.mit.edu/entities/publication/53d1375c-1dd7-48a6-849a-f43bce221b6c",
+      "relevance": "Models unimpeded taxi time and departure runway queueing separately."
+    },
+    {
+      "title": "Improving Departure Taxi Time Predictions Using ASDE-X Surveillance Data",
+      "url": "https://www.mitre.org/sites/default/files/pdf/11_0194.pdf",
+      "relevance": "Identifies runway queue position, cross traffic and nominal taxi versus queue delay as distinct mechanisms; the released events here are weaker proxies than ASDE-X trajectories."
+    }
+  ],
+  "known_limitations": [
+    "Other flights' AOBT and takeoff times are retrospective source records, not a measured airport-surface trajectory or observed runway queue.",
+    "The model's ordinary training labels may not represent the missing-clock gate's extreme or source-corrupted targets.",
+    "The gate is small and some very large errors may be unpredictable from released covariates; no magnitude of improvement is assumed.",
+    "UTC-month partitioning emulates ranking batch boundaries but cannot recover traffic omitted from the supplied batch.",
+    "All local 2025 checks have been repeatedly explored and cannot guarantee a ranking result or prize."
+  ]
+}
