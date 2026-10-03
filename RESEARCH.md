@@ -394,3 +394,7 @@ python later_feature_final.py --mode final-predict
 ```
 
 The extension produces an internal artifact only. Finalization, public reproduction records, a fresh increasing-version/day/size quota check, MinIO CLI upload and remote readback/acceptance checks remain separate mandatory steps.
+
+### V11 original gates passed
+
+The departure interval-flow candidate passed both original all-finite gates at January/July's selected weight **0.5**. January/July RMSE is 322.310529 → 321.916357 seconds, with paired UTC-day gain interval [0.248558, 0.600218]. November/December retains 0.5 and improves 215.198602 → 214.459611, interval [0.544528, 0.963144]. Both original models used 10,000 trees. Exact original-stage evidence is `reports/taxi_flow_original_validation_v11.json`, `reports/taxi_flow_seasonal_provenance_v11.json` and `reports/taxi_flow_forward_provenance_v11.json`. Their pending fresh flag describes this snapshot. The independently refitted April/October audit is running next; no compatibility selection or May/September score has occurred, and the candidate remains unauthorized for ranking.

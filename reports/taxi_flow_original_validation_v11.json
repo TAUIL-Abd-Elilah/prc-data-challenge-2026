@@ -1,0 +1,63 @@
+{
+  "protocol_sha256": "b359787a47fe0c3fe60294e954856b109b797e07dabaa060472055c50dda7e39",
+  "frozen_reference_sha256": "372443f5a09b576031dc6192f4855ce54f09c93a88a559e14b1325e5e7db144d",
+  "folds": {
+    "seasonal_jan_jul": {
+      "rows_all_finite": 344419,
+      "rows_valid_aobt": 338802,
+      "scores_all_finite_rmse": {
+        "0.0": 322.3105287178819,
+        "0.1": 322.15824617137,
+        "0.25": 321.99863060166564,
+        "0.5": 321.9163573627203,
+        "1.0": 322.4408980239853
+      },
+      "day_bootstrap": {
+        "days": 62,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          0.2485578790475742,
+          0.6002177221987806
+        ],
+        "fraction_positive": 1.0,
+        "observed_gain_sec": 0.39417135516157487
+      },
+      "expert_oof_sha256": "4d37a22f29e6877573553622402baaa5b0a1104677bdf121bdc051eafb85fab3",
+      "model_sha256": "6aafaed4305921bf3403ff9ad711b571860201e2ce296d8b673ace577abad7ca",
+      "fit_report_sha256": "593b9cf1544640d9915a998f1d1a8995e1a1f76640fe2fbc8d1de985bea31ab4",
+      "fold_provenance_sha256": "4a6beb41b794c18b4dbe3f6b9fe8e0d74fa000e7179c7594f9e5feb9b8b17b8c",
+      "trees": 10000
+    },
+    "forward_nov_dec": {
+      "rows_all_finite": 328009,
+      "rows_valid_aobt": 324862,
+      "scores_all_finite_rmse": {
+        "0.0": 215.19860172054857,
+        "0.1": 214.95651340770462,
+        "0.25": 214.68160763792997,
+        "0.5": 214.45961104438902,
+        "1.0": 214.90305232651468
+      },
+      "day_bootstrap": {
+        "days": 61,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          0.5445283493668356,
+          0.9631435473640962
+        ],
+        "fraction_positive": 1.0,
+        "observed_gain_sec": 0.7389906761595455
+      },
+      "expert_oof_sha256": "867739c63b8800bff1932d65a2b48b1b6db44016d6b0d7a067ba9fb04847cb61",
+      "model_sha256": "56de61d43c55398f6c3be375c7f162580dabba17d4dbfce82d8bd81ba365ebff",
+      "fit_report_sha256": "606c18f41ac1d911317c531d2fb13313111a7cd26af4030cca71955bd69566c1",
+      "fold_provenance_sha256": "b3ef5a41e489fb134d65ba37b1354536f9c817d243a8abdedb6f10433699f02e",
+      "trees": 10000
+    }
+  },
+  "selected_weight": 0.5,
+  "existing_folds_passed": true,
+  "fresh_audit_passed": false,
+  "ranking_authorized": false,
+  "validation_predictions_sha256": "a91d47c4102bea2964968ba9610eb7f41868c76ed3db300c2b00123892933a26"
+}
