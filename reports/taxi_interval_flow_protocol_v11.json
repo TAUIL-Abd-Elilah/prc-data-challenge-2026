@@ -1,0 +1,76 @@
+{
+  "spec": {
+    "purpose": "Fixed label-free retrospective taxi interval-flow features",
+    "scientific_source": {
+      "inspiration": "MIT aircraft taxi queue study",
+      "url": "https://dspace.mit.edu/entities/publication/f0891972-627a-409e-9fbc-2e12fe4ba28b",
+      "qualification": "Original released-NM proxy features; not a true measured taxi queue. No paper code or data reused."
+    },
+    "raw_phase_filter": "PHASE_mvt == DEP before selecting any feature columns",
+    "raw_dep_allowlist": [
+      "MVT_ID_mvt",
+      "ADEP_mvt",
+      "RUNWAY_mvt",
+      "MVT_TIME_UTC_mvt",
+      "AOBT_3_flt"
+    ],
+    "raw_dep_forbidden": [
+      "BLOCK_TIME_UTC_mvt",
+      "TAXITIME_SEC_mvt"
+    ],
+    "id_use": "Exact alignment, uniqueness, and self-exclusion only; never a predictor",
+    "normalization": "Airport and runway strip/uppercase using runway_arrival_features.normalized; missing/placeholders invalid",
+    "quality_valid_interval": "finite AOBT_3_flt and MVT timestamps, 0 <= MVT-AOBT <= 7200 seconds",
+    "query": "Own quality-valid interval [s=AOBT_3_flt,t=MVT]; otherwise every count is NaN",
+    "scopes": [
+      "normalized airport",
+      "normalized airport plus runway"
+    ],
+    "counts": {
+      "takeoffs_between": "other MVT strictly s < MVT < t; other AOBT may be missing",
+      "proxy_starts_between": "quality-valid other interval, strictly s < AOBT < t",
+      "active_at_takeoff": "quality-valid other interval, AOBT <= t < MVT",
+      "overtakers": "quality-valid other interval, AOBT > s and MVT < t",
+      "left_behind": "quality-valid other interval, AOBT < s and MVT > t"
+    },
+    "boundaries": "All ten counts exclude the own row, including tied times; zero own duration gives zero takeoffs/starts/overtakers but may have active/left-behind",
+    "missing_group": "Invalid airport gives NaN in both scopes; invalid runway gives NaN in runway scope only",
+    "features": [
+      "taxi_flow_airport_takeoffs_between_count",
+      "taxi_flow_airport_proxy_starts_between_count",
+      "taxi_flow_airport_active_at_takeoff_count",
+      "taxi_flow_airport_overtakers_count",
+      "taxi_flow_airport_left_behind_count",
+      "taxi_flow_runway_takeoffs_between_count",
+      "taxi_flow_runway_proxy_starts_between_count",
+      "taxi_flow_runway_active_at_takeoff_count",
+      "taxi_flow_runway_overtakers_count",
+      "taxi_flow_runway_left_behind_count"
+    ],
+    "dtype": "float32",
+    "ranking_availability": "Complete released DEP batch available retrospectively; not a real-time forecast",
+    "departure_labels_used": false,
+    "validation_policy": "No model fit or labels in this builder; May/September labels remain reserved"
+  },
+  "source_sha256": {
+    "builder": "99c0e0c3ae6f1a73b01fd39517a7524f6deb40fc455bf79ef993487277d1e3ef",
+    "normalization": "314673d1cd21479e0657368b0ec45c08784a70e6b604db5d43aea02088440f30",
+    "raw_training": {
+      "training_2025-01-01_2025-02-01.parquet": "a4dc8f152c082c650cd7eb745fe9c641089f34f74df127e6944a188990a0ed94",
+      "training_2025-02-01_2025-03-01.parquet": "b6f9ff2cdb1cfe07c5442f4e1f11bbcdbeafe52852dcb0b8175f62ab84c6a066",
+      "training_2025-03-01_2025-04-01.parquet": "58fde7e5f8b539546af63b41d7f6ec0f2884fdc3d3dd9b6bfca7c59a420dcdd3",
+      "training_2025-04-01_2025-05-01.parquet": "9ffe0cf5741c4863799c41be81475dfaecedabe0ba687b8f8e4eacba992f9390",
+      "training_2025-05-01_2025-06-01.parquet": "5481c0642a8fbb4dc395f93bc713c57f4cc16854fb361d404967077e1fce2ff9",
+      "training_2025-06-01_2025-07-01.parquet": "c3ef5080f2cc636c3416baf1555f7d0ee3519f9046e8043c1c0c8f017a244025",
+      "training_2025-07-01_2025-08-01.parquet": "34d1c5bba7c8596a1c20c09edd3cb2f63277b5a684fa801911660fe0eaf63c9d",
+      "training_2025-08-01_2025-09-01.parquet": "6c8d2aa7a1b6c9dff9a0305a37eb02de1e87a68d07557264f41b77738272c540",
+      "training_2025-09-01_2025-10-01.parquet": "955308a4000947e32a00586d3ee13928949d2231b67f84f6dfb0631893f3754a",
+      "training_2025-10-01_2025-11-01.parquet": "4a31a35601c1bdcd74b8cd6379231ba516a48324e4c2478bf1c9360cd23e687f",
+      "training_2025-11-01_2025-12-01.parquet": "ac36b17db7a537e3baeb682fa4763dacaa1fcc5d9bfa6bf32b3ee5d9f91300b0",
+      "training_2025-12-01_2026-01-01.parquet": "2d357f2f403a86778a69e93f72d8754effe77f1ac0942399b3d1b7728241f724"
+    },
+    "raw_ranking": "9db75e3a56fa09b87aab72e191a53da3fe763d9887ad2b23aea9cde6a6325f86",
+    "baseline_training_rows": "b19e760a11b15e77996203ee84431fbcc225e0e2a325b15cd43bc38a00c47fcc",
+    "baseline_ranking_rows": "da1a018792fba6531616fd32e5bcb4021dac0690676ea28a5eefdbb021c28235"
+  }
+}
