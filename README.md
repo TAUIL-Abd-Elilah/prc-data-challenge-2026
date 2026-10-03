@@ -175,7 +175,9 @@ python later_feature_final.py --mode final-predict
 python finalize_submission.py --predictions artifacts/later-feature-final/predictions.parquet --team merry-mushroom --version 9
 ```
 
-The final tree count is the integer median of the two original selected-family folds, and ranking inputs are sealed before feature reads. V8 remains immutable; a distinct v9 is finalized only if the selected reserved guard passes. Finalization, public aggregate provenance, a fresh quota check, MinIO CLI upload and remote readback/acceptance verification are required before reporting a new official result. May/September and later final execution are still pending.
+The final tree count is the integer median of the two original selected-family folds, and ranking inputs are sealed before feature reads. V8 remains immutable; a distinct v9 is finalized only if the selected reserved guard passes. Finalization, public aggregate provenance, a fresh quota check, MinIO CLI upload and remote readback/acceptance verification are required before reporting a new official result.
+
+The locked May/September guard passed: May RMSE 192.182053 → 191.760338 seconds, September 205.207898 → 204.994186, with pooled gain interval [0.170071, 0.439567]. See the [terminal receipt](reports/later_reserved_guard_terminal.json) and paired fit/provenance reports in [RESEARCH.md](RESEARCH.md). The selected route remains v11 at 0.5; its full fit uses exactly 10,000 trees from the original folds. Later final execution is still pending, and no v9 upload or official score exists.
 
 ## Submit with MinIO Client
 

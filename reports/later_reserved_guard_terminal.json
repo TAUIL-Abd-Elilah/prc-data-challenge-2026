@@ -1,0 +1,42 @@
+{
+  "architecture_comparison_only": true,
+  "bootstrap": {
+    "days": 61,
+    "gain_ci95_sec": [
+      0.17007113627565787,
+      0.4395670235300827
+    ],
+    "repeats": 1000,
+    "seed": 20261014
+  },
+  "comparator_model_sha256": "6404f9d0884ba481d4d13e6489844e3cff377061fc791d3b1504e3d90d825f6f",
+  "comparator_receipt_sha256": "dbbd9d2c310b4966fa88ee758e339c31413c6af5c45cfa6b0174dabe80673c86",
+  "heldout_months": [
+    5,
+    9
+  ],
+  "paired_predictions_sha256": "3184ee279b57ef50531cd3bf3afb64d201540fe1d25c04d460d81a92c547e713",
+  "passed": true,
+  "pooled_fixed_blend_rmse": 198.44788553280583,
+  "pooled_v7_rmse": 198.7626116429016,
+  "protocol_sha256": "622a3586c1e6f07d0b0d0192d34503a0cbeb6035c5ac203c21bc934231b87019",
+  "replacement_model_sha256": "4500827cd9ac115b1511099c2cf64be3eecfd36a60f42ae48f16b6055dd4c80c",
+  "replacement_receipt_sha256": "1722116e0659769bd8eec59aaf6c6915c94f75475ac29ecda81486aa6f93583e",
+  "retained_policy": "v11",
+  "route": "v11",
+  "schema_version": 1,
+  "scores": {
+    "5": {
+      "fixed_blend_rmse": 191.76033802200928,
+      "n": 183518,
+      "v7_rmse": 192.18205298359885
+    },
+    "9": {
+      "fixed_blend_rmse": 204.99418561870266,
+      "n": 181328,
+      "v7_rmse": 205.20789758963633
+    }
+  },
+  "selection_sha256": "72c9099bb32d0fc337e93b305062e426ef7c0ffef6db3da413bf9ee0c23c14a4",
+  "weight": 0.5
+}
