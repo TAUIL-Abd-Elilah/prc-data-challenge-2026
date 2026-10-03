@@ -158,6 +158,7 @@ def args_v13() -> argparse.Namespace:
         v6_dir=ROOT / "artifacts/v6-deep-arrival",
         v11_dir=ROOT / "artifacts/v11-taxi-flow-expert",
         portfolio_dir=ROOT / "artifacts/later-feature-portfolio",
+        submission_v9=V9_SUBMISSION,
         output_dir=V13_DIR, min_free_gib=10.0,
         iterations=MAX_TREES, depth=10, threads=2,
     )
