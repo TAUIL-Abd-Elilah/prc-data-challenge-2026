@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "prospective_before_real_download_or_weather_value_read",
+  "purpose": "Independently acquire and reproduce the fixed NOAA GHCNh weather input inside a disjoint run root",
+  "original_source_sha256": {
+    "download_noaa_weather.py": "bbb8fe3dc64250fbc41519ba716913af3349d5724fc65e388d399a3b1d380525",
+    "WEATHER_SOURCES.md": "da6c1f472813bcb95c8223054aa44e1086af8c69ea471cc1e4793b5e5f53ff0f",
+    "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "requirements-lock.txt": "2d201a484bc8c8f7027e56f608da51114958dd5c628ab32a5f2018a437086254"
+  },
+  "fixed_method": {
+    "station_map_and_years": "Exact ten published stations, all 2025 hours and January/July 2026 hours; 20 station-year Parquet downloads",
+    "processing": "Call only original weather_hours/hour_grid pure functions and preserve original grid, missingness, fog/deicing flags and float/boolean units",
+    "output_rows": 102480,
+    "no_original_main": true,
+    "no_weather_or_model_selection": true,
+    "no_competition_labels_or_leaderboard": true
+  },
+  "license": {
+    "dataset": "NOAA NCEI GHCNh",
+    "spdx": "CC0-1.0",
+    "doi": "https://doi.org/10.25921/jp3d-3v19",
+    "authoritative_metadata": "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C01688",
+    "citation_and_stations": "WEATHER_SOURCES.md"
+  },
+  "integrity": {
+    "source_only_published_trust_boundary": "User-supplied published source SHA plus matching committed Git HEAD source/spec bytes; source publication must occur before real preparation",
+    "prepared_protocol": "parents/weather_protocol.json; publish exact SHA before downloads or value reads",
+    "outputs": "Fresh isolated staging, exclusive canonical source files/weather/manifest/producer receipt; never overwrite or resume partial outputs",
+    "source_and_protocol_recheck": "Fresh source hashes before/after, each acquired source URL and raw byte SHA, exact saved Parquet value readback, all station-year source reaggregation on verify",
+    "RAM_launch_floor_GiB": 10,
+    "download_boundary": "HTTPS www.ncei.noaa.gov only including redirect target; maximum 64 MiB each station-year; 45 second request timeout",
+    "same_algorithm_replay_limit": "Value replay uses the same pinned public processing functions; it verifies acquisition/output correspondence, not an independent scientific weather oracle",
+    "new_snapshot": "NOAA records update; fresh bytes have their own SHA and receipt. Never assert equality to the original weather snapshot or official score transfer."
+  },
+  "integration_remaining": "Approved organizer raw files and a separate canonical raw/weather input manifest are still required by clean parent producers; this wrapper creates only weather provenance",
+  "initial_verification": ["compile", "synthetic processing test", "plan", "independent static peer review"],
+  "no_real_run_yet": true
+}

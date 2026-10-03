@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "status": "prospective_source_only_no_real_run_authorized",
+  "purpose": "Actual-genesis proof for the first two clean v3 stages; no receipt for the full v3 chain is issued",
+  "producer_driver_sha256": "c31178f84522f337947537085e6d748b7a0fd8431fac45e815f821ac88d803ca",
+  "producer_driver_spec_sha256": "26c9250f88493216e3ed5b4a1804726a95789f56cb5b82416ab158512a623fe1",
+  "solution_sha256": "13848cd8483737c1e5db0ac4e1e90c0b64eead8ce289cc17870944f58715aa11",
+  "supported_stages": ["baseline_train", "baseline_predict"],
+  "blocked_stages": ["missing", "grouped", "weather", "airports", "tail", "lirf", "ensemble", "lobt", "lobt_blend"],
+  "source_and_input_policy": {
+    "isolated_run_root": "Resolved root must be disjoint from source checkout; twelve monthly files, ranking, template and independently acquired NOAA weather are named and SHA-bound by the existing clean raw manifest before any value read.",
+    "publication": "Real modes require caller supplied SHA equal to this adapter's bytes and a Git HEAD tree containing this adapter, this spec, the pinned clean producer and original solution sources. This is an operator publication attestation, not an independent online GitHub check.",
+    "execution": "One original solution.py CLI per fresh exclusive stage, fixed 8 CPU threads and 900 round cap for training; child cwd is isolated root, all output paths remain under that root, 10 GiB physical RAM floor before heavy reads and child launch.",
+    "transaction": "Freeze source/raw SHA and prior actual transaction before launch; rehash before and after child and independent proof; link only verified outputs to canonical paths without overwrite, then write an exclusive stage transaction with actual command, log, inputs, output SHA and replay proof. A failed stage is not resumed."
+  },
+  "baseline_train_replay": {
+    "inputs": "Independently reconstruct solution.load_data and build_features from exactly the sealed twelve 2025 raw files. Compare full saved feature and training row values/schema/order and assert no target/BLOCK/opaque ID predictor.",
+    "split": "Both original heldout month folds [1,7] and [11,12]; train on finite 0..86400 labels outside heldout, early stop on same-range heldout, score every finite heldout label. Store ordered fit/early/held ID and label SHA.",
+    "models": "Load the actual saved LightGBM direct and conditional residual fold models. Check feature names/tree counts against reported selected rounds, replay each OOF direct/raw proxy/hybrid vector exactly to float32, and recompute all fold metrics, pooled residual-share/alpha search and validation report. Check final full direct/residual model schema and median original-fold tree count, saved metadata and conditional residual presence.",
+    "output": "Promote exact training feature/row caches, both OOF, validation report, metadata and every generated saved LightGBM model (including conditional residual)."
+  },
+  "baseline_predict_replay": {
+    "inputs": "Before child launch, rehash and replay the canonical baseline_train transaction; link only its verified model.json/direct.txt/conditional residual.txt into a fresh prediction stage.",
+    "proof": "Reconstruct ranking features and proxy from sealed ranking raw file; verify saved ranking feature/row caches, actual final LightGBM direct/residual predictions and fixed saved alpha/share formula, all prediction columns, exact 344841 template ID order, finite nonnegative selected values and proposal readback.",
+    "output": "Promote ranking features/rows/predictions and the proposal Parquet exclusively; proposal is a local lineage artifact and never an upload."
+  },
+  "remaining_full_v3_gap": "No missing/grouped/weather/airport/tail/LIRF/ensemble/LOBT/LOBT-blend child can launch from this adapter. Their model/policy/OOF/ranking proofs and a separate aggregate v3 receipt are required before the clean_parent_producers reviewed_v3_proof_adapter_sha256 null pin can be replaced. The timestamp and GPU/source chain remain blocked.",
+  "authorized_now": ["new_source", "new_spec", "source_only_plan", "synthetic_metadata_test", "compile", "static_peer_review"],
+  "not_authorized_now": ["read_real_raw_cache_or_model_values", "run_original_child", "fit_or_score_real_data", "emit_real_transaction", "clone_or_copy_original_artifacts", "upload_or_read_leaderboard"]
+}
