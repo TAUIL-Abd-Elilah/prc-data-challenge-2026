@@ -1,0 +1,25 @@
+{
+  "worker": "movement_prepared_stream_verify.py",
+  "worker_args": [
+    "--mode",
+    "verify",
+    "--min-free-gib",
+    "2.5",
+    "--abort-free-gib",
+    "1.5"
+  ],
+  "worker_source_sha256": "a1e9da6dbe2420b708e2aab9501fa1713112cf09b6f45210ea2c8c0904dbbb01",
+  "monitor_source_sha256": "70ec67f846f35d12223d7cd26b219f7c4e1b8e3b5a845b5ce1939b9662054612",
+  "child_pid": 42716,
+  "exit_code": 0,
+  "abort_reason": null,
+  "peak_worker_rss_gib": 0.9339485168457031,
+  "monitor_error_type": null,
+  "minimum_available_gib": 2.1440696716308594,
+  "minimum_available_limit_gib": 1.5,
+  "maximum_worker_rss_limit_gib": 2.0,
+  "memory_sample_interval_seconds": 0.5,
+  "elapsed_seconds": 51.640999999995984,
+  "worker_source_unchanged": true,
+  "success": true
+}

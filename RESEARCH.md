@@ -235,7 +235,7 @@ python v9b_stream_predict.py --mode predict-fold --fold forward_nov_dec
 python v9b_movement_valid_audit.py --mode evaluate-folds
 ```
 
-Streaming verification requires 3.5 GiB available initially, and saved inference requires 4 GiB. Each has a runtime memory floor and refuses to overwrite output. For independent reproduction, freeze a new receipt with the recorder's `--receipt` option and pass its SHA-256 through `v9b_stream_predict.py --receipt ... --receipt-sha256 ...`. The current run uses the published v2 receipt. Actual cache verification and valid-AOBT prediction outcomes remain pending.
+Streaming verification defaults to 3.5 GiB available initially, and saved inference to 4 GiB. Each has a runtime memory floor and refuses to overwrite output. For independent reproduction, freeze a new receipt with the recorder's `--receipt` option and pass its SHA-256 through `v9b_stream_predict.py --receipt ... --receipt-sha256 ...`. The current run uses the published v2 receipt. Complete monitored cache verification passed as documented below; valid-AOBT prediction outcomes remain pending.
 
 `lightgbm_stream_feasibility.py` tests a separate disk-backed training input on synthetic data only. Bounded conversion through the installed LightGBM pandas encoder retains global categorical coding and writes a C-contiguous float64 NumPy memmap. The default-parameter test and a synthetic bin-sampling stress test both match full pandas encoded values, complete model text and predictions exactly; see `reports/lightgbm_stream_feasibility.json`. This establishes an operational hypothesis, not a competition fit or score. Native binning memory and full-scale equivalence remain untested, so the production 10 GiB gate is unchanged.
 
@@ -254,7 +254,18 @@ python run_bounded_worker.py --worker movement_prepared_stream_verify.py --repor
 
 The first monitored full-cache attempt failed before sealing at the initial batch. Its sampled peak RSS was 0.579 GiB and minimum available RAM was 2.449 GiB. Diagnosis found no logical flight-category differences: pre-write Pandas `string` versus Parquet-readback `str` category representation caused strict Series equality to fail. The independent temporary writer now derives categorical UTF-8 storage from the baseline source schema and all twelve canonical raw flight-name schemas, rather than from the original prepared cache. Category labels, order and codes must match before writing; the original exact physical Arrow schema/metadata, reread values and categorical checks remain mandatory. A 1,024-row physical round-trip check passed; the complete rerun is still required.
 
+The repaired complete rerun passed all 2,085,047 departures and 79 fields. Exact schema/metadata, categorical levels/order, physical reread values, IDs and manifest match. The original prepared cache retains SHA-256 `454c9c8c9220564bd9b208c666143056725541683e05da774a479f55e6083a5f`. The immutable seal is copied to `reports/movement_prepared_integrity.json`; the successful watchdog report is copied to `reports/movement_stream_memory.json`. Sampled peak RSS was 0.934 GiB and minimum available memory 2.144 GiB over 51.6 seconds. The worker exited successfully and both source hashes were checked independently.
+
 The saved-model streaming producer also accepts `--min-free-gib 2.5` for monitored runs while retaining its 4 GiB default. It enforces a 1.5 GiB runtime floor. This changes resource handling only; it preserves the same source receipts, model, features, masks, rounds, predictions and downstream validation checks.
+
+`movement_memmap_fit.py` implements the provisional disk-backed native fit for an operational equivalence test only. It requires the independent prepared seal, a 3 GiB initial gate and a successful externally monitored run. Target dtype, 0..7200 ordinary range, UTC-day modulo-11 internal split, feature/category order, original 63-leaf parameters, 1200-round cap and 100-round stopping rule are unchanged. Only seasonal Jan/Jul fitting is enabled; all other month pairs refuse until separate scientific integration. Its model remains provisional until `verify-run` binds the watchdog, source, masks, matrices and model, and `verify-equivalence` proves byte-identical complete model output against the published original-model receipt. Its batch-encoder and native synthetic model parity checks passed. No full-scale memmap fit has run yet.
+
+```powershell
+python movement_memmap_fit.py --mode synthetic-parity
+python run_bounded_worker.py --worker movement_memmap_fit.py --report artifacts/movement-memmap/seasonal-watchdog.json -- --mode fit-fold --fold seasonal_jan_jul --run-dir artifacts/movement-memmap/seasonal --watchdog-report artifacts/movement-memmap/seasonal-watchdog.json
+python movement_memmap_fit.py --mode verify-run --fold seasonal_jan_jul --run-dir artifacts/movement-memmap/seasonal --watchdog-report artifacts/movement-memmap/seasonal-watchdog.json
+python movement_memmap_fit.py --mode verify-equivalence --fold seasonal_jan_jul --run-dir artifacts/movement-memmap/seasonal --watchdog-report artifacts/movement-memmap/seasonal-watchdog.json
+```
 
 The latter three stages require the completed feature cache and at least 10 GiB free memory. Run them serially after current fitting and audit jobs.
 
