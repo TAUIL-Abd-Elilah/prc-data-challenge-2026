@@ -1,3 +1,4 @@
 # Preserve exact bytes in published source and integrity receipts.
 *.py -text
 *.json -text
+*.txt -text
