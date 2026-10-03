@@ -1,0 +1,56 @@
+{
+  "selected_weight": 0.0,
+  "folds": {
+    "seasonal_jan_jul": {
+      "n_all_finite": 344419,
+      "n_valid_aobt": 338802,
+      "scores": {
+        "0.0": 322.3105287178819,
+        "0.1": 322.8434362556846,
+        "0.25": 325.4512607269328,
+        "0.5": 334.46882489222145
+      },
+      "bootstrap": {
+        "days": 62,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          0.0,
+          0.0
+        ],
+        "fraction_positive": 0.0,
+        "observed_gain_sec": 0.0
+      },
+      "passed": false
+    },
+    "forward_nov_dec": {
+      "n_all_finite": 328009,
+      "n_valid_aobt": 324862,
+      "scores": {
+        "0.0": 215.19860172054857,
+        "0.1": 216.16993096817592,
+        "0.25": 219.55893273111988,
+        "0.5": 230.0632383299265
+      },
+      "bootstrap": {
+        "days": 61,
+        "repeats": 1000,
+        "gain_ci95_sec": [
+          0.0,
+          0.0
+        ],
+        "fraction_positive": 0.0,
+        "observed_gain_sec": 0.0
+      },
+      "passed": false
+    }
+  },
+  "existing_folds_passed": false,
+  "protocol_sha256": "c6a1dcea1731ffa5a8181a1e3cf6bcb517ef372b2d217ce5f63f402a1c25d2a0",
+  "v7_validation_sha256": "a382b46fa064b811e1a83d5c4eda93f3b783db1f2b2e652ed10fd69e2e0694e8",
+  "v7_oof_sha256": "a5e1e8911f30d1c346be17b6b2d666c2571cfa7eb8727a85c082d9b0bab8d095",
+  "movement_fold_oof_sha256": {
+    "seasonal_jan_jul": "37fc23333b9afb3a30aa540f30a5022283e84b56625b7c237836a65ff019a7fe",
+    "forward_nov_dec": "41e4e479f699d270bc7f1bca69a50ed196b1bb0da620e5196bb9cb4ec6851a2c"
+  },
+  "validation_predictions_sha256": "35781d04de90f9412c7b9a7e8cc246760aee3a8b88dcc6713a1e2c9a2aea2478"
+}

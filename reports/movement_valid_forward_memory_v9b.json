@@ -1,0 +1,25 @@
+{
+  "worker": "v9b_stream_predict.py",
+  "worker_args": [
+    "--mode",
+    "predict-fold",
+    "--fold",
+    "forward_nov_dec",
+    "--min-free-gib",
+    "2.5"
+  ],
+  "worker_source_sha256": "a11d625c3a466f2e73e1237938dbb0787f6cabb25d08e153f9c8b2b5d5b74a23",
+  "monitor_source_sha256": "70ec67f846f35d12223d7cd26b219f7c4e1b8e3b5a845b5ce1939b9662054612",
+  "child_pid": 44648,
+  "exit_code": 0,
+  "abort_reason": null,
+  "peak_worker_rss_gib": 0.7692337036132812,
+  "monitor_error_type": null,
+  "minimum_available_gib": 12.33297348022461,
+  "minimum_available_limit_gib": 1.5,
+  "maximum_worker_rss_limit_gib": 2.0,
+  "memory_sample_interval_seconds": 0.5,
+  "elapsed_seconds": 146.01499999999942,
+  "worker_source_unchanged": true,
+  "success": true
+}

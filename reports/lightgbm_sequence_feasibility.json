@@ -1,0 +1,58 @@
+{
+  "synthetic_rows": 6600,
+  "lightgbm_version": "4.7.0",
+  "frozen_model_params": {
+    "objective": "regression",
+    "metric": "rmse",
+    "learning_rate": 0.04,
+    "num_leaves": 63,
+    "min_data_in_leaf": 90,
+    "lambda_l2": 8.0,
+    "feature_fraction": 0.85,
+    "bagging_fraction": 0.85,
+    "bagging_freq": 1,
+    "max_cat_threshold": 64,
+    "cat_smooth": 20,
+    "verbosity": -1,
+    "num_threads": 3,
+    "seed": 20261002,
+    "feature_fraction_seed": 20261002,
+    "bagging_seed": 20261002,
+    "deterministic": true,
+    "force_col_wise": true
+  },
+  "results": [
+    {
+      "bin_construct_sample_cnt": "LightGBM default",
+      "fit_rows": 5005,
+      "internal_early_rows": 495,
+      "encoded_values_exact": true,
+      "categorical_names_and_levels_exact": true,
+      "best_iteration_pandas": 90,
+      "best_iteration_sequence": 90,
+      "complete_model_text_equal": true,
+      "tree_dump_equal": true,
+      "predictions_bitwise_equal": true,
+      "max_absolute_prediction_difference": 0.0,
+      "maximum_sequence_batch_rows": 113
+    },
+    {
+      "bin_construct_sample_cnt": 1000,
+      "fit_rows": 5005,
+      "internal_early_rows": 495,
+      "encoded_values_exact": true,
+      "categorical_names_and_levels_exact": true,
+      "best_iteration_pandas": 90,
+      "best_iteration_sequence": 90,
+      "complete_model_text_equal": false,
+      "tree_dump_equal": false,
+      "predictions_bitwise_equal": false,
+      "max_absolute_prediction_difference": 0.21681110944420023,
+      "maximum_sequence_batch_rows": 113
+    }
+  ],
+  "competition_data_or_models_read": false,
+  "competition_fit_performed": false,
+  "source_sha256": "5785b206d2b73d686f9724bf878c319932af558fa69a86a442e2eb24f29bb239",
+  "decision": "Rejected as an equivalent operational route; sampled binning differs"
+}

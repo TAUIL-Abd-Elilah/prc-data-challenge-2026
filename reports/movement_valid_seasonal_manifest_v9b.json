@@ -1,0 +1,16 @@
+{
+  "months": [
+    1,
+    7
+  ],
+  "n_valid_finite": 338802,
+  "model_source": "original_movement",
+  "model_path": "artifacts\\v6-movement-only\\seasonal_jan_jul.txt",
+  "model_sha256": "04557d0c3ec6f5551b5bcb7abfdb828cd84ea93e8fdfdb089d7335ef0b51124e",
+  "fit_report_sha256": "872f1f4fcb8fc299c882a64e79a56f524e16d13363ca3f67dfdec4b45df1c964",
+  "features_manifest_sha256": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4f8d6084825",
+  "prepared_features_sha256": "454c9c8c9220564bd9b208c666143056725541683e05da774a479f55e6083a5f",
+  "arrival_cache_sha256": "c4cad12b3a7d0bcf600f775fe12178bb2132fbfc9e0741c8fa35fd71257d76b5",
+  "v5_oof_sha256": "036da1502f4ae68238927e31a0479b9cb82a6fb31b7acdbab26aa0657b7a67f8",
+  "output_sha256": "37fc23333b9afb3a30aa540f30a5022283e84b56625b7c237836a65ff019a7fe"
+}
