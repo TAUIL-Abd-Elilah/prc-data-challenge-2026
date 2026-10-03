@@ -380,3 +380,17 @@ The three fit/evaluate commands are conditional on selecting a replacement; unch
 The unchanged 0.25 same-runway arrival-taxi blend passed April/October on all 357,813 finite-label valid-AOBT rows. April RMSE improves 186.344151 → 185.882733 seconds and October 204.527379 → 203.983989; the pooled UTC-day gain interval is [0.428200, 0.590764]. Its independently refitted model used 10,000 trees, which does not alter the original-fold median rule. Independent read-only verification recomputed all original weight scores, selected-weight day intervals, fresh formulas and scores, and checked actual model metadata plus 69 source/model/cache/report fingerprints. Exact snapshots are `reports/runway_taxi_fresh_audit_v10.json`, `reports/runway_taxi_complete_validation_v10.json` and `reports/runway_taxi_fresh_provenance_v10.json`. This remains a component architecture comparison, with no ranking authorization.
 
 The v11 model input protocol is now sealed in `reports/taxi_flow_model_protocol_v11.json`, and its original complementary-fold fits have started with the published settings. The later compatibility/choice waits for both families to be terminal. No May/September score, replacement final fit or new submission has occurred.
+
+
+`later_feature_final.py` completes the guarded final extension; source SHA-256 `b5d0c9d49e293b16f1c42cb7dce5d12a3429e27e29713330e6aa96b630852fad`. It verifies the selected family's original inputs and the reserved model/OOF/fit receipts, then replays the same single fixed reserved formula and score as an integrity check. Only a passing selected replacement may train all eligible 2025 rows, with exactly 184 fields and the original fold median tree count. It seals ranking sources before reading features, predicts the exact valid-proxy mask, uses the frozen v7 blend formula, preserves current v8 on every other row, and checks complete template order, finite nonnegative output and readback. Current-policy selection verifies the existing file and creates no new fit. Source, syntax, API, synthetic mask/formula/ID/receipt-tamper checks and independent static review passed; real final execution has not occurred.
+
+Only after the selected reserved guard passes, publish its aggregate receipt before final preparation:
+
+```powershell
+python later_feature_final.py --mode prepare
+python later_feature_final.py --mode fit-final
+python later_feature_final.py --mode freeze-ranking-inputs
+python later_feature_final.py --mode final-predict
+```
+
+The extension produces an internal artifact only. Finalization, public reproduction records, a fresh increasing-version/day/size quota check, MinIO CLI upload and remote readback/acceptance checks remain separate mandatory steps.
