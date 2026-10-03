@@ -216,6 +216,14 @@ python v10_runway_taxi_expert.py --mode fit-folds
 python v10_runway_taxi_expert.py --mode fresh-audit
 ```
 
+### Saved movement fold provenance
+
+`record_movement_fold_provenance.py` records the existing movement models, fit reports, original OOF files, feature cache, raw/source inputs and published original validation before any new valid-AOBT inference. It reads model metadata and hashes, without prediction or scoring. The immutable receipt is `reports/movement_fold_model_provenance.json`; both model hashes and cache hashes match the prior audit. Reproduction can generate a new receipt from its own fitted models using the same recorder. The receipt does not promote either movement route or replace the required feature-cache proof and later validation gates.
+
+```powershell
+python record_movement_fold_provenance.py
+```
+
 The latter three stages require the completed feature cache and at least 10 GiB free memory. Run them serially after current fitting and audit jobs.
 
 OpenStreetMap geometry was considered only for a read-only extraction audit. No maps were obtained, matching coverage is unknown, and no OSM data enter a model or submission. ODbL is an open-data license; the challenge's external-data wording says open-source license without naming accepted data licenses. Geometry is excluded while that interpretation remains unresolved. No OurAirports or OpenAP data are used.

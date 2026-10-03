@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "scope": "Existing fold metadata and hashes only, before new v9b inference",
+  "source_files": {
+    "prepared_features": {
+      "path": "artifacts\\v6-movement-only\\features.parquet",
+      "sha256": "454c9c8c9220564bd9b208c666143056725541683e05da774a479f55e6083a5f"
+    },
+    "row_ids": {
+      "path": "artifacts\\v6-movement-only\\row_ids.parquet",
+      "sha256": "ac1d9cf6a5b4665fe2abcf4b4aa73d9ada52feda482247bff4e1ae179d319ec3"
+    },
+    "features_manifest": {
+      "path": "artifacts\\v6-movement-only\\features_manifest.json",
+      "sha256": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4f8d6084825"
+    },
+    "original_protocol": {
+      "path": "artifacts\\v6-movement-only\\protocol.json",
+      "sha256": "93b2f2f3ae48d97a57263695bfb2c55f3ff8af954403f5b6951ed1e262a355e5"
+    },
+    "original_validation": {
+      "path": "artifacts\\v6-movement-only\\validation.json",
+      "sha256": "a378ff065ed140ab3f01ef8867db81227d1db0ec02f18ed32bcc8567e28023f3"
+    },
+    "public_original_validation": {
+      "path": "reports\\movement_only_validation_v6.json",
+      "sha256": "a378ff065ed140ab3f01ef8867db81227d1db0ec02f18ed32bcc8567e28023f3"
+    },
+    "recorder_source": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\record_movement_fold_provenance.py",
+      "sha256": "e7b62bab55b64ac0687fbbfa25690d26d3ff5fac609035393c109db98eb0be2c"
+    }
+  },
+  "folds": {
+    "seasonal_jan_jul": {
+      "model_path": "artifacts\\v6-movement-only\\seasonal_jan_jul.txt",
+      "fit_report_path": "artifacts\\v6-movement-only\\seasonal_jan_jul_fit.json",
+      "original_oof_path": "artifacts\\v6-movement-only\\seasonal_jan_jul_oof.parquet",
+      "model_sha256": "04557d0c3ec6f5551b5bcb7abfdb828cd84ea93e8fdfdb089d7335ef0b51124e",
+      "fit_report_sha256": "872f1f4fcb8fc299c882a64e79a56f524e16d13363ca3f67dfdec4b45df1c964",
+      "original_oof_sha256": "ad0d8288a8e1804818070e045eebc58e01c00fffdc375814a629c8a7203e6944",
+      "heldout_months": [
+        1,
+        7
+      ],
+      "best_round": 876,
+      "feature_count": 79,
+      "num_trees": 876,
+      "original_heldout_gate_rows": 4976
+    },
+    "forward_nov_dec": {
+      "model_path": "artifacts\\v6-movement-only\\forward_nov_dec.txt",
+      "fit_report_path": "artifacts\\v6-movement-only\\forward_nov_dec_fit.json",
+      "original_oof_path": "artifacts\\v6-movement-only\\forward_nov_dec_oof.parquet",
+      "model_sha256": "7f148e5adb8b2558a2872f6ac026e9f199f6ae44849b9dfe993b5f6791adb9bc",
+      "fit_report_sha256": "bef06660be60c5b1bb007c793f851729241c6a146cd5cdd240f375ba513e0ec0",
+      "original_oof_sha256": "b4d075c2bcc567cb7ee16a53926e6cafac1681689580593482b9dc4d66d0ea69",
+      "heldout_months": [
+        11,
+        12
+      ],
+      "best_round": 987,
+      "feature_count": 79,
+      "num_trees": 987,
+      "original_heldout_gate_rows": 2865
+    }
+  },
+  "features": [
+    "dep_prev5",
+    "dep_prev15",
+    "dep_prev30",
+    "dep_next15",
+    "arr_prev15",
+    "arr_prev30",
+    "arr_next15",
+    "same_runway_prev15",
+    "utc_hour",
+    "utc_weekday",
+    "utc_month",
+    "utc_dayofyear",
+    "is_weekend",
+    "local_hour",
+    "local_weekday",
+    "hour_sin",
+    "hour_cos",
+    "year_sin",
+    "year_cos",
+    "stand_number",
+    "flight_number",
+    "ADEP_mvt",
+    "ADES_mvt",
+    "RUNWAY_mvt",
+    "STAND_mvt",
+    "AIRCRAFT_TYPE_mvt",
+    "FLIGHT_RULE_mvt",
+    "flight_prefix",
+    "stand_zone",
+    "route",
+    "airport_runway",
+    "airport_stand",
+    "airport_stand_runway",
+    "flight_name_mvt",
+    "mvt_utc_minute",
+    "mvt_utc_second",
+    "schedule_utc_hour",
+    "schedule_utc_minute",
+    "schedule_utc_second",
+    "schedule_utc_weekday",
+    "schedule_local_hour",
+    "schedule_local_weekday",
+    "mvt_schedule_gap_seconds",
+    "mvt_schedule_day_offset",
+    "schedule_missing",
+    "wx_temperature_c",
+    "wx_dewpoint_c",
+    "wx_relative_humidity_pct",
+    "wx_wind_speed_mps",
+    "wx_wind_gust_mps",
+    "wx_precip_mm",
+    "wx_snow_depth_mm",
+    "wx_visibility_km",
+    "wx_ceiling_m",
+    "wx_snow_reported",
+    "wx_fog_reported",
+    "wx_mist_reported",
+    "wx_rain_reported",
+    "wx_freezing_precip_reported",
+    "wx_obs_count",
+    "wx_wind_direction_deg",
+    "wx_fog_proxy",
+    "wx_deicing_proxy",
+    "wx_headwind_mps",
+    "wx_crosswind_abs_mps",
+    "arr_taxi_count_15m",
+    "arr_taxi_mean_15m",
+    "arr_taxi_highshare_15m",
+    "arr_taxi_count_60m",
+    "arr_taxi_mean_60m",
+    "arr_taxi_highshare_60m",
+    "arr_taxi_count_180m",
+    "arr_taxi_mean_180m",
+    "arr_taxi_highshare_180m",
+    "arr_taxiing_now",
+    "arr_block_prev_60m",
+    "arr_same_stand_last_block_gap",
+    "arr_same_stand_last_taxi",
+    "arr_same_stand_blocks_4h"
+  ],
+  "categorical": [
+    "ADEP_mvt",
+    "ADES_mvt",
+    "RUNWAY_mvt",
+    "STAND_mvt",
+    "AIRCRAFT_TYPE_mvt",
+    "FLIGHT_RULE_mvt",
+    "flight_prefix",
+    "stand_zone",
+    "route",
+    "airport_runway",
+    "airport_stand",
+    "airport_stand_runway",
+    "flight_name_mvt"
+  ],
+  "provenance_input_sha256": {
+    "baseline_training_rows": "b19e760a11b15e77996203ee84431fbcc225e0e2a325b15cd43bc38a00c47fcc",
+    "baseline_features": "62b35f2ebb012cf85853c41c2aae55d72b2bd8cd7fb68243b23a9868afca0253",
+    "released_arrival_cache": "c4cad12b3a7d0bcf600f775fe12178bb2132fbfc9e0741c8fa35fd71257d76b5",
+    "noaa_weather": "cf8b9d15f38a9f516cf47d18974caae87b1c9aba48cc3bf112853d49ab8cb925",
+    "frozen_v5_oof": "036da1502f4ae68238927e31a0479b9cb82a6fb31b7acdbab26aa0657b7a67f8",
+    "training_parquet": {
+      "training_2025-01-01_2025-02-01.parquet": "a4dc8f152c082c650cd7eb745fe9c641089f34f74df127e6944a188990a0ed94",
+      "training_2025-02-01_2025-03-01.parquet": "b6f9ff2cdb1cfe07c5442f4e1f11bbcdbeafe52852dcb0b8175f62ab84c6a066",
+      "training_2025-03-01_2025-04-01.parquet": "58fde7e5f8b539546af63b41d7f6ec0f2884fdc3d3dd9b6bfca7c59a420dcdd3",
+      "training_2025-04-01_2025-05-01.parquet": "9ffe0cf5741c4863799c41be81475dfaecedabe0ba687b8f8e4eacba992f9390",
+      "training_2025-05-01_2025-06-01.parquet": "5481c0642a8fbb4dc395f93bc713c57f4cc16854fb361d404967077e1fce2ff9",
+      "training_2025-06-01_2025-07-01.parquet": "c3ef5080f2cc636c3416baf1555f7d0ee3519f9046e8043c1c0c8f017a244025",
+      "training_2025-07-01_2025-08-01.parquet": "34d1c5bba7c8596a1c20c09edd3cb2f63277b5a684fa801911660fe0eaf63c9d",
+      "training_2025-08-01_2025-09-01.parquet": "6c8d2aa7a1b6c9dff9a0305a37eb02de1e87a68d07557264f41b77738272c540",
+      "training_2025-09-01_2025-10-01.parquet": "955308a4000947e32a00586d3ee13928949d2231b67f84f6dfb0631893f3754a",
+      "training_2025-10-01_2025-11-01.parquet": "4a31a35601c1bdcd74b8cd6379231ba516a48324e4c2478bf1c9360cd23e687f",
+      "training_2025-11-01_2025-12-01.parquet": "ac36b17db7a537e3baeb682fa4763dacaa1fcc5d9bfa6bf32b3ee5d9f91300b0",
+      "training_2025-12-01_2026-01-01.parquet": "2d357f2f403a86778a69e93f72d8754effe77f1ac0942399b3d1b7728241f724"
+    }
+  }
+}
