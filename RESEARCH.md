@@ -151,13 +151,15 @@ Use the guarded fresh/final modes only if the preceding gates pass; `python v9b_
 
 The shared-flight covariate recovery audit (`v8_flight_covariate_recovery.py`) reads no block/taxi labels and uses flight IDs only as join keys. Missing departure NM clocks have no matching ARR counterpart in either the 2025 training set or the supplied 2026 ranking set. It recovers zero clocks, so this route is rejected. Shared records with available AOBT agree exactly in all 315,234 training pairs and all 50,923 ranking pairs. Reproduce with `python v8_flight_covariate_recovery.py`; the aggregate report is `reports/flight_covariate_recovery_audit_v8.json`.
 
-The fixed CPU alternative (`v8_lightgbm_residual.py`) uses the timestamp, ARR, neighbor and runway covariates with 255 LightGBM leaves, minimum leaf size 80, L2 penalty 30, learning rate 0.03 and at most 2,000 rounds. Early stopping uses complete calendar days inside complementary months. Its frozen comparator is v6; January/July select one coarse weight, November/December apply it unchanged, and a separate April/October paired architecture audit is mandatory. All raw files, caches, weather, references and the template are fingerprinted. No fitting outcome is available yet. Run its CPU stages serially with other training jobs:
+The fixed CPU alternative (`v8_lightgbm_residual.py`) uses the timestamp, ARR, neighbor and runway covariates with 255 LightGBM leaves, minimum leaf size 80, L2 penalty 30, learning rate 0.03 and at most 2,000 rounds. Early stopping uses complete calendar days inside complementary months. Its frozen comparator is v6; January/July select one coarse weight, November/December apply it unchanged, and a separate April/October paired architecture audit is mandatory. All raw files, caches, weather, references and the template are fingerprinted. Run its CPU stages serially with other training jobs:
 
 ```powershell
 python v8_lightgbm_residual.py --mode prepare
 python v8_lightgbm_residual.py --mode fit
 python v8_lightgbm_residual.py --mode fresh-audit
 ```
+
+The two CPU folds have completed at 912 and 929 trees. January/July select weight 0.25: all-finite RMSE changes from 323.723 to 323.056 seconds, with paired-day gain interval 0.430 to 0.941. November/December at that fixed weight changes from 217.903 to 217.267, with interval 0.439 to 0.854. Both original-fold gates pass. The April/October audit and v7 combination check are pending, so this is not promoted or submitted. The aggregate snapshot is `reports/lightgbm_validation_v8.json`.
 
 The separate `v8_combo_audit.py` protocol is frozen before v8 training. If both standalone candidates pass, it applies the same v8 seasonally selected weight toward the v8 expert from the v7 candidate, without choosing another weight. Promotion requires improvement over v7 and positive day confidence bounds in both OOF folds and the paired April/October audit. A failed combination is rejected without retuning. Reproduce with `python v8_combo_audit.py --mode prepare`, then `python v8_combo_audit.py --mode audit` once both standalone validation reports are promoted.
 
