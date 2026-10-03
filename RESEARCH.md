@@ -464,3 +464,31 @@ python v12_runway_geometry_expert.py --mode fresh-audit
 Publish the prepared protocol before fitting, and run full fits serially. Final and ranking modes in this comparison script refuse. A separate prospective February/August matched 184-field/200-field refit guard must be implemented, reviewed, published, frozen and passed at the original selected weight before any final model or new ranking prediction is permitted. Guard failure retains v9 without weight adjustment or alternative switching. The original two-fold tree-count median alone would set final iterations. Public leaderboard feedback is excluded from all choices.
 
 The v12 comparison preparation subsequently completed with 92 named input seals and 12 canonical raw training seals. Its exact public protocol is `reports/runway_geometry_model_protocol_v12.json`, SHA-256 `ba430895452f7834beb677f0c585c55a1a05d6018b6d7712a11c7b174bea6981`. The frozen all-finite v9 reference has SHA-256 `bc38ce726d57296fca76bddf211d837e95bb85d7ca308b024a30f84cdb3ef1a5`. No v12 model fit or score has occurred at preparation; original complementary-fold training follows publication of this protocol.
+
+### Prospective v12 February/August guard and final path
+
+`v12_geometry_final.py`, SHA-256 `73ce757e080e7d54fc3e5c1b2fc8991f37e073c6ec01dc71a514941a89c80ffe`, implements the separately required guard before any guard preparation, label read or fit. Publication precedes all real modes. Original v12 and April/October gates must first pass; the guard freezes their unchanged selected weight and source/model/input receipts. Its 184-field v11 comparator and 200-field replacement refits exclude February/August from fitting and early stopping, use identical fit/early/held IDs and categorical vocabularies, and record their hashes. A read-only verifier independently reconstructs those splits from sealed inputs. Each month must improve clipped RMSE and the pooled paired UTC-day 95 percent lower gain must be positive (1,000 repeats, seed 20261015). Failure retains v9 without retuning or alternative switching.
+
+After publication and only if the original and April/October gates pass, run serially:
+
+```powershell
+$v12GuardSourceSha = '73ce757e080e7d54fc3e5c1b2fc8991f37e073c6ec01dc71a514941a89c80ffe'
+python v12_geometry_final.py --mode prepare --published-source-sha256 $v12GuardSourceSha
+# Publish the exact prepared guard protocol before either fit.
+python v12_geometry_final.py --mode guardfit-comparator --published-source-sha256 $v12GuardSourceSha
+python v12_geometry_final.py --mode guardfit-replacement --published-source-sha256 $v12GuardSourceSha
+python v12_geometry_final.py --mode guard-eval --published-source-sha256 $v12GuardSourceSha
+```
+
+Only after the fixed guard passes and its aggregate receipts are published:
+
+```powershell
+python v12_geometry_final.py --mode finalprepare --published-source-sha256 $v12GuardSourceSha
+# Publish the exact full-fit protocol before fitting.
+python v12_geometry_final.py --mode finalfit --published-source-sha256 $v12GuardSourceSha
+python v12_geometry_final.py --mode rankingseal --published-source-sha256 $v12GuardSourceSha
+# Publish the full-model receipt and ranking input seal before inference.
+python v12_geometry_final.py --mode predict --published-source-sha256 $v12GuardSourceSha
+```
+
+Full-fit iterations are solely the integer median of the two original v12 fold tree counts. Effective CatBoost settings, requested parameters, 200-field schema, categorical indices and actual saved tree count are checked. Ranking inputs are hashed before feature-value reads; the final formula is `clip(v9 + fixed_weight * (new_raw_200 - v9), lower=0)` on exactly the 339,377 valid-proxy rows. All 5,464 other rows, including 4,907 missing-clock rows, retain sealed v9 exactly. Exclusive outputs and a 10 GiB launch floor apply. Static peer review, compilation and synthetic coverage/formula/ID/tamper/rejection checks passed. No real guard, final fit or inference has run at publication. The extension does not finalize a submission, select a version, upload or read leaderboard feedback; those remain separate steps within the existing v8-then-v9 queue and competition limits.
