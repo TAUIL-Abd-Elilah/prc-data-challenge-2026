@@ -56,7 +56,17 @@
     "v10_runway_taxi_expert.py": "bd25c47d81021d38e7e9c1ea464dcc0699bc10a447130a5752eee60b60b2e9de",
     "v11_taxi_interval_flow_expert.py": "8d2027973780495bb7f4715aa4a665889020f6250903211ee80f2e4e73258298",
     "runway_arrival_taxi_features.py": "8c8527d63eaf28fa1cefabf4a6b3bdd21e7c1d2f2ceac5e04977de703aac96a0",
-    "taxi_interval_flow_features.py": "99c0e0c3ae6f1a73b01fd39517a7524f6deb40fc455bf79ef993487277d1e3ef"
+    "taxi_interval_flow_features.py": "99c0e0c3ae6f1a73b01fd39517a7524f6deb40fc455bf79ef993487277d1e3ef",
+    "reports/submission_v8_finalized_manifest.json": "264d494e406ec8e4afd327b370aa21ba4bd1a787b61f7ce86b797552f921b366",
+    "artifacts/current-candidate/ranking_manifest.json": "8acc90526363ba2aa7f12efd3ee774a889e179efb898c8d5a975df65eaa31458",
+    "artifacts/current-candidate/ranking_sources.json": "6dac1dc0ef78672e6c552bbe9725d3ca864a8937b22420ffeab144bc66719218",
+    "artifacts/v7-runway-traffic/predictions.parquet": "314e5dcc537b46954744ddc02018c7e2a65cd1dfe10be8e13da313c69eb0b0eb",
+    "artifacts/v7-runway-traffic/fresh_audit_predictions.parquet": "d1b204ceaec7693d0e6a916dc2e9e721d504d7d7f0c5026dbeaf79fdafcb35e1",
+    "artifacts/v7-runway-traffic/fresh_audit.json": "47389aa4e34dfd40e0fcde9b4368be1667f863aebda9735abb9d18b0d3dec79e",
+    "artifacts/v6-movement-only/validation_predictions.parquet": "98493a0c46c3e4e5bacf609d6014c61f2b361a46720cd41a78139d152d40fc26",
+    "reports/movement_only_validation_v6.json": "a378ff065ed140ab3f01ef8867db81227d1db0ec02f18ed32bcc8567e28023f3",
+    "reports/movement_only_fresh_audit.json": "083fbc90551c46ec7084c9767b7710bb5764a0b478cf3743f9977d8d36ec0be0",
+    "reports/movement_only_reserved_audit.json": "5839fbdbd11f19e9d4d4c5ce349052caa1eb0289568eab1575c07d141d384132"
   },
   "input_integrity": "Require these exact baseline, spec and source hashes before and after all later compatibility comparisons and before sealing selection. Future implementation source is separately published and frozen before comparisons."
 }
