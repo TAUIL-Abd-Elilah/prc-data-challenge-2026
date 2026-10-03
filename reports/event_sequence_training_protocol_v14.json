@@ -1,0 +1,147 @@
+{
+  "event_columns": [
+    "relative_mvt_time",
+    "phase",
+    "runway_relation",
+    "peer_nm_aobt_relative_time",
+    "peer_nm_aobt_valid",
+    "peer_nm_proxy_interval"
+  ],
+  "event_dtype": "float16",
+  "event_shape_per_row": [
+    32,
+    6
+  ],
+  "forbidden_raw_columns": [
+    "BLOCK_TIME_UTC_mvt",
+    "TAXITIME_SEC_mvt",
+    "target"
+  ],
+  "future_slots": 16,
+  "ids_never_predictors": true,
+  "inputs": {
+    "baseline_features": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\artifacts\\baseline\\features.parquet",
+      "sha256": "62b35f2ebb012cf85853c41c2aae55d72b2bd8cd7fb68243b23a9868afca0253"
+    },
+    "baseline_rows": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\artifacts\\baseline\\training_rows.parquet",
+      "sha256": "b19e760a11b15e77996203ee84431fbcc225e0e2a325b15cd43bc38a00c47fcc"
+    },
+    "builder_source": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\event_sequence_features_v14.py",
+      "sha256": "3719fd5b0048e0590f77f094bf1bc3829982e9fe3db4115688dc196cec4405e2"
+    },
+    "movement_feature_manifest": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\artifacts\\v6-movement-only\\features_manifest.json",
+      "sha256": "1066c5e1c47402a4858381055522f330d09dc9274da298277f40f4f8d6084825"
+    },
+    "movement_feature_source": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\movement_only_expert.py",
+      "sha256": "bacd7a8c9446ea740969f3eeb1f59d4839eb83a8b6a348c7d3f07a8bf7f5ea26"
+    },
+    "movement_prepared_integrity": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\artifacts\\v6-movement-only\\prepared_integrity.json",
+      "sha256": "9e121c94d76c5e0bc94fb01ba306066911d3e33308fb9956cdcac97d7bc2b668"
+    },
+    "movement_training_features": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\artifacts\\v6-movement-only\\features.parquet",
+      "sha256": "454c9c8c9220564bd9b208c666143056725541683e05da774a479f55e6083a5f"
+    },
+    "movement_training_row_ids": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\artifacts\\v6-movement-only\\row_ids.parquet",
+      "sha256": "ac1d9cf6a5b4665fe2abcf4b4aa73d9ada52feda482247bff4e1ae179d319ec3"
+    },
+    "published_spec": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\reports\\event_sequence_missing_spec_v14.json",
+      "sha256": "26782bcd1c46662bb705525fa5a72c4d9eb1d57616bbca1ee42edcff1a50aabb"
+    },
+    "raw_training_01": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-01-01_2025-02-01.parquet",
+      "sha256": "a4dc8f152c082c650cd7eb745fe9c641089f34f74df127e6944a188990a0ed94"
+    },
+    "raw_training_02": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-02-01_2025-03-01.parquet",
+      "sha256": "b6f9ff2cdb1cfe07c5442f4e1f11bbcdbeafe52852dcb0b8175f62ab84c6a066"
+    },
+    "raw_training_03": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-03-01_2025-04-01.parquet",
+      "sha256": "58fde7e5f8b539546af63b41d7f6ec0f2884fdc3d3dd9b6bfca7c59a420dcdd3"
+    },
+    "raw_training_04": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-04-01_2025-05-01.parquet",
+      "sha256": "9ffe0cf5741c4863799c41be81475dfaecedabe0ba687b8f8e4eacba992f9390"
+    },
+    "raw_training_05": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-05-01_2025-06-01.parquet",
+      "sha256": "5481c0642a8fbb4dc395f93bc713c57f4cc16854fb361d404967077e1fce2ff9"
+    },
+    "raw_training_06": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-06-01_2025-07-01.parquet",
+      "sha256": "c3ef5080f2cc636c3416baf1555f7d0ee3519f9046e8043c1c0c8f017a244025"
+    },
+    "raw_training_07": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-07-01_2025-08-01.parquet",
+      "sha256": "34d1c5bba7c8596a1c20c09edd3cb2f63277b5a684fa801911660fe0eaf63c9d"
+    },
+    "raw_training_08": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-08-01_2025-09-01.parquet",
+      "sha256": "6c8d2aa7a1b6c9dff9a0305a37eb02de1e87a68d07557264f41b77738272c540"
+    },
+    "raw_training_09": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-09-01_2025-10-01.parquet",
+      "sha256": "955308a4000947e32a00586d3ee13928949d2231b67f84f6dfb0631893f3754a"
+    },
+    "raw_training_10": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-10-01_2025-11-01.parquet",
+      "sha256": "4a31a35601c1bdcd74b8cd6379231ba516a48324e4c2478bf1c9360cd23e687f"
+    },
+    "raw_training_11": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-11-01_2025-12-01.parquet",
+      "sha256": "ac36b17db7a537e3baeb682fa4763dacaa1fcc5d9bfa6bf32b3ee5d9f91300b0"
+    },
+    "raw_training_12": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\data\\training_2025-12-01_2026-01-01.parquet",
+      "sha256": "2d357f2f403a86778a69e93f72d8754effe77f1ac0942399b3d1b7728241f724"
+    },
+    "training_file_selector_source": {
+      "path": "D:\\Competition\\prc-data-challenge-2026.netlify\\solution.py",
+      "sha256": "13848cd8483737c1e5db0ac4e1e90c0b64eead8ce289cc17870944f58715aa11"
+    }
+  },
+  "month_partition": "UTC calendar year/month and normalized airport",
+  "past_slots": 16,
+  "peer_arr_columns": [
+    "MVT_ID_mvt",
+    "FLIGHT_ID_mvt",
+    "PHASE_mvt",
+    "ADES_mvt",
+    "RUNWAY_mvt",
+    "MVT_TIME_UTC_mvt"
+  ],
+  "peer_dep_columns": [
+    "MVT_ID_mvt",
+    "FLIGHT_ID_mvt",
+    "PHASE_mvt",
+    "ADEP_mvt",
+    "RUNWAY_mvt",
+    "MVT_TIME_UTC_mvt",
+    "AOBT_3_flt"
+  ],
+  "presence_dtype": "uint8",
+  "purpose": "label-free OTHER-movement event sequence; no departure target or block input",
+  "query_columns": [
+    "MVT_ID_mvt",
+    "FLIGHT_ID_mvt",
+    "PHASE_mvt",
+    "ADEP_mvt",
+    "RUNWAY_mvt",
+    "MVT_TIME_UTC_mvt"
+  ],
+  "raw_phase_filter_before_projection": true,
+  "rows": 2085047,
+  "schema_version": 1,
+  "scope": "training",
+  "spec_sha256": "26782bcd1c46662bb705525fa5a72c4d9eb1d57616bbca1ee42edcff1a50aabb",
+  "window_ns": 3600000000000
+}
