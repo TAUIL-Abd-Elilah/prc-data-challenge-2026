@@ -1,0 +1,109 @@
+{
+  "purpose": "Prospective 16-column original runway geometry, true wind, and other-strip traffic family",
+  "source": {
+    "provider": "OurAirports",
+    "commit": "59574226b6df9417f5a7a8d03eeb6c7158a76168",
+    "data_page": "https://ourairports.com/data/",
+    "data_dictionary": "https://ourairports.com/help/data-dictionary.html",
+    "repository": "https://github.com/davidmegginson/ourairports-data",
+    "license": "Public Domain on provider data page; pinned repository LICENSE is Unlicense",
+    "pinned_sha256": {
+      "LICENSE": "6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e",
+      "airports.csv": "a5f3b2ba662528c92fcda43fbbb11f00261eec580b339d4ac98537f882f9fd9d",
+      "runways.csv": "7be01aa01204b13edde729d603505cf4c1661d274128b70a137c2285be728197"
+    },
+    "temporal_note": "2024-12-30 snapshot predates both periods; later runway changes may be unrepresented. Current closed flags are excluded."
+  },
+  "scientific_motivation": "https://web.mit.edu/hamsa/www/pubs/SimaiakisBalakrishnanTRR.pdf",
+  "originality": "Geometry and traffic algorithms in this source are original; no research code or datasets beyond the licensed OurAirports snapshot are reused.",
+  "movement_phase_first_allowlist": {
+    "DEP": [
+      "PHASE_mvt",
+      "MVT_ID_mvt",
+      "ADEP_mvt",
+      "RUNWAY_mvt",
+      "MVT_TIME_UTC_mvt"
+    ],
+    "ARR": [
+      "PHASE_mvt",
+      "MVT_ID_mvt",
+      "ADES_mvt",
+      "RUNWAY_mvt",
+      "MVT_TIME_UTC_mvt"
+    ]
+  },
+  "weather_allowlist": [
+    "airport",
+    "weather_hour_utc",
+    "wx_wind_direction_deg",
+    "wx_wind_speed_mps"
+  ],
+  "baseline_id_allowlist": [
+    "MVT_ID_mvt"
+  ],
+  "forbidden_values": [
+    "BLOCK_TIME_UTC_mvt",
+    "TAXITIME_SEC_mvt",
+    "departure labels",
+    "ranking labels"
+  ],
+  "features": [
+    "rgeom_heading_sin",
+    "rgeom_heading_cos",
+    "rgeom_strip_length_m",
+    "rgeom_headwind_mps",
+    "rgeom_tailwind_positive_mps",
+    "rgeom_crosswind_abs_mps",
+    "rgeom_intersecting_other_strip_count",
+    "rgeom_near_parallel_other_strip_count",
+    "rgeom_intersecting_arr_past15_count",
+    "rgeom_intersecting_arr_past60_count",
+    "rgeom_intersecting_dep_past15_count",
+    "rgeom_intersecting_dep_past60_count",
+    "rgeom_near_parallel_arr_past15_count",
+    "rgeom_near_parallel_arr_past60_count",
+    "rgeom_near_parallel_dep_past15_count",
+    "rgeom_near_parallel_dep_past60_count"
+  ],
+  "feature_dtype": "float32",
+  "geometry": {
+    "airport_runway_matching": "Exact ICAO airport and trimmed-uppercase runway-end identifier only; ambiguous/invalid mapping missing",
+    "length_heading": "Endpoint-to-reciprocal haversine length and true initial bearing; reverse end gets reverse true bearing",
+    "relation_projection": "Per-airport local equirectangular metric projection from mean runway endpoints",
+    "intersecting": "Closed physical line segments intersect; own reciprocal physical strip excluded",
+    "near_parallel": "Nonintersecting strips with unoriented bearing difference <=15 degrees and segment distance <=2000 m",
+    "wind": "NOAA wind-from direction, exact airport/UTC hour; signed headwind, max(-headwind,0) tailwind, absolute crosswind"
+  },
+  "counts": {
+    "groups": [
+      "other intersecting strips",
+      "other nearby parallel strips"
+    ],
+    "phases": [
+      "ARR",
+      "DEP"
+    ],
+    "windows_seconds": [
+      900,
+      3600
+    ],
+    "bounds": "Past [query MVT minus window, query MVT); own row and tied-time events excluded",
+    "only_event_values": [
+      "airport",
+      "runway",
+      "MVT_TIME_UTC_mvt"
+    ],
+    "ranking_availability": "Full retrospective ranking batch is released; not a live forecast"
+  },
+  "missing": {
+    "unmapped_runway": "All 16 NaN",
+    "missing_query_MVT": "Heading sin/cos, strip length and two strip-neighbor counts remain; three wind and eight traffic counts NaN",
+    "missing_invalid_NOAA_wind": "Only the three wind components NaN",
+    "valid_group_without_events": "Eight traffic counts are zero"
+  },
+  "output": "MVT_ID_mvt for exact alignment only, followed by exactly 16 float32 features; no ID as model predictor",
+  "input_seal": "Prepare pins helper/spec/source/raw/weather/baseline ID cache/runtime hashes before feature reads; build verifies before and after",
+  "output_seal": "Exclusive cache/report names, Parquet readback, exact baseline ID/order and float32/finite-or-NaN checks",
+  "memory_floor_gib": 4.0,
+  "validation_status": "No feature cache, model fitting, label comparison, ranking selection, or submission has run; root freezes any later test policy separately."
+}

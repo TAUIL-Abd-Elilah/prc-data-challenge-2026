@@ -1,0 +1,741 @@
+{
+  "audit_utc": "2026-10-03T03:40:48.562619+00:00",
+  "purpose": "Pre-model, label-free historical runway geometry matching feasibility",
+  "movement_column_allowlist": [
+    "PHASE_mvt",
+    "ADEP_mvt",
+    "ADES_mvt",
+    "RUNWAY_mvt"
+  ],
+  "never_read": [
+    "BLOCK_TIME_UTC_mvt",
+    "TAXITIME_SEC_mvt",
+    "target",
+    "ranking_labels"
+  ],
+  "snapshot_receipt_sha256": "fd44c1ce4c5c12a2e8c1829f82597e2082ff19efb6e5cfd3089d2beaedeab78a",
+  "competition_input_sha256": {
+    "training_2025-01-01_2025-02-01.parquet": "a4dc8f152c082c650cd7eb745fe9c641089f34f74df127e6944a188990a0ed94",
+    "training_2025-02-01_2025-03-01.parquet": "b6f9ff2cdb1cfe07c5442f4e1f11bbcdbeafe52852dcb0b8175f62ab84c6a066",
+    "training_2025-03-01_2025-04-01.parquet": "58fde7e5f8b539546af63b41d7f6ec0f2884fdc3d3dd9b6bfca7c59a420dcdd3",
+    "training_2025-04-01_2025-05-01.parquet": "9ffe0cf5741c4863799c41be81475dfaecedabe0ba687b8f8e4eacba992f9390",
+    "training_2025-05-01_2025-06-01.parquet": "5481c0642a8fbb4dc395f93bc713c57f4cc16854fb361d404967077e1fce2ff9",
+    "training_2025-06-01_2025-07-01.parquet": "c3ef5080f2cc636c3416baf1555f7d0ee3519f9046e8043c1c0c8f017a244025",
+    "training_2025-07-01_2025-08-01.parquet": "34d1c5bba7c8596a1c20c09edd3cb2f63277b5a684fa801911660fe0eaf63c9d",
+    "training_2025-08-01_2025-09-01.parquet": "6c8d2aa7a1b6c9dff9a0305a37eb02de1e87a68d07557264f41b77738272c540",
+    "training_2025-09-01_2025-10-01.parquet": "955308a4000947e32a00586d3ee13928949d2231b67f84f6dfb0631893f3754a",
+    "training_2025-10-01_2025-11-01.parquet": "4a31a35601c1bdcd74b8cd6379231ba516a48324e4c2478bf1c9360cd23e687f",
+    "training_2025-11-01_2025-12-01.parquet": "ac36b17db7a537e3baeb682fa4763dacaa1fcc5d9bfa6bf32b3ee5d9f91300b0",
+    "training_2025-12-01_2026-01-01.parquet": "2d357f2f403a86778a69e93f72d8754effe77f1ac0942399b3d1b7728241f724",
+    "ranking.parquet": "9db75e3a56fa09b87aab72e191a53da3fe763d9887ad2b23aea9cde6a6325f86"
+  },
+  "matching": "Uppercase and trim airport/runway only; no alias rewriting; unique physical strip and all four endpoint coordinates required",
+  "training_2025": {
+    "rows_ten_airports_dep_arr": 4167797,
+    "by_airport_phase": {
+      "EDDF_DEP": {
+        "rows": 230141,
+        "missing_or_placeholder_runway": 8,
+        "valid_runway_label": 230133,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 230133,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 230133,
+        "complete_geometry_fraction": 0.9999652387014917,
+        "top_unmatched_codes": []
+      },
+      "EDDF_ARR": {
+        "rows": 230122,
+        "missing_or_placeholder_runway": 12,
+        "valid_runway_label": 230110,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 230110,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 230110,
+        "complete_geometry_fraction": 0.9999478537471428,
+        "top_unmatched_codes": []
+      },
+      "EDDM_DEP": {
+        "rows": 167334,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 167334,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 167334,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 167334,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "EDDM_ARR": {
+        "rows": 167323,
+        "missing_or_placeholder_runway": 1,
+        "valid_runway_label": 167322,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 167322,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 167322,
+        "complete_geometry_fraction": 0.999994023535318,
+        "top_unmatched_codes": []
+      },
+      "EGLL_DEP": {
+        "rows": 239546,
+        "missing_or_placeholder_runway": 3,
+        "valid_runway_label": 239543,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 239543,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 239543,
+        "complete_geometry_fraction": 0.9999874763093518,
+        "top_unmatched_codes": []
+      },
+      "EGLL_ARR": {
+        "rows": 239511,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 239511,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 239511,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 239511,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "EHAM_DEP": {
+        "rows": 247951,
+        "missing_or_placeholder_runway": 1,
+        "valid_runway_label": 247950,
+        "unmatched_runway_code": 29,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 247921,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 247921,
+        "complete_geometry_fraction": 0.9998790083524567,
+        "top_unmatched_codes": [
+          {
+            "runway": "HEL",
+            "rows": 29
+          }
+        ]
+      },
+      "EHAM_ARR": {
+        "rows": 247706,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 247706,
+        "unmatched_runway_code": 281,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 247425,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 247425,
+        "complete_geometry_fraction": 0.9988655906598952,
+        "top_unmatched_codes": [
+          {
+            "runway": "HEL",
+            "rows": 281
+          }
+        ]
+      },
+      "LEBL_DEP": {
+        "rows": 179705,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 179705,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 179705,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 179705,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LEBL_ARR": {
+        "rows": 179081,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 179081,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 179081,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 179081,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LEMD_DEP": {
+        "rows": 212242,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 212242,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 212242,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 212242,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LEMD_ARR": {
+        "rows": 211091,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 211091,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 211091,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 211091,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LFPG_DEP": {
+        "rows": 239552,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 239552,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 239552,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 239552,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LFPG_ARR": {
+        "rows": 238835,
+        "missing_or_placeholder_runway": 115,
+        "valid_runway_label": 238720,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 238720,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 238720,
+        "complete_geometry_fraction": 0.999518496032826,
+        "top_unmatched_codes": []
+      },
+      "LIRF_DEP": {
+        "rows": 160704,
+        "missing_or_placeholder_runway": 24,
+        "valid_runway_label": 160680,
+        "unmatched_runway_code": 6,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 160674,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 160674,
+        "complete_geometry_fraction": 0.9998133213859021,
+        "top_unmatched_codes": [
+          {
+            "runway": "01R",
+            "rows": 6
+          }
+        ]
+      },
+      "LIRF_ARR": {
+        "rows": 160504,
+        "missing_or_placeholder_runway": 22,
+        "valid_runway_label": 160482,
+        "unmatched_runway_code": 1,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 160481,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 160481,
+        "complete_geometry_fraction": 0.9998567013906196,
+        "top_unmatched_codes": [
+          {
+            "runway": "7",
+            "rows": 1
+          }
+        ]
+      },
+      "LTFM_DEP": {
+        "rows": 272965,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 272965,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 272965,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 272965,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LTFM_ARR": {
+        "rows": 273886,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 273886,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 273886,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 273886,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LSZH_DEP": {
+        "rows": 134907,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 134907,
+        "unmatched_runway_code": 387,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 134520,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 134520,
+        "complete_geometry_fraction": 0.9971313571571527,
+        "top_unmatched_codes": [
+          {
+            "runway": "H",
+            "rows": 387
+          }
+        ]
+      },
+      "LSZH_ARR": {
+        "rows": 134691,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 134691,
+        "unmatched_runway_code": 376,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 134315,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 134315,
+        "complete_geometry_fraction": 0.9972084252102962,
+        "top_unmatched_codes": [
+          {
+            "runway": "H",
+            "rows": 376
+          }
+        ]
+      }
+    },
+    "other_airport_rows_excluded": "Not included in this ten-airport audit",
+    "snapshot_airport_geometry": {
+      "EDDF": {
+        "snapshot_airport_ident_matches": [
+          "EDDF"
+        ],
+        "runway_strips": 4,
+        "strips_with_both_endpoint_coordinates": 4
+      },
+      "EDDM": {
+        "snapshot_airport_ident_matches": [
+          "EDDM"
+        ],
+        "runway_strips": 2,
+        "strips_with_both_endpoint_coordinates": 2
+      },
+      "EGLL": {
+        "snapshot_airport_ident_matches": [
+          "EGLL"
+        ],
+        "runway_strips": 2,
+        "strips_with_both_endpoint_coordinates": 2
+      },
+      "EHAM": {
+        "snapshot_airport_ident_matches": [
+          "EHAM"
+        ],
+        "runway_strips": 6,
+        "strips_with_both_endpoint_coordinates": 6
+      },
+      "LEBL": {
+        "snapshot_airport_ident_matches": [
+          "LEBL"
+        ],
+        "runway_strips": 3,
+        "strips_with_both_endpoint_coordinates": 3
+      },
+      "LEMD": {
+        "snapshot_airport_ident_matches": [
+          "LEMD"
+        ],
+        "runway_strips": 4,
+        "strips_with_both_endpoint_coordinates": 4
+      },
+      "LFPG": {
+        "snapshot_airport_ident_matches": [
+          "LFPG"
+        ],
+        "runway_strips": 4,
+        "strips_with_both_endpoint_coordinates": 4
+      },
+      "LIRF": {
+        "snapshot_airport_ident_matches": [
+          "LIRF"
+        ],
+        "runway_strips": 4,
+        "strips_with_both_endpoint_coordinates": 3
+      },
+      "LTFM": {
+        "snapshot_airport_ident_matches": [
+          "LTFM"
+        ],
+        "runway_strips": 5,
+        "strips_with_both_endpoint_coordinates": 5
+      },
+      "LSZH": {
+        "snapshot_airport_ident_matches": [
+          "LSZH"
+        ],
+        "runway_strips": 3,
+        "strips_with_both_endpoint_coordinates": 3
+      }
+    },
+    "overall": {
+      "rows": 4167797,
+      "missing_or_placeholder_runway": 186,
+      "valid_runway_label": 4167611,
+      "unmatched_runway_code": 1080,
+      "ambiguous_runway_code": 0,
+      "unique_code_match": 4166531,
+      "matched_missing_coordinates": 0,
+      "complete_geometry": 4166531,
+      "complete_geometry_fraction": 0.9996962424033609
+    }
+  },
+  "ranking_2026": {
+    "rows_ten_airports_dep_arr": 689534,
+    "by_airport_phase": {
+      "EDDF_DEP": {
+        "rows": 36317,
+        "missing_or_placeholder_runway": 2,
+        "valid_runway_label": 36315,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 36315,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 36315,
+        "complete_geometry_fraction": 0.9999449293719195,
+        "top_unmatched_codes": []
+      },
+      "EDDF_ARR": {
+        "rows": 36253,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 36253,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 36253,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 36253,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "EDDM_DEP": {
+        "rows": 25966,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 25966,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 25966,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 25966,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "EDDM_ARR": {
+        "rows": 25935,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 25935,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 25935,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 25935,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "EGLL_DEP": {
+        "rows": 39840,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 39840,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 39840,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 39840,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "EGLL_ARR": {
+        "rows": 39837,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 39837,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 39837,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 39837,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "EHAM_DEP": {
+        "rows": 38182,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 38182,
+        "unmatched_runway_code": 11,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 38171,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 38171,
+        "complete_geometry_fraction": 0.9997119061337804,
+        "top_unmatched_codes": [
+          {
+            "runway": "HEL",
+            "rows": 11
+          }
+        ]
+      },
+      "EHAM_ARR": {
+        "rows": 38143,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 38143,
+        "unmatched_runway_code": 40,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 38103,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 38103,
+        "complete_geometry_fraction": 0.9989513147890832,
+        "top_unmatched_codes": [
+          {
+            "runway": "HEL",
+            "rows": 40
+          }
+        ]
+      },
+      "LEBL_DEP": {
+        "rows": 30080,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 30080,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 30080,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 30080,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LEBL_ARR": {
+        "rows": 29973,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 29973,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 29973,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 29973,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LEMD_DEP": {
+        "rows": 36954,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 36954,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 36954,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 36954,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LEMD_ARR": {
+        "rows": 37093,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 37093,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 37093,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 37093,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LFPG_DEP": {
+        "rows": 39872,
+        "missing_or_placeholder_runway": 2,
+        "valid_runway_label": 39870,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 39870,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 39870,
+        "complete_geometry_fraction": 0.9999498394863563,
+        "top_unmatched_codes": []
+      },
+      "LFPG_ARR": {
+        "rows": 39733,
+        "missing_or_placeholder_runway": 31,
+        "valid_runway_label": 39702,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 39702,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 39702,
+        "complete_geometry_fraction": 0.9992197921123499,
+        "top_unmatched_codes": []
+      },
+      "LIRF_DEP": {
+        "rows": 26899,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 26899,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 26899,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 26899,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LIRF_ARR": {
+        "rows": 26839,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 26839,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 26839,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 26839,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LTFM_DEP": {
+        "rows": 47581,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 47581,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 47581,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 47581,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LTFM_ARR": {
+        "rows": 47764,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 47764,
+        "unmatched_runway_code": 0,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 47764,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 47764,
+        "complete_geometry_fraction": 1.0,
+        "top_unmatched_codes": []
+      },
+      "LSZH_DEP": {
+        "rows": 23150,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 23150,
+        "unmatched_runway_code": 79,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 23071,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 23071,
+        "complete_geometry_fraction": 0.9965874730021598,
+        "top_unmatched_codes": [
+          {
+            "runway": "H",
+            "rows": 79
+          }
+        ]
+      },
+      "LSZH_ARR": {
+        "rows": 23123,
+        "missing_or_placeholder_runway": 0,
+        "valid_runway_label": 23123,
+        "unmatched_runway_code": 77,
+        "ambiguous_runway_code": 0,
+        "unique_code_match": 23046,
+        "matched_missing_coordinates": 0,
+        "complete_geometry": 23046,
+        "complete_geometry_fraction": 0.9966699822687367,
+        "top_unmatched_codes": [
+          {
+            "runway": "H",
+            "rows": 77
+          }
+        ]
+      }
+    },
+    "other_airport_rows_excluded": "Not included in this ten-airport audit",
+    "snapshot_airport_geometry": {
+      "EDDF": {
+        "snapshot_airport_ident_matches": [
+          "EDDF"
+        ],
+        "runway_strips": 4,
+        "strips_with_both_endpoint_coordinates": 4
+      },
+      "EDDM": {
+        "snapshot_airport_ident_matches": [
+          "EDDM"
+        ],
+        "runway_strips": 2,
+        "strips_with_both_endpoint_coordinates": 2
+      },
+      "EGLL": {
+        "snapshot_airport_ident_matches": [
+          "EGLL"
+        ],
+        "runway_strips": 2,
+        "strips_with_both_endpoint_coordinates": 2
+      },
+      "EHAM": {
+        "snapshot_airport_ident_matches": [
+          "EHAM"
+        ],
+        "runway_strips": 6,
+        "strips_with_both_endpoint_coordinates": 6
+      },
+      "LEBL": {
+        "snapshot_airport_ident_matches": [
+          "LEBL"
+        ],
+        "runway_strips": 3,
+        "strips_with_both_endpoint_coordinates": 3
+      },
+      "LEMD": {
+        "snapshot_airport_ident_matches": [
+          "LEMD"
+        ],
+        "runway_strips": 4,
+        "strips_with_both_endpoint_coordinates": 4
+      },
+      "LFPG": {
+        "snapshot_airport_ident_matches": [
+          "LFPG"
+        ],
+        "runway_strips": 4,
+        "strips_with_both_endpoint_coordinates": 4
+      },
+      "LIRF": {
+        "snapshot_airport_ident_matches": [
+          "LIRF"
+        ],
+        "runway_strips": 4,
+        "strips_with_both_endpoint_coordinates": 3
+      },
+      "LTFM": {
+        "snapshot_airport_ident_matches": [
+          "LTFM"
+        ],
+        "runway_strips": 5,
+        "strips_with_both_endpoint_coordinates": 5
+      },
+      "LSZH": {
+        "snapshot_airport_ident_matches": [
+          "LSZH"
+        ],
+        "runway_strips": 3,
+        "strips_with_both_endpoint_coordinates": 3
+      }
+    },
+    "overall": {
+      "rows": 689534,
+      "missing_or_placeholder_runway": 35,
+      "valid_runway_label": 689499,
+      "unmatched_runway_code": 207,
+      "ambiguous_runway_code": 0,
+      "unique_code_match": 689292,
+      "matched_missing_coordinates": 0,
+      "complete_geometry": 689292,
+      "complete_geometry_fraction": 0.9996490383360357
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "provider": "OurAirports",
+  "official_data_page": "https://ourairports.com/data/",
+  "official_data_dictionary": "https://ourairports.com/help/data-dictionary.html",
+  "repository": "https://github.com/davidmegginson/ourairports-data",
+  "commit_api": "https://api.github.com/repos/davidmegginson/ourairports-data/commits/59574226b6df9417f5a7a8d03eeb6c7158a76168",
+  "commit_sha": "59574226b6df9417f5a7a8d03eeb6c7158a76168",
+  "commit_committer_utc": "2024-12-30T08:53:45Z",
+  "license": "OurAirports data page: Public Domain; pinned repository LICENSE: Unlicense",
+  "files": {
+    "LICENSE": {
+      "url": "https://raw.githubusercontent.com/davidmegginson/ourairports-data/59574226b6df9417f5a7a8d03eeb6c7158a76168/LICENSE",
+      "sha256": "6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e",
+      "bytes": 1211
+    },
+    "airports.csv": {
+      "url": "https://raw.githubusercontent.com/davidmegginson/ourairports-data/59574226b6df9417f5a7a8d03eeb6c7158a76168/airports.csv",
+      "sha256": "a5f3b2ba662528c92fcda43fbbb11f00261eec580b339d4ac98537f882f9fd9d",
+      "bytes": 11927849
+    },
+    "runways.csv": {
+      "url": "https://raw.githubusercontent.com/davidmegginson/ourairports-data/59574226b6df9417f5a7a8d03eeb6c7158a76168/runways.csv",
+      "sha256": "7be01aa01204b13edde729d603505cf4c1661d274128b70a137c2285be728197",
+      "bytes": 3948848
+    }
+  },
+  "temporal_caveat": "The 2024-12-30 snapshot predates 2025 training and 2026 ranking; runway identifiers or geometry may subsequently change. Current closed status is not used."
+}
