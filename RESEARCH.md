@@ -608,3 +608,24 @@ The full v12 geometry fit also completed with exactly 9,998 trees, the integer m
 `replica_v8.py`, SHA-256 `30228a876e5474f844704b924ba11a7b423ca425ceb382f79cb2f68fe6049bbb`, and `reports/clean_replication_v8_spec.json`, SHA-256 `b3f0524acd90fe9ce4ceb4d11df334a71757aec094b2bd4a89fa6c94b3d47060`, are published before any real replica mode. Independent review, compilation, metadata-only plan and synthetic lineage/tamper/split/formula checks passed. The new driver uses an isolated root, independently rebuilt parent input/model/output receipts and its own fingerprints. It replays saved models against held-out predictions and recomputes fixed gates before downstream use. Original sources, hashes, artifacts and scientific choices remain intact. It supplies only the v8 movement route; independently rebuilt upstream v5/v7 producers and later adapters remain necessary. No real replica preparation, fit, score or ranking inference has run, and complete clean reproduction is not claimed.
 
 The independent training-cache spot audit is implemented in `v14_event_oracle_audit.py`, SHA-256 `4f813ad20d7cb50dd0d45e3e38d37871ea742e17603548b9eb4f789064137581`, before real audit execution. It independently brute-selects and encodes neighboring events without using the builder's selection functions. The fixed 24-query sample uses only ID, airport, month, UTC time and padding metadata to cover months, airports, boundaries and empty sequences. Raw reads phase-filter before the label-free allowlist projection and process one month/airport group at a time. Compilation and synthetic self/same-flight, peer ties, closest-16, strict window, month-boundary and mask checks passed. Real mode `python v14_event_oracle_audit.py --mode audit` requires the complete immutable training cache, checks its source/ID/byte seals before and after the spot comparisons and saves aggregate evidence. This samples transformation correctness; it does not independently recompute every event row or inspect departure labels.
+
+The prospective v14 final extension is implemented in `v14_event_final.py`, SHA-256 `abe5cd1495f95590f5a1ccd4eb7961d805d98a8f4fb827dff314f3cd3772d649`. Independent static review, compilation and CPU-only contract/formula checks passed before any real execution. It requires replayed success of the canonical original/fresh/reserved trainer terminal. Final training uses all ordinary eligible 2025 departures, fit-only preprocessing and exactly the floor median of the two original best epochs, with the published CNN, optimizer and deterministic settings. Its saved checkpoint, optimizer steps, feature schema, source snapshot and probe prediction are verified. The reference path and SHA are frozen in a published full-fit protocol.
+
+Only if every fixed v14 gate passes, run these stages serially:
+
+```powershell
+$v14FinalSha = 'abe5cd1495f95590f5a1ccd4eb7961d805d98a8f4fb827dff314f3cd3772d649'
+python v14_event_final.py --mode prepare-final --published-source-sha256 $v14FinalSha --ranking-reference '<validated-current-reference.parquet>' --reference-sha256 '<exact-current-reference-sha256>'
+# Publish the exact prepared full-fit protocol before training.
+python v14_event_final.py --mode fit-final --published-source-sha256 $v14FinalSha
+python v14_event_final.py --mode prepare-ranking --published-source-sha256 $v14FinalSha
+# Publish the full-model receipt and prebuild ranking protocol.
+python event_sequence_features_v14.py --mode prepare --scope ranking --trainer-terminal artifacts/v14-event-sequence/terminal.json --published-source-sha256 $v14BuilderSha
+# Publish the builder ranking_inputs.json and ranking_protocol.json before construction.
+python event_sequence_features_v14.py --mode build --scope ranking --trainer-terminal artifacts/v14-event-sequence/terminal.json --published-source-sha256 $v14BuilderSha
+# Publish the exact ranking_build.json receipt before inference.
+python v14_event_final.py --mode predict-ranking --published-source-sha256 $v14FinalSha --published-ranking-seal-sha256 '<prebuild-ranking-protocol-sha256>' --published-builder-input-sha256 '<builder-ranking-input-sha256>' --published-builder-protocol-sha256 '<builder-ranking-protocol-sha256>' --published-builder-build-sha256 '<builder-ranking-build-sha256>'
+python v14_event_final.py --mode verify-ranking --published-source-sha256 $v14FinalSha
+```
+
+Ranking cache construction remains a separate published-protocol step. Inference requires all four publication hashes, exact template coverage/order and the 4,907-row missing-clock gate. The pinned current reference must match sealed v8 on that gate before direct weight-1 replacement; every other current-reference value is copied exactly. All outputs are exclusive, finite and nonnegative, with no upper cap. The extension has no finalizer, submission version choice, upload or leaderboard selection. No real final preparation, training, ranking build or inference has run at publication.
