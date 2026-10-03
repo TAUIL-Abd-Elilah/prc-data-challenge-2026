@@ -462,3 +462,5 @@ python v12_runway_geometry_expert.py --mode fresh-audit
 ```
 
 Publish the prepared protocol before fitting, and run full fits serially. Final and ranking modes in this comparison script refuse. A separate prospective February/August matched 184-field/200-field refit guard must be implemented, reviewed, published, frozen and passed at the original selected weight before any final model or new ranking prediction is permitted. Guard failure retains v9 without weight adjustment or alternative switching. The original two-fold tree-count median alone would set final iterations. Public leaderboard feedback is excluded from all choices.
+
+The v12 comparison preparation subsequently completed with 92 named input seals and 12 canonical raw training seals. Its exact public protocol is `reports/runway_geometry_model_protocol_v12.json`, SHA-256 `ba430895452f7834beb677f0c585c55a1a05d6018b6d7712a11c7b174bea6981`. The frozen all-finite v9 reference has SHA-256 `bc38ce726d57296fca76bddf211d837e95bb85d7ca308b024a30f84cdb3ef1a5`. No v12 model fit or score has occurred at preparation; original complementary-fold training follows publication of this protocol.
