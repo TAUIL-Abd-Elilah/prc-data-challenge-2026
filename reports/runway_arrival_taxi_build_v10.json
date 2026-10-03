@@ -1,0 +1,63 @@
+{
+  "protocol_sha256": "2ebfe35cb4d159597fb08556d8e0df0414e6cb879a91a7aa921b575dbca56572",
+  "training": {
+    "rows": 2085047,
+    "taxi_range_arrival_events": 2082388,
+    "feature_names": [
+      "runway_arr_taxi_completed_15m_count",
+      "runway_arr_taxi_completed_15m_mean",
+      "runway_arr_taxi_completed_15m_std",
+      "runway_arr_taxi_completed_60m_count",
+      "runway_arr_taxi_completed_60m_mean",
+      "runway_arr_taxi_completed_60m_std",
+      "runway_arr_taxi_completed_180m_count",
+      "runway_arr_taxi_completed_180m_mean",
+      "runway_arr_taxi_completed_180m_std",
+      "runway_arr_taxiing_now_count"
+    ],
+    "nonnull_fraction": {
+      "runway_arr_taxi_completed_15m_count": 0.9999827342021547,
+      "runway_arr_taxi_completed_15m_mean": 0.13414853478123034,
+      "runway_arr_taxi_completed_15m_std": 0.13414853478123034,
+      "runway_arr_taxi_completed_60m_count": 0.9999827342021547,
+      "runway_arr_taxi_completed_60m_mean": 0.19235201892331444,
+      "runway_arr_taxi_completed_60m_std": 0.19235201892331444,
+      "runway_arr_taxi_completed_180m_count": 0.9999827342021547,
+      "runway_arr_taxi_completed_180m_mean": 0.2787275298830194,
+      "runway_arr_taxi_completed_180m_std": 0.2787275298830194,
+      "runway_arr_taxiing_now_count": 0.9999827342021547
+    },
+    "output_sha256": "7a205a67989874b1496020cc30942854dca44b01b7f16110466dc1a8958eca98"
+  },
+  "ranking": {
+    "rows": 344841,
+    "taxi_range_arrival_events": 344627,
+    "feature_names": [
+      "runway_arr_taxi_completed_15m_count",
+      "runway_arr_taxi_completed_15m_mean",
+      "runway_arr_taxi_completed_15m_std",
+      "runway_arr_taxi_completed_60m_count",
+      "runway_arr_taxi_completed_60m_mean",
+      "runway_arr_taxi_completed_60m_std",
+      "runway_arr_taxi_completed_180m_count",
+      "runway_arr_taxi_completed_180m_mean",
+      "runway_arr_taxi_completed_180m_std",
+      "runway_arr_taxiing_now_count"
+    ],
+    "nonnull_fraction": {
+      "runway_arr_taxi_completed_15m_count": 0.9999884004512224,
+      "runway_arr_taxi_completed_15m_mean": 0.10941274384426446,
+      "runway_arr_taxi_completed_15m_std": 0.10941274384426446,
+      "runway_arr_taxi_completed_60m_count": 0.9999884004512224,
+      "runway_arr_taxi_completed_60m_mean": 0.1706931600360746,
+      "runway_arr_taxi_completed_60m_std": 0.1706931600360746,
+      "runway_arr_taxi_completed_180m_count": 0.9999884004512224,
+      "runway_arr_taxi_completed_180m_mean": 0.26363164472902006,
+      "runway_arr_taxi_completed_180m_std": 0.26363164472902006,
+      "runway_arr_taxiing_now_count": 0.9999884004512224
+    },
+    "output_sha256": "81eefe1a470b561d650baa98813a19e4089508fd5d21801ac5b0d4b30960eb6a"
+  },
+  "departure_labels_used": false,
+  "released_arrival_taxi_used": true
+}
