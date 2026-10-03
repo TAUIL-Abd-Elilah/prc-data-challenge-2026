@@ -1,0 +1,50 @@
+{
+  "architecture_comparison_only": true,
+  "bootstrap": {
+    "days": 59,
+    "gain_ci95_sec": [
+      0.2947213187332601,
+      0.5196384354013815
+    ],
+    "repeats": 1000,
+    "seed": 20261015
+  },
+  "comparator_sha256": {
+    "fit": "0b7233666344953e1e31ef552ca582d9754fe2eceade2937f3d8c12650a7963b",
+    "model": "4e57d37c99cbb7d5361a80968109ee0e9afa16073bc2aa543855a2e9c6c54b07",
+    "oof": "a676924d77bd5a9abfcea367069bc78557d9f7d18ee7c0f18f84d2a5acda0c3b",
+    "receipt": "19ab1778cf0a246cc60df47f1c5c87bc0296de9dfd7a17900e1e10ed7bfc7d27"
+  },
+  "heldout_months": [
+    2,
+    8
+  ],
+  "outside_current_v9_unchanged_on_failure": true,
+  "paired_predictions_sha256": "d2eb49a6829eb14c15af2ee14ef757f31b756c1c543e8dfa44bfb7b16bf81ed2",
+  "passed": true,
+  "pooled_fixed_blend_rmse": 213.0854471398593,
+  "pooled_v11_rmse": 213.49967099267704,
+  "protocol_sha256": "9a1edb40c699e5f4ca9340b8f7ec4923e5599ef0c6b97cdff1182847f6871bbb",
+  "ranking_authorized": true,
+  "replacement_sha256": {
+    "fit": "fbeffb3ea2150d86f5e173f044352ced5ce254f219673cc001413aa1916bc120",
+    "model": "33b55eb056967f7eb45ae50b8cadd917e2499a9ac7ec2fa5f67fa25d6f36b6b2",
+    "oof": "15d26fc362323a570fc55db47149ae57d666bb356624295fd7494b7db24c326a",
+    "receipt": "6226b0703e0030e154a50b93ff356f6df28005e9f6805ca6748ac24510228055"
+  },
+  "retained_policy": "v12",
+  "schema_version": 1,
+  "scores": {
+    "2": {
+      "fixed_blend_rmse": 214.14429461027848,
+      "n": 142588,
+      "v11_rmse": 214.46743353557034
+    },
+    "8": {
+      "fixed_blend_rmse": 212.28216768750494,
+      "n": 188776,
+      "v11_rmse": 212.76577373097308
+    }
+  },
+  "selected_weight": 0.25
+}
