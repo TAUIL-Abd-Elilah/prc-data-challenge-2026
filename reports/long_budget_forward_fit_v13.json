@@ -1,0 +1,28 @@
+{
+  "fold": "forward_nov_dec",
+  "heldout_months": [
+    11,
+    12
+  ],
+  "requested_iterations": 20000,
+  "saved_trees": 20000,
+  "prefix_trees": 10000,
+  "exact_prefix_available": true,
+  "early_stopping_rounds": 200,
+  "use_best_model": true,
+  "fit_seconds": 774.3289999999979,
+  "fit_rows": 1632383,
+  "early_rows": 104194,
+  "heldout_valid_rows": 324862,
+  "heldout_all_finite_rows": 328009,
+  "fit_indices_sha256": "9dc5d1cb2482ff3e80c71e90b703f0c0e240d7cf8c8a7fb66b4dcdc1c6ab616b",
+  "early_indices_sha256": "2103103985690a5926b0bdb9c2fa5c7beb620e7cb41bbb68f4eb52198152bf72",
+  "test_indices_sha256": "14a8dc74bf1a61d52687e9c3599444183bad532674922b8d03a45059e0888338",
+  "held_all_indices_sha256": "2e2277e9c0cb0c393644018f7135e13a8b39f8d0da5f013bde681534fa5e900b",
+  "fit_ids_sha256": "6da7a5182bfb019dd9e31e130bc80fd553ae9f151fceff961097dbe9dfd6d3d6",
+  "early_ids_sha256": "2d75081c2e85d404a4666a1220d4ab6969bdfd026f4a1c1c9c9f2028b508b8e8",
+  "test_ids_sha256": "a93f7dfe6407709c13e049e8c3565a08b4156b92b3e43c8233389bd153d2a903",
+  "held_all_ids_sha256": "fe082a7bae73cfb963b79305591732e66cef784c5eab0dd3635bc2b4c1e623e8",
+  "model_sha256": "87f27dbbf8966f0559ec4d54d7a3d469626577c1fab8fbd3daea9410057505f1",
+  "oof_sha256": "3137667be1e4b13eb38b0f209af8806411dd5cc3fbc97ee623c7d7d8c96b7321"
+}

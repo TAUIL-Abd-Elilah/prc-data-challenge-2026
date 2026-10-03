@@ -1,0 +1,909 @@
+{
+  "schema_version": 1,
+  "fold": "forward_nov_dec",
+  "heldout_months": [
+    11,
+    12
+  ],
+  "heldout_scope": "all_finite_targets",
+  "protocol_sha256": "b3e1159ecc41127bb74bca3700ecbb867d81e0b6d6149292da508057774d9824",
+  "model_params_requested": {
+    "task_type": "GPU",
+    "devices": "0",
+    "gpu_ram_part": 0.45,
+    "loss_function": "RMSE",
+    "eval_metric": "RMSE",
+    "iterations": 20000,
+    "depth": 10,
+    "learning_rate": 0.04,
+    "l2_leaf_reg": 12,
+    "random_strength": 0.5,
+    "bagging_temperature": 0.5,
+    "max_ctr_complexity": 1,
+    "one_hot_max_size": 20,
+    "border_count": 128,
+    "thread_count": 2,
+    "random_seed": 2026,
+    "allow_writing_files": false,
+    "verbose": 500
+  },
+  "model_params_effective": {
+    "nan_mode": "Min",
+    "gpu_ram_part": 0.45,
+    "eval_metric": "RMSE",
+    "combinations_ctr": [
+      "Borders:CtrBorderCount=15:CtrBorderType=Uniform:TargetBorderCount=1:TargetBorderType=MinEntropy:Prior=0/1:Prior=0.5/1:Prior=1/1",
+      "FeatureFreq:CtrBorderCount=15:CtrBorderType=Median:Prior=0/1"
+    ],
+    "iterations": 20000,
+    "fold_permutation_block": 64,
+    "leaf_estimation_method": "Newton",
+    "observations_to_bootstrap": "TestOnly",
+    "od_pval": 0,
+    "random_score_type": "NormalWithModelSizeDecrease",
+    "counter_calc_method": "SkipTest",
+    "grow_policy": "SymmetricTree",
+    "penalties_coefficient": 1,
+    "boosting_type": "Plain",
+    "ctr_history_unit": "Sample",
+    "feature_border_type": "GreedyLogSum",
+    "bayesian_matrix_reg": 0.1000000015,
+    "one_hot_max_size": 20,
+    "devices": "0",
+    "eval_fraction": 0,
+    "pinned_memory_bytes": "104857600",
+    "force_unit_auto_pair_weights": false,
+    "l2_leaf_reg": 12,
+    "random_strength": 0.5,
+    "od_type": "Iter",
+    "rsm": 1,
+    "boost_from_average": true,
+    "gpu_cat_features_storage": "GpuRam",
+    "fold_size_loss_normalization": false,
+    "max_ctr_complexity": 1,
+    "model_size_reg": 0.5,
+    "simple_ctr": [
+      "Borders:CtrBorderCount=15:CtrBorderType=Uniform:TargetBorderCount=1:TargetBorderType=MinEntropy:Prior=0/1:Prior=0.5/1:Prior=1/1",
+      "FeatureFreq:CtrBorderCount=15:CtrBorderType=MinEntropy:Prior=0/1"
+    ],
+    "pool_metainfo_options": {
+      "tags": {}
+    },
+    "use_best_model": true,
+    "meta_l2_frequency": 0,
+    "od_wait": 200,
+    "random_seed": 2026,
+    "depth": 10,
+    "ctr_target_border_count": 1,
+    "has_time": false,
+    "border_count": 128,
+    "min_fold_size": 100,
+    "data_partition": "DocParallel",
+    "bagging_temperature": 0.5,
+    "classes_count": 0,
+    "auto_class_weights": "None",
+    "leaf_estimation_backtracking": "AnyImprovement",
+    "best_model_min_trees": 1,
+    "min_data_in_leaf": 1,
+    "add_ridge_penalty_to_loss_function": false,
+    "loss_function": "RMSE",
+    "learning_rate": 0.03999999911,
+    "meta_l2_exponent": 1,
+    "score_function": "Cosine",
+    "task_type": "GPU",
+    "leaf_estimation_iterations": 1,
+    "bootstrap_type": "Bayesian",
+    "max_leaves": 1024,
+    "permutation_count": 4
+  },
+  "early_stopping_rounds": 200,
+  "use_best_model": true,
+  "feature_schema": [
+    {
+      "name": "dep_prev5",
+      "dtype": "float32"
+    },
+    {
+      "name": "dep_prev15",
+      "dtype": "float32"
+    },
+    {
+      "name": "dep_prev30",
+      "dtype": "float32"
+    },
+    {
+      "name": "dep_next15",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_prev15",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_prev30",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_next15",
+      "dtype": "float32"
+    },
+    {
+      "name": "same_runway_prev15",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_backlog_at_aobt",
+      "dtype": "float32"
+    },
+    {
+      "name": "same_runway_backlog_at_aobt",
+      "dtype": "float32"
+    },
+    {
+      "name": "takeoff_minus_SCHED_TIME_UTC_mvt",
+      "dtype": "float32"
+    },
+    {
+      "name": "takeoff_minus_AOBT_3_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "takeoff_minus_LOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "takeoff_minus_IOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "takeoff_minus_EOBT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "takeoff_minus_ARVT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "takeoff_minus_ARVT_3_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "delta_AOBT_3_flt_LOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "delta_AOBT_3_flt_IOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "delta_AOBT_3_flt_EOBT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "delta_LOBT_flt_EOBT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "delta_SCHED_TIME_UTC_mvt_LOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "proxy_valid",
+      "dtype": "int8"
+    },
+    {
+      "name": "proxy_seconds",
+      "dtype": "float32"
+    },
+    {
+      "name": "aobt_lobt_abs_difference",
+      "dtype": "float32"
+    },
+    {
+      "name": "AOBT_3_flt_missing",
+      "dtype": "int8"
+    },
+    {
+      "name": "LOBT_flt_missing",
+      "dtype": "int8"
+    },
+    {
+      "name": "EOBT_1_flt_missing",
+      "dtype": "int8"
+    },
+    {
+      "name": "IOBT_flt_missing",
+      "dtype": "int8"
+    },
+    {
+      "name": "flight_airport_agrees",
+      "dtype": "int8"
+    },
+    {
+      "name": "aircraft_type_agrees",
+      "dtype": "int8"
+    },
+    {
+      "name": "destination_agrees",
+      "dtype": "int8"
+    },
+    {
+      "name": "utc_hour",
+      "dtype": "float32"
+    },
+    {
+      "name": "utc_weekday",
+      "dtype": "float32"
+    },
+    {
+      "name": "utc_month",
+      "dtype": "float32"
+    },
+    {
+      "name": "utc_dayofyear",
+      "dtype": "float32"
+    },
+    {
+      "name": "is_weekend",
+      "dtype": "int8"
+    },
+    {
+      "name": "local_hour",
+      "dtype": "float32"
+    },
+    {
+      "name": "local_weekday",
+      "dtype": "float32"
+    },
+    {
+      "name": "hour_sin",
+      "dtype": "float32"
+    },
+    {
+      "name": "hour_cos",
+      "dtype": "float32"
+    },
+    {
+      "name": "year_sin",
+      "dtype": "float32"
+    },
+    {
+      "name": "year_cos",
+      "dtype": "float32"
+    },
+    {
+      "name": "ADEP_mvt",
+      "dtype": "category"
+    },
+    {
+      "name": "ADES_mvt",
+      "dtype": "category"
+    },
+    {
+      "name": "ADEP_flt",
+      "dtype": "category"
+    },
+    {
+      "name": "ADES_flt",
+      "dtype": "category"
+    },
+    {
+      "name": "ADES_FILED_flt",
+      "dtype": "category"
+    },
+    {
+      "name": "RUNWAY_mvt",
+      "dtype": "category"
+    },
+    {
+      "name": "STAND_mvt",
+      "dtype": "category"
+    },
+    {
+      "name": "AIRCRAFT_TYPE_mvt",
+      "dtype": "category"
+    },
+    {
+      "name": "AIRCRAFT_TYPE_flt",
+      "dtype": "category"
+    },
+    {
+      "name": "AIRCRAFT_OPERATOR_flt",
+      "dtype": "category"
+    },
+    {
+      "name": "MARKET_SEGMENT_flt",
+      "dtype": "category"
+    },
+    {
+      "name": "WK_TBL_CAT_flt",
+      "dtype": "category"
+    },
+    {
+      "name": "FLIGHT_RULE_mvt",
+      "dtype": "category"
+    },
+    {
+      "name": "FLIGHT_RULE_flt",
+      "dtype": "category"
+    },
+    {
+      "name": "FLIGHT_TYPE_flt",
+      "dtype": "category"
+    },
+    {
+      "name": "flight_prefix",
+      "dtype": "category"
+    },
+    {
+      "name": "callsign_prefix",
+      "dtype": "category"
+    },
+    {
+      "name": "flight_number",
+      "dtype": "float32"
+    },
+    {
+      "name": "stand_zone",
+      "dtype": "category"
+    },
+    {
+      "name": "stand_number",
+      "dtype": "float32"
+    },
+    {
+      "name": "route",
+      "dtype": "category"
+    },
+    {
+      "name": "airport_runway",
+      "dtype": "category"
+    },
+    {
+      "name": "airport_stand",
+      "dtype": "category"
+    },
+    {
+      "name": "airport_stand_runway",
+      "dtype": "category"
+    },
+    {
+      "name": "wx_temperature_c",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_dewpoint_c",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_relative_humidity_pct",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_wind_speed_mps",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_wind_gust_mps",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_precip_mm",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_snow_depth_mm",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_visibility_km",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_ceiling_m",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_snow_reported",
+      "dtype": "int8"
+    },
+    {
+      "name": "wx_fog_reported",
+      "dtype": "int8"
+    },
+    {
+      "name": "wx_mist_reported",
+      "dtype": "int8"
+    },
+    {
+      "name": "wx_rain_reported",
+      "dtype": "int8"
+    },
+    {
+      "name": "wx_freezing_precip_reported",
+      "dtype": "int8"
+    },
+    {
+      "name": "wx_obs_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_wind_direction_deg",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_fog_proxy",
+      "dtype": "int8"
+    },
+    {
+      "name": "wx_deicing_proxy",
+      "dtype": "int8"
+    },
+    {
+      "name": "wx_headwind_mps",
+      "dtype": "float32"
+    },
+    {
+      "name": "wx_crosswind_abs_mps",
+      "dtype": "float32"
+    },
+    {
+      "name": "flight_name",
+      "dtype": "category"
+    },
+    {
+      "name": "time_second_MVT_TIME_UTC_mvt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_minute_MVT_TIME_UTC_mvt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_hour_MVT_TIME_UTC_mvt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_weekday_MVT_TIME_UTC_mvt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_second_SCHED_TIME_UTC_mvt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_minute_SCHED_TIME_UTC_mvt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_hour_SCHED_TIME_UTC_mvt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_weekday_SCHED_TIME_UTC_mvt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_second_AOBT_3_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_minute_AOBT_3_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_hour_AOBT_3_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_weekday_AOBT_3_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_second_LOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_minute_LOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_hour_LOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_weekday_LOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_second_IOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_minute_IOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_hour_IOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_weekday_IOBT_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_second_EOBT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_minute_EOBT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_hour_EOBT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_weekday_EOBT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_second_ARVT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_minute_ARVT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_hour_ARVT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_weekday_ARVT_1_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_second_ARVT_3_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_minute_ARVT_3_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_hour_ARVT_3_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "time_weekday_ARVT_3_flt",
+      "dtype": "float32"
+    },
+    {
+      "name": "nm_flown_duration",
+      "dtype": "float32"
+    },
+    {
+      "name": "nm_planned_duration",
+      "dtype": "float32"
+    },
+    {
+      "name": "nm_arrival_delay",
+      "dtype": "float32"
+    },
+    {
+      "name": "nm_planning_revision",
+      "dtype": "float32"
+    },
+    {
+      "name": "schedule_gap_unclipped",
+      "dtype": "float32"
+    },
+    {
+      "name": "nm_id_missing",
+      "dtype": "int8"
+    },
+    {
+      "name": "full_nm_callsign",
+      "dtype": "category"
+    },
+    {
+      "name": "flight_callsign_equal",
+      "dtype": "int8"
+    },
+    {
+      "name": "arr_taxi_count_15m",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_taxi_mean_15m",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_taxi_highshare_15m",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_taxi_count_60m",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_taxi_mean_60m",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_taxi_highshare_60m",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_taxi_count_180m",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_taxi_mean_180m",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_taxi_highshare_180m",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_taxiing_now",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_block_prev_60m",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_same_stand_last_block_gap",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_same_stand_last_taxi",
+      "dtype": "float32"
+    },
+    {
+      "name": "arr_same_stand_blocks_4h",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_past15m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_past15m_mean",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_past15m_std",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_past60m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_past60m_mean",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_past60m_std",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_future15m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_future15m_mean",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_future15m_std",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_future60m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_future60m_mean",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_airport_future60m_std",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_past15m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_past15m_mean",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_past15m_std",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_past60m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_past60m_mean",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_past60m_std",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_future15m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_future15m_mean",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_future15m_std",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_future60m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_future60m_mean",
+      "dtype": "float32"
+    },
+    {
+      "name": "nbr_runway_future60m_std",
+      "dtype": "float32"
+    },
+    {
+      "name": "runway_arr_past15m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "runway_arr_future15m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "runway_arr_past60m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "runway_arr_future60m_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "runway_arr_prev_gap_sec",
+      "dtype": "float32"
+    },
+    {
+      "name": "runway_arr_next_gap_sec",
+      "dtype": "float32"
+    },
+    {
+      "name": "runway_dep_prev_gap_sec",
+      "dtype": "float32"
+    },
+    {
+      "name": "runway_dep_next_gap_sec",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_flow_airport_takeoffs_between_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_flow_airport_proxy_starts_between_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_flow_airport_active_at_takeoff_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_flow_airport_overtakers_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_flow_airport_left_behind_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_flow_runway_takeoffs_between_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_flow_runway_proxy_starts_between_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_flow_runway_active_at_takeoff_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_flow_runway_overtakers_count",
+      "dtype": "float32"
+    },
+    {
+      "name": "taxi_flow_runway_left_behind_count",
+      "dtype": "float32"
+    }
+  ],
+  "categorical_feature_indices": [
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    61,
+    63,
+    64,
+    65,
+    66,
+    87,
+    126
+  ],
+  "categorical_vocabulary_sha256": {
+    "ADEP_mvt": "70272c2dd82115fed322410cbc0faa3f22e1ed9c65151869e08c24b6e3c34334",
+    "ADES_mvt": "175b730e2a2940a064ed331b2747932aa524c90fc8e5cd55e81efa610e949df3",
+    "ADEP_flt": "850d7d736c43960b6d9cb0874d7bcb321256bd36466aa92697063b837a651929",
+    "ADES_flt": "257e8e94f1bf0894f79bbb4554ad1693ec51a550482e756595c7c6a98b70c8b3",
+    "ADES_FILED_flt": "1e4309be2368423cffe1b03dbbe490ba9ad582f132a9550473b7916167033446",
+    "RUNWAY_mvt": "b8d4bb28a56670ceff3c3d5e8b96772db056ccd4a6ecb0ed85f76907240c189b",
+    "STAND_mvt": "3a34e686fddbdbad84af6c20f0442f834f979008dcb173deacb8581197cd40f4",
+    "AIRCRAFT_TYPE_mvt": "7da0c32de643030589af74461d5f184de697e0ec23a8b3564225bc45a4be96e2",
+    "AIRCRAFT_TYPE_flt": "93e02fdf89d641cf418fac68abeb1aa7fa0276772f4a65e3c1bcd992e4f200af",
+    "AIRCRAFT_OPERATOR_flt": "7c44e8236f1b0d1ecb65eb5b96f5e4220bd311f7ae4cb111ad8572e3ab6f60b8",
+    "MARKET_SEGMENT_flt": "3d8ec6d393d82180202b975514562dee7da0353a64319992762469d4df0e5475",
+    "WK_TBL_CAT_flt": "d07d0e448d28d3bd60814939d3b5cba48da957a50fcbd0c994a9db86bff69cd8",
+    "FLIGHT_RULE_mvt": "235ad9179337ba50c23c9e6c33d100811633b7d818c07993d74d2e479832010d",
+    "FLIGHT_RULE_flt": "ef6dc031bd716ea81a047deb191980b358ed4473bbb79aa7097b109a84ecee65",
+    "FLIGHT_TYPE_flt": "476d7d9f78a02dfbb3a02aa301f60bbdccc6735d0d797013424deb55e4eca0af",
+    "flight_prefix": "8595b28bb713394ee0af445a8ec7dc445ade4750061333add59584b022744a54",
+    "callsign_prefix": "7ce19d825dd4aab0759d931f0aa4e5133304bc57ca560f469c2f3ae8d04cc172",
+    "stand_zone": "b061550fc8de34e249f7e99a0be7c6c3ab6e73674a4666fbb5d50c1e9d234a3e",
+    "route": "0889c29cee19f0f76025c5ff45eab017f88e5b3ff46515ab126350e531fbe4ac",
+    "airport_runway": "3d55565adaa9907e9f1530d2563c1062dbb47f6ab416c263f4c910f5a2bc4adc",
+    "airport_stand": "ce7e6aec65a0ba4509a2931bd6a753bb75754223a3fe6f5c61c870c5cc58cd8f",
+    "airport_stand_runway": "3efa9d939f950648257e6efd78661110ddb20a5e6be55c568c05ad6b3112f26c",
+    "flight_name": "383c077407c4da42393cff642d1fc299a2955ca03f4ae0586fc8b9233de202cc",
+    "full_nm_callsign": "73b0aa69986360a7bbc3e3167d473013d293109391bf22ff6d5d800f68081082"
+  },
+  "fit_rows": 1632383,
+  "early_rows": 104194,
+  "heldout_valid_rows": 324862,
+  "heldout_all_finite_rows": 328009,
+  "fit_indices_sha256": "9dc5d1cb2482ff3e80c71e90b703f0c0e240d7cf8c8a7fb66b4dcdc1c6ab616b",
+  "early_indices_sha256": "2103103985690a5926b0bdb9c2fa5c7beb620e7cb41bbb68f4eb52198152bf72",
+  "test_indices_sha256": "14a8dc74bf1a61d52687e9c3599444183bad532674922b8d03a45059e0888338",
+  "held_all_indices_sha256": "2e2277e9c0cb0c393644018f7135e13a8b39f8d0da5f013bde681534fa5e900b",
+  "fit_ids_sha256": "6da7a5182bfb019dd9e31e130bc80fd553ae9f151fceff961097dbe9dfd6d3d6",
+  "early_ids_sha256": "2d75081c2e85d404a4666a1220d4ab6969bdfd026f4a1c1c9c9f2028b508b8e8",
+  "test_ids_sha256": "a93f7dfe6407709c13e049e8c3565a08b4156b92b3e43c8233389bd153d2a903",
+  "held_all_ids_sha256": "fe082a7bae73cfb963b79305591732e66cef784c5eab0dd3635bc2b4c1e623e8",
+  "saved_trees": 20000,
+  "prefix_trees": 10000,
+  "exact_prefix_available": true,
+  "model_sha256": "87f27dbbf8966f0559ec4d54d7a3d469626577c1fab8fbd3daea9410057505f1",
+  "oof_sha256": "3137667be1e4b13eb38b0f209af8806411dd5cc3fbc97ee623c7d7d8c96b7321",
+  "fit_report_sha256": "db23a0ec0820dfe67ccdaac4e7a26c331f41c036e5fc374c202f99b0d7f54653"
+}
