@@ -181,6 +181,8 @@ The locked May/September guard passed: May RMSE 192.182053 → 191.760338 second
 
 ## Submit with MinIO Client
 
+The guarded runway-geometry candidate is also finalized as **v10**. Its fixed 0.25 blend passed the original folds and matched April/October and February/August tests before full fitting. The saved 200-field model has 9,998 trees. [Ranking provenance](reports/runway_geometry_ranking_manifest_v12.json) and the [v10 finalization receipt](reports/submission_v10_finalized_manifest.json) record exact template coverage, all 5,464 outside-gate predictions retained from v9, and SHA-256 `1ad3adf70a5500b5310faa397653a88e96475b1c968b5efefb4acb7c810d4dce`. V8, v9 and v10 remain unsubmitted. Their locally fixed upload order is v8, then v9, then v10, with a fresh quota and acceptance check for every version. An official 2026 improvement has not been established.
+
 The organizer accepts uploads through the MinIO Client (`mc`), using the team's own bucket. On Windows PowerShell, use the [official community Windows release](https://github.com/minio/mc/releases/download/RELEASE.2025-08-13T08-35-41Z/mc.windows-amd64.RELEASE.2025-08-13T08-35-41Z.exe) (AGPL-3.0), generate an OpenSky access key and secret for your account, replace the placeholders below, and upload the finalized file for the selected version. The [current AIStor Windows client](https://dl.min.io/aistor/mc/release/windows-amd64/mc.exe) is also available from MinIO.
 
 ```powershell
